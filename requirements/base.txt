@@ -3,3 +3,6 @@ django==1.10.6
 
 # POSTGRES
 psycopg2==2.7.1
+
+# paramiko
+paramiko==2.1.2
