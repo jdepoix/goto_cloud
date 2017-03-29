@@ -25,7 +25,7 @@ def execute_mock(self, command):
 @patch('paramiko.SSHClient.close', close_mock)
 @patch('paramiko.SSHClient.get_transport', lambda self: self.connected if self.connected else None)
 @patch('paramiko.SSHClient.exec_command', execute_mock)
-class TestRemoteExecutor(TestCase):
+class TestSshRemoteExecutor(TestCase):
     @patch('paramiko.SSHClient.connect', connect_mock)
     def setUp(self):
         self.remote_executor = SshRemoteExecutor('test')

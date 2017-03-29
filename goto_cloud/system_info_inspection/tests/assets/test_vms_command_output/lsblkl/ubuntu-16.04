@@ -1,0 +1,8 @@
+vda
+└─vda1
+vdb
+└─vdb1
+  └─vol1-lvol1
+vdc
+├─vdc1
+└─vdc2
