@@ -1,9 +1,13 @@
-#!/usr/bin/env python
+#!virtualenv/bin/python
+
 import os
 import sys
 
-if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "goto_cloud.settings")
+
+if __name__ == '__main__':
+    sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'goto_cloud'))
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings.testing' if sys.argv[1] == 'test' else 'settings.local')
+
     try:
         from django.core.management import execute_from_command_line
     except ImportError:

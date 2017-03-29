@@ -9,18 +9,18 @@ https://docs.djangoproject.com/en/1.10/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
-
 import os
+import json
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_DIR = os.path.dirname(BASE_DIR)
+SECRETS_FILE_PATH = PROJECT_DIR + '/secrets.json'
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
+SECRETS = json.load(open(SECRETS_FILE_PATH))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'b+(6_@omqo!q4k()o2_2hg5!&8utnvp&(^4ugu_)mnl6uzm8*3'
+SECRET_KEY = SECRETS.get('django_secret', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -67,18 +67,25 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'goto_cloud.wsgi.application'
+WSGI_APPLICATION = 'goto_cloud.wsgi.prod.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-DATABASES = {
+DEFAULT_DATABASE = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+DATABASES = {
+    'default': {
+        **SECRETS.get('database'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    }
+} if SECRETS.get('database') else DEFAULT_DATABASE
 
 
 # Password validation

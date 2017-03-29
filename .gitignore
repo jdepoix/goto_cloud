@@ -1,0 +1,4 @@
+.idea
+virtualenv
+secrets.json
+__pycache__

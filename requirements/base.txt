@@ -1,0 +1,5 @@
+# Django
+django==1.10.6
+
+# POSTGRES
+psycopg2==2.7.1
