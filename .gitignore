@@ -2,3 +2,4 @@
 virtualenv
 secrets.json
 __pycache__
+.coverage
