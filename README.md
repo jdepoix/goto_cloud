@@ -1,3 +1,3 @@
-# GOTO -> Cloud: Making Cloud Migration easy
+# goto cloud; Making Cloud Migration easy
 
 under development!

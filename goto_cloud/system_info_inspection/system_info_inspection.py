@@ -9,7 +9,7 @@ class SystemInfoGetter(metaclass=ABCMeta):
         """
         is initialized with a given RemoteExecutor
         :param remote_executor: the remote executor the commands are executed by
-        :type remote_executor: remote_execution.remote_execution.RemoteExecutor
+        :type remote_executor: remote_execution.public.RemoteExecutor 
         
         """
         self.remote_executor = remote_executor

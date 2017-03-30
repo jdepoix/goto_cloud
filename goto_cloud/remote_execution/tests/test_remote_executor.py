@@ -3,7 +3,7 @@ from io import BytesIO
 from unittest import TestCase
 from unittest.mock import patch
 
-from remote_execution.remote_execution import RemoteExecutor, SshRemoteExecutor
+from ..remote_execution import RemoteExecutor, SshRemoteExecutor
 
 
 def connect_mock(self, *ags, **kwargs):

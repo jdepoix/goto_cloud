@@ -1,6 +1,7 @@
 from settings.base import BASE_DIR
 
-from system_info_inspection.tests.utils import VmMock
+from ..tests.utils import VmMock
+
 
 COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH = BASE_DIR + '/system_info_inspection/tests/assets/test_vms_command_output'
 COMMAND_DIRECTORY_MAP = {
