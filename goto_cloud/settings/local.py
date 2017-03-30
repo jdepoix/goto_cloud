@@ -1,3 +1,3 @@
-from settings.base import *
+from .base import *
 
 ENVIRONMENT = 'local'

@@ -25,7 +25,6 @@ class VmMock(object):
         filename,
         command_directory_map,
         expected_config,
-        custom_commands=None
     ):
         commands_root_directory = os.path.realpath(commands_root_directory_path)
         commands = {}
@@ -35,8 +34,4 @@ class VmMock(object):
                 os.path.join(os.path.join(commands_root_directory, command_directory_map[command]), filename)
             ) as command_output:
                 commands[command] = command_output.read()
-
-        if custom_commands:
-            commands.update(custom_commands)
-
         return VmMock(commands, expected_config)

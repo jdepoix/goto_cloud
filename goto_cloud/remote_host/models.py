@@ -7,6 +7,9 @@ class RemoteHost(TrackedModel):
     """
     represents an Entity which can be accessed remotely
     """
+    # TODO add enum
+    os = models.CharField(max_length=255)
+    version = models.CharField(max_length=255, null=True, blank=True)
     address = models.CharField(max_length=512)
     port = models.PositiveIntegerField(default=22)
     username = models.CharField(max_length=512, null=True, blank=True)

@@ -81,7 +81,7 @@ UBUNTU_12_04 = VmMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubu
     },
     'os': {
         'name': 'Ubuntu',
-        'version': '12.04'
+        'version': 12.04
     },
     'hardware': {
         'ram': {
@@ -177,7 +177,7 @@ UBUNTU_14_04 = VmMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubu
     },
     'os': {
         'name': 'Ubuntu',
-        'version': '14.04'
+        'version': 14.04
     },
     'hardware': {
         'ram': {
@@ -316,7 +316,7 @@ UBUNTU_16_04 = VmMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubu
     },
     'os': {
         'name': 'Ubuntu',
-        'version': '16.04'
+        'version': 16.04
     },
     'hardware': {
         'ram': {

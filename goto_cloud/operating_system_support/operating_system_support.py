@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractclassmethod
 
 from dict_utils.public import DictUtils
 from operating_system.public import OperatingSystem
@@ -34,7 +34,8 @@ class PartiallySupported(metaclass=ABCMeta):
     """
     represents a class which is only supported by limited operating systems
     """
-    def is_supported(self, operating_system):
+    @classmethod
+    def is_supported(cls, operating_system):
         """
         checks if the given operating system is supported
         
@@ -43,19 +44,18 @@ class PartiallySupported(metaclass=ABCMeta):
         :return: if it is supported or not
         :rtype: bool
         """
-        related_systems = OperatingSystemRelations.get_subsystems(operating_system)
+        supported_systems = cls._get_supported_operating_systems()
 
         return (
-            operating_system in self._supported_operating_systems
+            operating_system in supported_systems
             or any(
-                supported_system in related_systems
-                for supported_system in self._supported_operating_systems
+                operating_system in OperatingSystemRelations.get_subsystems(supported_system)
+                for supported_system in supported_systems
             )
         )
 
-    @property
-    @abstractmethod
-    def _supported_operating_systems(self):
+    @abstractclassmethod
+    def _get_supported_operating_systems(cls):
         """
         
         :return: a tuple of supported operating systems

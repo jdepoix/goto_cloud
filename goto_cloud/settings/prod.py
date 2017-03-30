@@ -1,4 +1,4 @@
-from settings.base import *
+from .base import *
 
 DEBUG = False
 ENVIRONMENT = 'prod'

@@ -18,9 +18,9 @@ RELATION_MOCK = {
 
 
 class PartiallySupportedTestClass(PartiallySupported):
-    @property
-    def _supported_operating_systems(self):
-        return '4', '8'
+    @classmethod
+    def _get_supported_operating_systems(cls):
+        return '2', '8'
 
 
 class TestOperatingSystemRelations(TestCase):
@@ -45,10 +45,10 @@ class TestPartiallySupported(TestCase):
         OperatingSystemRelations._RELATIONS = RELATION_MOCK
 
     def test_is_supported(self):
-        self.assertTrue(PartiallySupportedTestClass().is_supported('4'))
+        self.assertTrue(PartiallySupportedTestClass.is_supported('2'))
 
     def test_is_supported__related(self):
-        self.assertTrue(PartiallySupportedTestClass().is_supported('2'))
+        self.assertTrue(PartiallySupportedTestClass.is_supported('4'))
 
     def test_is_supported__not_supported(self):
-        self.assertFalse(PartiallySupportedTestClass().is_supported('10'))
+        self.assertFalse(PartiallySupportedTestClass.is_supported('10'))

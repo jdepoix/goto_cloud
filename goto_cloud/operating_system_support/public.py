@@ -1,0 +1,1 @@
+from .operating_system_support import PartiallySupported

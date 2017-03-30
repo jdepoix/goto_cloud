@@ -24,7 +24,8 @@ exclude_lines =
     if 0:
     if __name__ == .__main__.:
 
-    # Don't empty stubs of abstract methods
+    # Don't complain about empty stubs of abstract methods
     @abstractmethod
+    @abstractclassmethod
 
 show_missing = True

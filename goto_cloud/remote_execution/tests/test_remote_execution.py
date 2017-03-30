@@ -1,9 +1,14 @@
 from io import BytesIO
 
-from unittest import TestCase
+import unittest
 from unittest.mock import patch
 
-from ..remote_execution import RemoteExecutor, SshRemoteExecutor
+from django.test import TestCase
+
+from operating_system.public import OperatingSystem
+from remote_host.public import RemoteHost
+
+from ..remote_execution import RemoteExecutor, SshRemoteExecutor, RemoteHostExecutor
 
 
 def connect_mock(self, *ags, **kwargs):
@@ -25,7 +30,7 @@ def execute_mock(self, command):
 @patch('paramiko.SSHClient.close', close_mock)
 @patch('paramiko.SSHClient.get_transport', lambda self: self.connected if self.connected else None)
 @patch('paramiko.SSHClient.exec_command', execute_mock)
-class TestSshRemoteExecutor(TestCase):
+class TestSshRemoteExecutor(unittest.TestCase):
     @patch('paramiko.SSHClient.connect', connect_mock)
     def setUp(self):
         self.remote_executor = SshRemoteExecutor('test')
@@ -61,3 +66,48 @@ class TestSshRemoteExecutor(TestCase):
             self.remote_executor.execute('error_command')
 
         self.assertIn('Command Error', str(context_manager.exception))
+
+
+@patch('paramiko.SSHClient.connect', connect_mock)
+@patch('paramiko.SSHClient.close', close_mock)
+@patch('paramiko.SSHClient.get_transport', lambda self: self.connected if self.connected else None)
+class TestRemoteHostExecutor(TestCase, TestSshRemoteExecutor):
+    @patch('paramiko.SSHClient.connect', connect_mock)
+    def setUp(self):
+        self.remote_executor = RemoteHostExecutor(RemoteHost.objects.create(os=OperatingSystem.LINUX))
+
+    def test_initialization(self):
+        self.assertTrue(
+            isinstance(
+                RemoteHostExecutor(
+                    RemoteHost.objects.create(
+                        os=OperatingSystem.LINUX,
+                    )
+                ).remote_executor,
+                SshRemoteExecutor
+            )
+        )
+
+    def test_initialization__os_related(self):
+        self.assertTrue(
+            isinstance(
+                RemoteHostExecutor(
+                    RemoteHost.objects.create(
+                        os=OperatingSystem.UBUNTU,
+                    )
+                ).remote_executor,
+                SshRemoteExecutor
+            )
+        )
+
+    def test_initialization__os_not_supported(self):
+        with self.assertRaises(OperatingSystem.NotSupportedException):
+            RemoteHostExecutor(RemoteHost.objects.create(os=OperatingSystem.WINDOWS))
+
+    def test_close(self):
+        self.assertTrue(self.remote_executor.remote_executor.remote_client.connected)
+        self.remote_executor.close()
+        self.assertFalse(self.remote_executor.remote_executor.remote_client.connected)
+
+    def test_connect(self):
+        self.assertTrue(self.remote_executor.remote_executor.remote_client.connected)

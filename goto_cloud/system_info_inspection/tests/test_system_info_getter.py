@@ -21,6 +21,7 @@ DEBIAN_VMS = {
 }
 
 
+# TODO: use public interface
 @patch('remote_execution.remote_execution.SshRemoteExecutor.connect', lambda self: None)
 @patch('remote_execution.remote_execution.SshRemoteExecutor.close', lambda self: None)
 @patch('remote_execution.remote_execution.SshRemoteExecutor.is_connected', lambda self: True)

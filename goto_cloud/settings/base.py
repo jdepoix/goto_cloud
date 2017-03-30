@@ -42,7 +42,7 @@ DJANGO_APPS = [
 EXTERNAL_APPS = []
 
 INTERNAL_APPS = [
-    'remote_host'
+    'remote_host',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + INTERNAL_APPS
