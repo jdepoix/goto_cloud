@@ -111,7 +111,7 @@ class RemoteExecutor(metaclass=ABCMeta):
         :param command: the command to execute
         :type command: str
         :return: the return value of the execution
-        :rtype: any
+        :rtype: Any
         """
         pass
 
