@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractclassmethod
 
 from dict_utils.public import DictUtils
+
 from operating_system.public import OperatingSystem
 
 

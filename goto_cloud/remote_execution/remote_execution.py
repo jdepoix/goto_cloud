@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 from paramiko import SSHClient, AutoAddPolicy
 
 from operating_system.public import OperatingSystem
+
 from operating_system_support.public import PartiallySupported
 
 

@@ -1,6 +1,7 @@
 [run]
 source = goto_cloud
 
+
 [report]
 omit =
     goto_cloud/wsgi/*
