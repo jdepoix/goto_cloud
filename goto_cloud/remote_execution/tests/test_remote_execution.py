@@ -11,11 +11,13 @@ from remote_host.public import RemoteHost
 from ..remote_execution import RemoteExecutor, SshRemoteExecutor, RemoteHostExecutor
 
 
-def connect_mock(self, *ags, **kwargs):
+def connect_mock(self, *args, **kwargs):
     self.connected = True
 
-def close_mock(self, *ags, **kwargs):
+
+def close_mock(self):
     self.connected = False
+
 
 def execute_mock(self, command):
     test_commands = {
@@ -26,7 +28,6 @@ def execute_mock(self, command):
     return test_commands[command]
 
 
-@patch('paramiko.SSHClient.connect', connect_mock)
 @patch('paramiko.SSHClient.close', close_mock)
 @patch('paramiko.SSHClient.get_transport', lambda self: self.connected if self.connected else None)
 @patch('paramiko.SSHClient.exec_command', execute_mock)
@@ -71,6 +72,7 @@ class TestSshRemoteExecutor(unittest.TestCase):
 @patch('paramiko.SSHClient.connect', connect_mock)
 @patch('paramiko.SSHClient.close', close_mock)
 @patch('paramiko.SSHClient.get_transport', lambda self: self.connected if self.connected else None)
+@patch('paramiko.SSHClient.exec_command', execute_mock)
 class TestRemoteHostExecutor(TestCase, TestSshRemoteExecutor):
     @patch('paramiko.SSHClient.connect', connect_mock)
     def setUp(self):
@@ -110,4 +112,7 @@ class TestRemoteHostExecutor(TestCase, TestSshRemoteExecutor):
         self.assertFalse(self.remote_executor.remote_executor.remote_client.connected)
 
     def test_connect(self):
+        self.remote_executor.close()
+        self.assertFalse(self.remote_executor.remote_executor.remote_client.connected)
+        self.remote_executor.connect()
         self.assertTrue(self.remote_executor.remote_executor.remote_client.connected)

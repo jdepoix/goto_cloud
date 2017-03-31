@@ -44,7 +44,7 @@ class RemoteExecutor(PartiallySupported, metaclass=ABCMeta):
         
         """
         if self.is_connected():
-            self.remote_client.close()
+            self._close()
 
     @abstractmethod
     def _close(self):
