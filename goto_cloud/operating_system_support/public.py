@@ -1,1 +1,1 @@
-from .operating_system_support import PartiallySupported
+from .operating_system_support import AbstractedRemoteHostOperator

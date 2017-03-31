@@ -90,13 +90,13 @@ class TestAbstractedRemoteHostOperator(TestCase):
     def test_initialization__related(self):
         self.assertTrue(
             isinstance(
-                AbstractedRemoteHostOperatorTestImplementation(RemoteHost.objects.create(os='1')).operator,
+                AbstractedRemoteHostOperatorTestImplementation(RemoteHost.objects.create(os='4')).operator,
                 TestOperationA
             )
         )
         self.assertTrue(
             isinstance(
-                AbstractedRemoteHostOperatorTestImplementation(RemoteHost.objects.create(os='12')).operator,
+                AbstractedRemoteHostOperatorTestImplementation(RemoteHost.objects.create(os='14')).operator,
                 TestOperationB
             )
         )

@@ -85,7 +85,7 @@ class TestRemoteHostExecutor(TestCase, TestSshRemoteExecutor):
                     RemoteHost.objects.create(
                         os=OperatingSystem.LINUX,
                     )
-                ).remote_executor,
+                ).operator,
                 SshRemoteExecutor
             )
         )
@@ -97,7 +97,7 @@ class TestRemoteHostExecutor(TestCase, TestSshRemoteExecutor):
                     RemoteHost.objects.create(
                         os=OperatingSystem.UBUNTU,
                     )
-                ).remote_executor,
+                ).operator,
                 SshRemoteExecutor
             )
         )
@@ -107,12 +107,12 @@ class TestRemoteHostExecutor(TestCase, TestSshRemoteExecutor):
             RemoteHostExecutor(RemoteHost.objects.create(os=OperatingSystem.WINDOWS))
 
     def test_close(self):
-        self.assertTrue(self.remote_executor.remote_executor.remote_client.connected)
+        self.assertTrue(self.remote_executor.operator.remote_client.connected)
         self.remote_executor.close()
-        self.assertFalse(self.remote_executor.remote_executor.remote_client.connected)
+        self.assertFalse(self.remote_executor.operator.remote_client.connected)
 
     def test_connect(self):
         self.remote_executor.close()
-        self.assertFalse(self.remote_executor.remote_executor.remote_client.connected)
+        self.assertFalse(self.remote_executor.operator.remote_client.connected)
         self.remote_executor.connect()
-        self.assertTrue(self.remote_executor.remote_executor.remote_client.connected)
+        self.assertTrue(self.remote_executor.operator.remote_client.connected)

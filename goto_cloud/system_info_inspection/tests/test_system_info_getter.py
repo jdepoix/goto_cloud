@@ -1,10 +1,13 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from remote_execution.remote_execution import SshRemoteExecutor
-from system_info_inspection.system_info_inspection import SystemInfoGetter, DebianSystemInfoGetter
+from operating_system.public import OperatingSystem
 
-from system_info_inspection.tests.test_vms import UBUNTU_12_04, UBUNTU_16_04, UBUNTU_14_04
+from remote_host.public import RemoteHost
+
+from ..system_info_inspection import RemoteHostSystemInfoGetter
+
+from ..tests.test_vms import UBUNTU_12_04, UBUNTU_16_04, UBUNTU_14_04
 
 
 def vm_mock_execution_factory(hostname_mapping):
@@ -21,20 +24,26 @@ DEBIAN_VMS = {
 }
 
 
-# TODO: use public interface
 @patch('remote_execution.remote_execution.SshRemoteExecutor.connect', lambda self: None)
 @patch('remote_execution.remote_execution.SshRemoteExecutor.close', lambda self: None)
 @patch('remote_execution.remote_execution.SshRemoteExecutor.is_connected', lambda self: True)
 @patch('remote_execution.remote_execution.SshRemoteExecutor._execute', vm_mock_execution_factory(DEBIAN_VMS))
-class TestDebianSystemInfoGetter(TestCase):
+class TestSystemInfoGetter(TestCase):
     TEST_VMS = DEBIAN_VMS
-    TEST_SYSTEM_INFO_GETTER = DebianSystemInfoGetter
+    TEST_SYSTEM_INFO_GETTER = RemoteHostSystemInfoGetter
 
     def call_on_all_test_vms(self, call_method, assert_output):
         for hostname in self.TEST_VMS:
             assert_output(
                 self.TEST_VMS[hostname],
-                call_method(self.TEST_SYSTEM_INFO_GETTER(SshRemoteExecutor(hostname)))
+                call_method(
+                    self.TEST_SYSTEM_INFO_GETTER(
+                        RemoteHost.objects.create(
+                            os=OperatingSystem.DEBIAN,
+                            address=hostname,
+                        )
+                    )
+                )
             )
 
     def test_get_hardware(self):
@@ -59,6 +68,34 @@ class TestDebianSystemInfoGetter(TestCase):
         self.call_on_all_test_vms(
             lambda system_info_getter: system_info_getter.get_block_devices(),
             lambda tested_vm, result: self.assertDictEqual(result, tested_vm.get_config().get('block_devices'))
+        )
+
+    def test_get_cpus(self):
+        self.call_on_all_test_vms(
+            lambda system_info_getter: system_info_getter.get_cpus(),
+            lambda tested_vm, result: self.assertEqual(result, tested_vm.get_config().get('hardware').get('cpus'))
+        )
+
+    def test_get_ram(self):
+        self.call_on_all_test_vms(
+            lambda system_info_getter: system_info_getter.get_ram(),
+            lambda tested_vm, result: self.assertDictEqual(result, tested_vm.get_config().get('hardware').get('ram'))
+        )
+
+    def test_get_hostname(self):
+        self.call_on_all_test_vms(
+            lambda system_info_getter: system_info_getter.get_hostname(),
+            lambda tested_vm, result: self.assertEqual(
+                result, tested_vm.get_config().get('network').get('hostname')
+            )
+        )
+
+    def test_get_network_interfaces(self):
+        self.call_on_all_test_vms(
+            lambda system_info_getter: system_info_getter.get_network_interfaces(),
+            lambda tested_vm, result: self.assertDictEqual(
+                result, tested_vm.get_config().get('network').get('interfaces')
+            )
         )
 
     def test_get_system_info(self):

@@ -63,46 +63,45 @@ class AbstractedRemoteHostOperator(metaclass=ABCMeta):
     a operation which executes on a given RemoteHost and abstracts the operating system support away
     """
     def __init__(self, remote_host):
-        self.operator = self._get_supported_operator(remote_host)
+        self.remote_host = remote_host
+        self.operator = self._get_supported_operator()
 
-    def _get_supported_operator(self, remote_host):
+    def _get_supported_operator(self):
         """
         returns the supported operator class for a given RemoteHost  
         
-        :param remote_host: the remote host you want to return the supported operator for
-        :type remote_host: remote_host.public.RemoteHost
         :return: a operator class, which is supported by the given RemoteHost
         :rtype: Any.__class__
         :raises OperatingSystem.NotSupportedException: raised in case, the operating system of the given RemoteHost is
         not supported at all
         """
-        supported_operator = self._get_directly_supported_operator(remote_host)
+        supported_operator = self._get_directly_supported_operator()
 
         if supported_operator:
-            return self._init_operator_class(supported_operator)
+            return supported_operator
 
-        related_supported_operator = self._get_related_supported_operator(remote_host)
+        related_supported_operator = self._get_related_supported_operator()
 
         if related_supported_operator:
-            return self._init_operator_class(related_supported_operator)
+            return related_supported_operator
 
         raise OperatingSystem.NotSupportedException()
 
 
-    def _get_directly_supported_operator(self, remote_host):
+    def _get_directly_supported_operator(self):
         for operating_systems, operator_class in self._get_operating_systems_to_supported_operation_mapping().items():
-            if remote_host.os in operating_systems:
-                return operator_class
+            if self.remote_host.os in operating_systems:
+                return self._init_operator_class(operator_class)
         return None
 
-    def _get_related_supported_operator(self, remote_host):
+    def _get_related_supported_operator(self):
         for operating_systems, operator_class in self._get_operating_systems_to_supported_operation_mapping().items():
-            remote_host_operating_system_relations = OperatingSystemRelations(remote_host.os)
+            remote_host_operating_system_relations = OperatingSystemRelations(self.remote_host.os)
             if any(
-                remote_host_operating_system_relations.is_parent_of(operating_system)
+                remote_host_operating_system_relations.is_child_of(operating_system)
                 for operating_system in operating_systems
             ):
-                return operator_class
+                return self._init_operator_class(operator_class)
         return None
 
     @abstractmethod
