@@ -45,6 +45,7 @@ INTERNAL_APPS = [
     'remote_host',
     'migration_plan',
     'migration_run',
+    'target',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + INTERNAL_APPS
