@@ -58,22 +58,22 @@ UBUNTU_12_04 = VmMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubu
         'interfaces' : {
             'lo': {
                 'ip': '127.0.0.1',
-                'netmask': '255.0.0.0',
+                'net_mask': '255.0.0.0',
                 'routes': []
             },
             'eth0': {
                 'ip': '10.17.32.6',
-                'netmask': '255.255.255.0',
+                'net_mask': '255.255.255.0',
                 'routes': [
                     {
                         'net': '0.0.0.0',
                         'gateway': '10.17.32.1',
-                        'netmask': '0.0.0.0'
+                        'net_mask': '0.0.0.0'
                     },
                     {
                         'net': '10.17.32.0',
                         'gateway': '0.0.0.0',
-                        'netmask': '255.255.255.0'
+                        'net_mask': '255.255.255.0'
                     }
                 ]
             }
@@ -143,33 +143,33 @@ UBUNTU_14_04 = VmMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubu
         'interfaces' : {
             'lo': {
                 'ip': '127.0.0.1',
-                'netmask': '255.0.0.0',
+                'net_mask': '255.0.0.0',
                 'routes': []
             },
             'eth0': {
                 'ip': '10.0.2.15',
-                'netmask': '255.255.255.0',
+                'net_mask': '255.255.255.0',
                 'routes': [
                     {
                         'net': '0.0.0.0',
                         'gateway': '10.0.2.2',
-                        'netmask': '0.0.0.0'
+                        'net_mask': '0.0.0.0'
                     },
                     {
                         'net': '10.0.2.0',
                         'gateway': '0.0.0.0',
-                        'netmask': '255.255.255.0'
+                        'net_mask': '255.255.255.0'
                     },
                 ]
             },
             'eth1': {
                 'ip': '192.168.33.10',
-                'netmask': '255.255.255.0',
+                'net_mask': '255.255.255.0',
                 'routes': [
                     {
                         'net': '192.168.33.0',
                         'gateway': '0.0.0.0',
-                        'netmask': '255.255.255.0',
+                        'net_mask': '255.255.255.0',
                     },
                 ]
             },
@@ -288,27 +288,27 @@ UBUNTU_16_04 = VmMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubu
         'interfaces' : {
             'lo': {
                 'ip': '127.0.0.1',
-                'netmask': '255.0.0.0',
+                'net_mask': '255.0.0.0',
                 'routes': []
             },
             'eth0': {
                 'ip': '10.17.32.4',
-                'netmask': '255.255.255.0',
+                'net_mask': '255.255.255.0',
                 'routes': [
                     {
                         'net': '0.0.0.0',
                         'gateway': '10.17.32.1',
-                        'netmask': '0.0.0.0',
+                        'net_mask': '0.0.0.0',
                     },
                     {
                         'net': '10.0.0.0',
                         'gateway': '10.17.32.1',
-                        'netmask': '255.0.0.0',
+                        'net_mask': '255.0.0.0',
                     },
                     {
                         'net': '10.17.32.0',
                         'gateway': '0.0.0.0',
-                        'netmask': '255.255.255.0',
+                        'net_mask': '255.255.255.0',
                     },
                 ]
             },

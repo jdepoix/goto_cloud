@@ -63,6 +63,12 @@ class AbstractedRemoteHostOperator(metaclass=ABCMeta):
     a operation which executes on a given RemoteHost and abstracts the operating system support away
     """
     def __init__(self, remote_host):
+        """
+        takes a RemoteHost and evaluates which operator is supported and initializes it
+        
+        :param remote_host: the remote host you wan to execute on
+        :type remote_host: remote_host.public.RemoteHost
+        """
         self.remote_host = remote_host
         self.operator = self._get_supported_operator()
 

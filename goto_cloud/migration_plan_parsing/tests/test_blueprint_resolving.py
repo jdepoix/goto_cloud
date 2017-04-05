@@ -34,7 +34,23 @@ class TestBlueprintResolver(TestCase):
                     "password": "xxxxxx"
                 },
                 "network_mapping": {
-                    "0.0.0.0/0": "LAN 1",
+                    "0.0.0.0/0": {
+                        "network": "LAN 1",
+                    },
+                    "192.168.10.0/24": {
+                        "network": "LAN 3",
+                        "range": {
+                            "from": "10.17.33.100",
+                            "to": "10.17.33.200"
+                        }
+                    },
+                    "10.8.3.8.0/24": {
+                        "network": "LAN 4",
+                        "range": {
+                            "from": "10.17.34.100",
+                            "to": "10.17.34.200"
+                        }
+                    },
                     "192.168.0.0/24": {
                         "network": "LAN 2",
                         "range": {
@@ -42,8 +58,6 @@ class TestBlueprintResolver(TestCase):
                             "to": "10.17.32.30"
                         }
                     },
-                    "192.168.10.0/24": "LAN 3",
-                    "10.8.3.8.0/24": "LAN 4"
                 },
                 "hooks": {
                     "go_live_before": {
@@ -91,10 +105,30 @@ class TestBlueprintResolver(TestCase):
                     "password": "xxxxxx"
                 },
                 "network_mapping": {
-                    "0.0.0.0/0": "LAN 1",
-                    "192.168.0.0/24": "LAN 2",
-                    "192.168.10.0/24": "LAN 3",
-                    "10.8.3.8.0/24": "LAN 4"
+                    "0.0.0.0/0": {
+                        "network": "LAN 1",
+                    },
+                    "192.168.0.0/24": {
+                        "network": "LAN 2",
+                        "range": {
+                            "from": "10.17.32.100",
+                            "to": "10.17.32.200"
+                        }
+                    },
+                    "192.168.10.0/24": {
+                        "network": "LAN 3",
+                        "range": {
+                            "from": "10.17.33.100",
+                            "to": "10.17.33.200"
+                        }
+                    },
+                    "10.8.3.8.0/24": {
+                        "network": "LAN 4",
+                        "range": {
+                            "from": "10.17.34.100",
+                            "to": "10.17.34.200"
+                        }
+                    },
                 },
                 "hooks": {
                     "go_live_after": {

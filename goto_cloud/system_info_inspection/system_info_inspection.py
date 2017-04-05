@@ -292,7 +292,7 @@ class DebianSystemInfoGetter(SystemInfoGetter):
                 if key == 'addr':
                     network_info[interface]['ip'] = value
                 elif key == 'Mask':
-                    network_info[interface]['netmask'] = value
+                    network_info[interface]['net_mask'] = value
 
             network_info[interface]['routes'] = routes[interface] if interface in routes else []
 
@@ -306,7 +306,7 @@ class DebianSystemInfoGetter(SystemInfoGetter):
             route = {
                 'net': columns[0],
                 'gateway': columns[1],
-                'netmask': columns[2],
+                'net_mask': columns[2],
             }
 
             if columns[7] in routes:
