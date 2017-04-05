@@ -95,6 +95,19 @@ class IpValidation():
 
     @staticmethod
     def _validate_ip_cast(ip_string, cast_function):
+        """
+        casts an ip string and validates the cast
+        
+        :param ip_string: an ip represented as a string
+        :type ip_string: str
+        :param cast_function: the function used to cast the string ip
+        :type cast_function: (str) -> ipaddress.IPv4Address or (str) -> ipaddress.IPv6Address 
+            or (str) -> ipaddress.IPv4Network or (str) -> ipaddress.IPv6Network
+        :return: the casted ip
+        :rtype: (str) -> ipaddress.IPv4Address or (str) -> ipaddress.IPv6Address 
+            or (str) -> ipaddress.IPv4Network or (str) -> ipaddress.IPv6Network
+        :raises IpValidation.InvalidIpException: if ip is not valid
+        """
         try:
             return cast_function(ip_string)
         except ValueError:
@@ -123,6 +136,7 @@ class NetworkMapper():
         
         :param network_settings: the network settings to use
         :type network_settings: dict
+        :raises NetworkMapper.InvalidNetworkSettingsException: in case the settings are not valid
         """
         self.networks = self._create_network_structure(network_settings)
 
@@ -136,6 +150,7 @@ class NetworkMapper():
         :type blueprint: dict
         :return: a list of dicts representing the new interfaces
         :rtype: list[dict]
+        :raises NetworkMapper.InvalidNetworkSettingsException: in case the blueprints network settings are not valid
         """
         try:
             mapped_interfaces = []
@@ -163,6 +178,18 @@ class NetworkMapper():
             )
 
     def _map_network(self, ip_string, net_mask_string, network_mapping):
+        """
+        uses the given network mapping, to decide, which network the given ip is mapped to
+        
+        :param ip_string: the ip you want to map
+        :type ip_string: str
+        :param net_mask_string: the ips net mask
+        :type net_mask_string: str
+        :param network_mapping: the network mapping used to determine how the ip is mapped
+        :type network_mapping: dict
+        :return: the network the ip is mapped to
+        :rtype: dict
+        """
         ip = IpValidation.validate_ip_address(ip_string)
         net_mask = IpValidation.validate_ip_address(net_mask_string)
 
@@ -179,6 +206,14 @@ class NetworkMapper():
         return network_mapping[net_address]
 
     def _get_ip(self, network):
+        """
+        returns the ip for a given blueprints network setting
+        
+        :param network: the network you want to get an ip for
+        :type network: dict
+        :return: the ip
+        :rtype: ipaddress.IPv4Address or ipaddress.IPv6Address 
+        """
         if 'static' in network:
             static_ip = IpValidation.validate_ip_address(network['static'])
 
@@ -201,6 +236,18 @@ class NetworkMapper():
         return None
 
     def _get_ip_distributor(self, network_id, from_ip, to_ip):
+        """
+        returns the IpDistributor which should be used for given ip range
+        
+        :param network_id: the id of the network you want to have an IpDistributor for
+        :type network_id: str
+        :param from_ip: the ip the range starts at
+        :type from_ip: ipaddress.IPv4Address or ipaddress.IPv6Address
+        :param to_ip: the ip the range stops at
+        :type to_ip: ipaddress.IPv4Address or ipaddress.IPv6Address
+        :return: the ip distributor which should be used
+        :rtype: IpDistributor
+        """
         if (from_ip, to_ip,) not in self.networks[network_id]['distributors']:
             self.networks[network_id]['distributors'][(from_ip, to_ip,)] = IpDistributor(
                 from_ip, to_ip, self.networks[network_id]['net_address']
@@ -209,6 +256,14 @@ class NetworkMapper():
         return self.networks[network_id]['distributors'][(from_ip, to_ip,)]
 
     def _create_network_mapping(self, blueprint):
+        """
+        creates a network mapping from a blueprint
+        
+        :param blueprint: the blueprint to create the network mapping with 
+        :type blueprint: dict
+        :return: the network mapping
+        :rtype: dict
+        """
         network_mapping = {}
 
         for net_address_string, mapping_config in blueprint['network_mapping'].items():
@@ -225,6 +280,15 @@ class NetworkMapper():
         return network_mapping
 
     def _create_network_structure(self, network_settings):
+        """
+        creates an internally used data structure which represents the network settings
+        
+        :param network_settings: the network settings
+        :type network_settings: dict
+        :return: the network setting representation
+        :rtype: dict
+        :raises NetworkMapper.InvalidNetworkSettingsException: in case the settings are not valid
+        """
         try:
             networks = {}
 
@@ -281,18 +345,18 @@ class IpDistributor():
         initialized with a given range, in a given network
         
         :param from_ip: the ip the ranges starts at
-        :type from_ip: str
+        :type from_ip: ipaddress.IPv4Address or ipaddress.IPv6Address
         :param to_ip: the ip the range stops it (included)
-        :type to_ip: str
+        :type to_ip: ipaddress.IPv4Address or ipaddress.IPv6Address
         :param net_address: the network address, in which the ips are distributed
-        :type net_address: str
+        :type net_address: ipaddress.IPv4Network or ipaddress.IPv6Network
         :raises IpValidation.InvalidIpException: if a ip is not valid
         :raises IpValidation.InvalidRangeException: if range is not valid
         """
         self.last_distributed_ip = None
-        self.from_ip = IpValidation.validate_ip_address(from_ip)
-        self.to_ip = IpValidation.validate_ip_address(to_ip)
-        self.net_address = IpValidation.validate_net_address(net_address)
+        self.from_ip = from_ip
+        self.to_ip = to_ip
+        self.net_address = net_address
 
         IpValidation.validate_ip_range(self.from_ip, self.to_ip, self.net_address)
 

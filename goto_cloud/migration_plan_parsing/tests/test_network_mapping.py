@@ -1,5 +1,7 @@
 from unittest import TestCase
 
+from pip._vendor import ipaddress
+
 from ..network_mapping import IpDistributor, NetworkMapper, IpValidation
 
 
@@ -239,32 +241,12 @@ class TestNetworkMapper(TestCase):
 
 
 class TestIpDistributor(TestCase):
-    def test_init__invalid_from_address(self):
-        with self.assertRaises(IpValidation.InvalidIpException):
-            IpDistributor('192.168.0.333', '192.168.0.100', '192.168.0.0/24')
-
-    def test_init__invalid_to_address(self):
-        with self.assertRaises(IpValidation.InvalidIpException):
-            IpDistributor('192.168.0.100', '192.168.0.333', '192.168.0.0/24')
-
-    def test_init__invalid_net_address(self):
-        with self.assertRaises(IpValidation.InvalidIpException):
-            IpDistributor('192.168.0.10', '192.168.0.100', '192.168.0.20/24')
-
-    def test_init__from_not_in_net(self):
-        with self.assertRaises(IpValidation.InvalidRangeException):
-            IpDistributor('192.168.1.10', '192.168.0.100', '192.168.0.0/24')
-
-    def test_init__to_not_in_net(self):
-        with self.assertRaises(IpValidation.InvalidRangeException):
-            IpDistributor('192.168.0.10', '192.168.1.100', '192.168.0.0/24')
-
-    def test_init__to_lt_from(self):
-        with self.assertRaises(IpValidation.InvalidRangeException):
-            IpDistributor('192.168.0.100', '192.168.0.10', '192.168.0.0/24')
-
     def test_get_next_ip(self):
-        distributor = IpDistributor('192.168.0.250', '192.168.1.105', '192.168.0.0/16')
+        distributor = IpDistributor(
+            ipaddress.ip_address('192.168.0.250'),
+            ipaddress.ip_address('192.168.1.105'),
+            ipaddress.ip_network('192.168.0.0/16'),
+        )
 
         self.assertEquals(distributor.get_next_ip(), '192.168.0.250')
         self.assertEquals(distributor.get_next_ip(), '192.168.0.251')
@@ -277,19 +259,31 @@ class TestIpDistributor(TestCase):
         self.assertEquals(distributor.get_next_ip(), '192.168.1.2')
 
     def test_get_next_ip__skip_net_address(self):
-        distributor = IpDistributor('192.168.0.0', '192.168.0.105', '192.168.0.0/24')
+        distributor = IpDistributor(
+            ipaddress.ip_address('192.168.0.0'),
+            ipaddress.ip_address('192.168.0.105'),
+            ipaddress.ip_network('192.168.0.0/24'),
+        )
 
         self.assertEquals(distributor.get_next_ip(), '192.168.0.1')
 
     def test_get_next_ip__skip_broadcast_address(self):
-        distributor = IpDistributor('192.168.0.254', '192.168.0.255', '192.168.0.0/24')
+        distributor = IpDistributor(
+            ipaddress.ip_address('192.168.0.254'),
+            ipaddress.ip_address('192.168.0.255'),
+            ipaddress.ip_network('192.168.0.0/24'),
+        )
 
         self.assertEquals(distributor.get_next_ip(), '192.168.0.254')
         with self.assertRaises(IpDistributor.RangeExhaustedException):
             distributor.get_next_ip()
 
     def test_get_next_ip__range_exhausted(self):
-        distributor = IpDistributor('192.168.0.100', '192.168.0.104', '192.168.0.0/24')
+        distributor = IpDistributor(
+            ipaddress.ip_address('192.168.0.100'),
+            ipaddress.ip_address('192.168.0.104'),
+            ipaddress.ip_network('192.168.0.0/24'),
+        )
 
         distributor.get_next_ip()
         distributor.get_next_ip()
@@ -299,3 +293,49 @@ class TestIpDistributor(TestCase):
 
         with self.assertRaises(IpDistributor.RangeExhaustedException):
             distributor.get_next_ip()
+
+
+class TestIpValidation(TestCase):
+    def test_validate_ip_address(self):
+        self.assertEquals(
+            IpValidation.validate_ip_address('192.168.0.3'),
+            ipaddress.ip_address('192.168.0.3')
+        )
+
+    def test_validate_ip_address__invalid(self):
+        with self.assertRaises(IpValidation.InvalidIpException):
+            IpValidation.validate_ip_address('192.168.0.333')
+
+    def test_validate_net_address(self):
+        self.assertEquals(
+            IpValidation.validate_net_address('192.168.0.0/16'),
+            ipaddress.ip_network('192.168.0.0/16')
+        )
+
+    def test_validate_net_address__invalid(self):
+        with self.assertRaises(IpValidation.InvalidIpException):
+            IpValidation.validate_net_address('192.168.0.0/333')
+
+    def test_validate_ip_range__from_not_in_net(self):
+        with self.assertRaises(IpValidation.InvalidRangeException):
+            IpValidation.validate_ip_range(
+                ipaddress.ip_address('192.168.1.10'),
+                ipaddress.ip_address('192.168.0.100'),
+                ipaddress.ip_network('192.168.0.0/24'),
+            )
+
+    def test_validate_ip_range__to_not_in_net(self):
+        with self.assertRaises(IpValidation.InvalidRangeException):
+            IpValidation.validate_ip_range(
+                ipaddress.ip_address('192.168.0.10'),
+                ipaddress.ip_address('192.168.1.100'),
+                ipaddress.ip_network('192.168.0.0/24'),
+            )
+
+    def test_validate_ip_range__to_lt_from(self):
+        with self.assertRaises(IpValidation.InvalidRangeException):
+            IpValidation.validate_ip_range(
+                ipaddress.ip_address('192.168.0.100'),
+                ipaddress.ip_address('192.168.0.10'),
+                ipaddress.ip_network('192.168.0.0/24'),
+            )
