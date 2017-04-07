@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 from paramiko import SSHClient, AutoAddPolicy
+from paramiko.ssh_exception import NoValidConnectionsError, AuthenticationException
 
 from operating_system.public import OperatingSystem
 
@@ -12,12 +13,29 @@ class RemoteExecutor(metaclass=ABCMeta):
     Takes care of executing commands on a remote host. This class can be subclassed, to execute remote executing, using
     different kinds of remote clients, for different systems.
     """
+    class ConnectionException(Exception):
+        """
+        raised for all kinds of connection errors
+        """
+        pass
+
+    class AuthenticationException(ConnectionException):
+        """
+        raised if it's not possible to authenticate
+        """
+        pass
+
+    class NoValidConnectionException(ConnectionException):
+        """
+        raised if no valid connection can be established
+        """
+        pass
+
     class ExecutionException(Exception):
         """
         is raised when an error occurs, during the execution of a command on the remote host 
         """
         pass
-
 
     def __init__(self, hostname, username=None, password=None, port=22):
         """
@@ -129,9 +147,16 @@ class SshRemoteExecutor(RemoteExecutor):
     implements RemoteExecutor using SSH as the remote execution client
     """
     def connect(self):
-        self.remote_client = SSHClient()
-        self.remote_client.set_missing_host_key_policy(AutoAddPolicy())
-        self.remote_client.connect(self.hostname, username=self.username, password=self.password, port=self.port)
+        try:
+            self.remote_client = SSHClient()
+            self.remote_client.set_missing_host_key_policy(AutoAddPolicy())
+            self.remote_client.connect(self.hostname, username=self.username, password=self.password, port=self.port)
+        except AuthenticationException as e:
+            raise RemoteExecutor.AuthenticationException(str(e))
+        except NoValidConnectionsError as e:
+            raise RemoteExecutor.NoValidConnectionException(str(e))
+        except Exception as e:
+            raise RemoteExecutor.ConnectionException(str(e))
 
     def _close(self):
         self.remote_client.close()

@@ -5,6 +5,9 @@ from unittest.mock import patch
 
 from django.test import TestCase
 
+from paramiko.client import SSHClient
+from paramiko.ssh_exception import NoValidConnectionsError, AuthenticationException, SSHException
+
 from operating_system.public import OperatingSystem
 from remote_host.public import RemoteHost
 
@@ -26,6 +29,14 @@ def execute_mock(self, command):
     }
 
     return test_commands[command]
+
+
+def raise_exception_mock(exception):
+    def raise_exception(self, *args, **kwargs):
+        connect_mock(self, *args, **kwargs)
+        raise exception
+
+    return raise_exception
 
 
 @patch('paramiko.SSHClient.close', close_mock)
@@ -62,11 +73,29 @@ class TestSshRemoteExecutor(unittest.TestCase):
         self.remote_executor.execute('successful_command')
         self.assertTrue(self.remote_executor.is_connected())
 
-    def test_execute__fail(self):
+    def test_execute__execution_fail(self):
         with self.assertRaises(RemoteExecutor.ExecutionException) as context_manager:
             self.remote_executor.execute('error_command')
 
         self.assertIn('Command Error', str(context_manager.exception))
+
+    def test_connect__connection_exception(self):
+        SSHClient.connect = raise_exception_mock(SSHException())
+
+        with self.assertRaises(RemoteExecutor.ConnectionException):
+            SshRemoteExecutor('test')
+
+    def test_connect__authentication_exception(self):
+        SSHClient.connect = raise_exception_mock(AuthenticationException())
+
+        with self.assertRaises(RemoteExecutor.AuthenticationException):
+            SshRemoteExecutor('test')
+
+    def test_connect__no_valid_connection_exception(self):
+        SSHClient.connect = raise_exception_mock(NoValidConnectionsError({'127.0.0.1': 22}))
+
+        with self.assertRaises(RemoteExecutor.NoValidConnectionException):
+            SshRemoteExecutor('test')
 
 
 @patch('paramiko.SSHClient.connect', connect_mock)

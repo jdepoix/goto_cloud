@@ -6,7 +6,6 @@ from .source_parsing import SourceParser
 from .db_item_handling import DbItemHandler
 
 
-# TODO check availability
 class MigrationPlanParser(DbItemHandler):
     """
     Takes care of parsing a migration plan.

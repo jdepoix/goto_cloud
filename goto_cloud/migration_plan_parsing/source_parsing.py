@@ -57,7 +57,7 @@ class SourceParser(DbItemHandler):
         creates the RemoteHost db entry
         
         :param source: the source to use
-        :type source: Source
+        :type source: dict
         :param blueprint: the blueprint to use
         :type blueprint: dict
         :return: the newly created remote host
@@ -135,7 +135,7 @@ class SourceParser(DbItemHandler):
         resolves the blueprint for a given source
         
         :param source: the source to resolve the blueprint for 
-        :type source: Source
+        :type source: dict
         :return: the resolved blueprint 
         :rtype: dict
         """
