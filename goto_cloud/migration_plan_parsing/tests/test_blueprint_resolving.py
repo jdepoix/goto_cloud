@@ -27,11 +27,16 @@ class TestBlueprintResolver(TestCase):
                 }
             ),
             {
-                "authentication": {
-                    "ssh_pub_key": "xxxxx",
-                    "ssh_private_key_file": "~/.ssh/id_rsa_source",
+                "ssh": {
+                    "private_key": "xxxxx",
+                    "private_key_file_path": "~/.ssh/id_rsa_source",
                     "username": "root",
-                    "password": "xxxxxx"
+                    "password": "xxxxxx",
+                    "port": 22
+                },
+                "hardware": {
+                    "cores": 2,
+                    "ram": 4,
                 },
                 "network_mapping": {
                     "0.0.0.0/0": {
@@ -98,11 +103,12 @@ class TestBlueprintResolver(TestCase):
         self.assertDictEqual(
             self.blueprint_resolver.resolve("default"),
             {
-                "authentication": {
-                    "ssh_pub_key": "xxxxx",
-                    "ssh_private_key_file": "~/.ssh/id_rsa_source",
+                "ssh": {
+                    "private_key": "xxxxx",
+                    "private_key_file_path": "~/.ssh/id_rsa_source",
                     "username": "root",
-                    "password": "xxxxxx"
+                    "password": "xxxxxx",
+                    "port": 22
                 },
                 "network_mapping": {
                     "0.0.0.0/0": {

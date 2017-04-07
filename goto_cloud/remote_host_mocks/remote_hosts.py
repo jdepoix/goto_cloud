@@ -1,9 +1,9 @@
 from settings.base import BASE_DIR
 
-from ..tests.utils import VmMock
+from .remote_host_mocks import RemoteHostMock
 
 
-COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH = BASE_DIR + '/system_info_inspection/tests/assets/test_vms_command_output'
+COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH = BASE_DIR + '/remote_host_mocks/assets/test_vms_command_output'
 COMMAND_DIRECTORY_MAP = {
     'cat /proc/cpuinfo': 'cpuinfo',
     'sudo fdisk -l': 'fdisk',
@@ -16,7 +16,7 @@ COMMAND_DIRECTORY_MAP = {
     'lsblk -no NAME': 'lsblkl',
 }
 
-UBUNTU_12_04 = VmMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubuntu-12.04', COMMAND_DIRECTORY_MAP, {
+UBUNTU_12_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubuntu-12.04', COMMAND_DIRECTORY_MAP, {
     'block_devices': {
         'vda': {
             'type': 'disk',
@@ -81,7 +81,7 @@ UBUNTU_12_04 = VmMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubu
     },
     'os': {
         'name': 'Ubuntu',
-        'version': 12.04
+        'version': '12.04'
     },
     'hardware': {
         'ram': {
@@ -104,7 +104,7 @@ UBUNTU_12_04 = VmMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubu
     }
 })
 
-UBUNTU_14_04 = VmMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubuntu-14.04', COMMAND_DIRECTORY_MAP, {
+UBUNTU_14_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubuntu-14.04', COMMAND_DIRECTORY_MAP, {
     'block_devices': {
         'sda': {
             'type': 'disk',
@@ -177,7 +177,7 @@ UBUNTU_14_04 = VmMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubu
     },
     'os': {
         'name': 'Ubuntu',
-        'version': 14.04
+        'version': '14.04'
     },
     'hardware': {
         'ram': {
@@ -192,7 +192,7 @@ UBUNTU_14_04 = VmMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubu
     }
 })
 
-UBUNTU_16_04 = VmMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubuntu-16.04', COMMAND_DIRECTORY_MAP, {
+UBUNTU_16_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubuntu-16.04', COMMAND_DIRECTORY_MAP, {
     'block_devices': {
         'vda': {
             'type': 'disk',
@@ -316,7 +316,7 @@ UBUNTU_16_04 = VmMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubu
     },
     'os': {
         'name': 'Ubuntu',
-        'version': 16.04
+        'version': '16.04'
     },
     'hardware': {
         'ram': {

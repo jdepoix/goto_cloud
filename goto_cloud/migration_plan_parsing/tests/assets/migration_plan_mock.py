@@ -1,11 +1,12 @@
 MIGRATION_PLAN_MOCK = {
     "blueprints": {
         "default": {
-            "authentication": {
-                "ssh_pub_key": "xxxxx",
-                "ssh_private_key_file": "~/.ssh/id_rsa_source",
+            "ssh": {
+                "private_key": "xxxxx",
+                "private_key_file_path": "~/.ssh/id_rsa_source",
                 "username": "root",
-                "password": "xxxxxx"
+                "password": "xxxxxx",
+                "port": 22
             },
             "network_mapping": {
                 "0.0.0.0/0": {
@@ -74,6 +75,10 @@ MIGRATION_PLAN_MOCK = {
                     "execute": "systemctl start nginx gunicorn celery-main celery-beat",
                 }
             },
+            "hardware": {
+                "cores": 2,
+                "ram": 4,
+            }
         }
     },
     "sources": [
@@ -118,11 +123,12 @@ MIGRATION_PLAN_MOCK = {
         },
         "bootstrapping": {
             "template_snapshot": "template_bootstrap_vm",
-            "authentication": {
-                "ssh_pub_key": "xxxxx",
-                "ssh_private_key_file": "~/.ssh/id_rsa_source",
+            "ssh": {
+                "private_key": "xxxxx",
+                "private_key_file_path": "~/.ssh/id_rsa_source",
                 "username": "root",
-                "password": "xxxxxx"
+                "password": "xxxxxx",
+                "port": 22
             },
         },
         "networks": {

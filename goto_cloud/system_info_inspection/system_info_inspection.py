@@ -325,7 +325,7 @@ class DebianSystemInfoGetter(SystemInfoGetter):
             if key == 'NAME':
                 os_info['name'] = value.strip('"')
             elif key == 'VERSION_ID':
-                os_info['version'] = float(value.strip('"'))
+                os_info['version'] = value.strip('"')
 
         return os_info
 

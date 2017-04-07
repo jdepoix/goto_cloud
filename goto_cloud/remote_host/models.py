@@ -1,5 +1,7 @@
 from django.db import models
 
+from operating_system.public import OperatingSystem
+
 from tracked_model.public import TrackedModel
 
 
@@ -8,7 +10,8 @@ class RemoteHost(TrackedModel):
     represents an Entity which can be accessed remotely
     """
     # TODO add enum
-    os = models.CharField(max_length=255)
+    # os default is Linux, as of now, since only Linux is supported. Should be changed, if support for others is added.
+    os = models.CharField(max_length=255, default=OperatingSystem.DEBIAN)
     version = models.CharField(max_length=255, null=True, blank=True)
     address = models.CharField(max_length=512)
     port = models.PositiveIntegerField(default=22)

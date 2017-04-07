@@ -7,4 +7,4 @@ class MigrationPlan(TrackedModel):
     """
     represents the plan which is used for a migration
     """
-    plan = JSONField()
+    plan = JSONField(default=dict)

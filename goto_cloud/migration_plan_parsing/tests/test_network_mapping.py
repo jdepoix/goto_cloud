@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from pip._vendor import ipaddress
+import ipaddress
 
 from ..network_mapping import IpDistributor, NetworkMapper, IpValidation
 

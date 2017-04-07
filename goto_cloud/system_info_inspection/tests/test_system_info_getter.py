@@ -5,9 +5,9 @@ from operating_system.public import OperatingSystem
 
 from remote_host.public import RemoteHost
 
-from ..system_info_inspection import RemoteHostSystemInfoGetter
+from remote_host_mocks.public import UBUNTU_12_04, UBUNTU_16_04, UBUNTU_14_04
 
-from ..tests.test_vms import UBUNTU_12_04, UBUNTU_16_04, UBUNTU_14_04
+from ..system_info_inspection import RemoteHostSystemInfoGetter
 
 
 def vm_mock_execution_factory(hostname_mapping):

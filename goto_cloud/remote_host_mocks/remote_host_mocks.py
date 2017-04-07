@@ -2,7 +2,7 @@ import os
 from io import BytesIO
 
 
-class VmMock(object):
+class RemoteHostMock(object):
     def __init__(self, commands, expected_config):
         self.commands = commands
         self.expected_config = expected_config
@@ -34,4 +34,4 @@ class VmMock(object):
                 os.path.join(os.path.join(commands_root_directory, command_directory_map[command]), filename)
             ) as command_output:
                 commands[command] = command_output.read()
-        return VmMock(commands, expected_config)
+        return RemoteHostMock(commands, expected_config)
