@@ -28,5 +28,6 @@ exclude_lines =
     # Don't complain about empty stubs of abstract methods
     @abstractmethod
     @abstractclassmethod
+    @abstractstaticmethod
 
 show_missing = True
