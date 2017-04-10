@@ -1,1 +1,1 @@
-from .enum import StringEnum
+from .enums import StringEnum

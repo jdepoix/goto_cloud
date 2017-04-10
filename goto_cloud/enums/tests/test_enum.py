@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from ..enum import StringEnum
+from ..enums import StringEnum
 
 
 class EnumMock(StringEnum):
@@ -11,12 +11,11 @@ class EnumMock(StringEnum):
 
 class TestStringEnum(TestCase):
     def test_get_django_choices(self):
-        # self.assertEquals(
-        #     EnumMock.get_django_choices(),
-        #     (
-        #         (EnumMock.STATUS_ONE, EnumMock.STATUS_ONE),
-        #         (EnumMock.STATUS_TWO, EnumMock.STATUS_TWO),
-        #         (EnumMock.STATUS_THREE, EnumMock.STATUS_THREE),
-        #     ),
-        # )
-        pass
+        self.assertEquals(
+            EnumMock.get_django_choices(),
+            (
+                ('STATUS_ONE', EnumMock.STATUS_ONE),
+                ('STATUS_THREE', EnumMock.STATUS_THREE),
+                ('STATUS_TWO', EnumMock.STATUS_TWO),
+            ),
+        )

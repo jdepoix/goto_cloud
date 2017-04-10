@@ -9,9 +9,8 @@ class RemoteHost(TrackedModel):
     """
     represents an Entity which can be accessed remotely
     """
-    # TODO add enum
-    # os default is Linux, as of now, since only Linux is supported. Should be changed, if support for others is added.
-    os = models.CharField(max_length=255, default=OperatingSystem.DEBIAN)
+    # os default is Debian, as of now, since only Linux is supported. Should be changed, if support for others is added.
+    os = models.CharField(max_length=255, default=OperatingSystem.DEBIAN, choices=OperatingSystem.get_django_choices())
     version = models.CharField(max_length=255, null=True, blank=True)
     address = models.CharField(max_length=512)
     port = models.PositiveIntegerField(default=22)
