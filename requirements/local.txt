@@ -1,3 +1,7 @@
 -r base.txt
 
+# coverage.py
 coverage==4.3.4
+
+# testfixtures
+testfixtures==4.13.5
