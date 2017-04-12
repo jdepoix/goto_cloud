@@ -12,7 +12,7 @@ class RemoteHost(TrackedModel):
     # os default is Debian, as of now, since only Linux is supported. Should be changed, if support for others is added.
     os = models.CharField(max_length=255, default=OperatingSystem.DEBIAN, choices=OperatingSystem.get_django_choices())
     version = models.CharField(max_length=255, null=True, blank=True)
-    address = models.CharField(max_length=512)
+    address = models.CharField(max_length=512, null=False, blank=False)
     port = models.PositiveIntegerField(default=22)
     username = models.CharField(max_length=512, null=True, blank=True)
     password = models.CharField(max_length=512, null=True, blank=True)
