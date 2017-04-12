@@ -43,26 +43,37 @@ class SleepCommand(SourceCommand):
         return Commander.Signal.SLEEP
 
 
-DEFAULT_COMMANDER_DRIVER = {
-    TestSource.Status.FIRST: DefaultCommand,
-    TestSource.Status.SECOND: DefaultCommand,
-    TestSource.Status.THIRD: DefaultCommand,
-    TestSource.Status.FORTH: DefaultCommand,
-    TestSource.Status.FIFTH: DefaultCommand,
-}
+class DefaultCommander(Commander):
+    @property
+    def _commander_driver(self):
+        return {
+            TestSource.Status.FIRST: DefaultCommand,
+            TestSource.Status.SECOND: DefaultCommand,
+            TestSource.Status.THIRD: DefaultCommand,
+            TestSource.Status.FORTH: DefaultCommand,
+            TestSource.Status.FIFTH: DefaultCommand,
+        }
 
-SKIPPING_DEFAULT_COMMANDER_DRIVER = {
-    TestSource.Status.SECOND: DefaultCommand,
-    TestSource.Status.FORTH: DefaultCommand,
-}
 
-SLEEP_COMMANDER_DRIVER = {
-    TestSource.Status.FIRST: DefaultCommand,
-    TestSource.Status.SECOND: DefaultCommand,
-    TestSource.Status.THIRD: DefaultCommand,
-    TestSource.Status.FORTH: SleepCommand,
-    TestSource.Status.FIFTH: DefaultCommand,
-}
+class SkippingDefaultCommander(Commander):
+    @property
+    def _commander_driver(self):
+        return {
+            TestSource.Status.SECOND: DefaultCommand,
+            TestSource.Status.FORTH: DefaultCommand,
+        }
+
+
+class SleepCommander(Commander):
+    @property
+    def _commander_driver(self):
+        return {
+            TestSource.Status.FIRST: DefaultCommand,
+            TestSource.Status.SECOND: DefaultCommand,
+            TestSource.Status.THIRD: DefaultCommand,
+            TestSource.Status.FORTH: SleepCommand,
+            TestSource.Status.FIFTH: DefaultCommand,
+        }
 
 
 class TestCommander(TestCase):
@@ -71,23 +82,23 @@ class TestCommander(TestCase):
 
     def test_execute(self):
         self.assertEquals(self.test_source.status, TestSource.Status.FIRST)
-        Commander(self.test_source, DEFAULT_COMMANDER_DRIVER).execute()
+        DefaultCommander(self.test_source).execute()
         self.assertEquals(self.test_source.status, TestSource.Status.FIFTH)
 
     def test_execute__skip_statuses(self):
         self.assertEquals(self.test_source.status, TestSource.Status.FIRST)
-        Commander(self.test_source, SKIPPING_DEFAULT_COMMANDER_DRIVER).execute()
+        SkippingDefaultCommander(self.test_source).execute()
         self.assertEquals(self.test_source.status, TestSource.Status.FIFTH)
 
     def test_execute__sleep(self):
         self.assertEquals(self.test_source.status, TestSource.Status.FIRST)
-        Commander(self.test_source, SLEEP_COMMANDER_DRIVER).execute()
+        SleepCommander(self.test_source).execute()
         self.assertEquals(self.test_source.status, TestSource.Status.FORTH)
-        Commander(self.test_source, SLEEP_COMMANDER_DRIVER).execute()
+        SleepCommander(self.test_source).execute()
         self.assertEquals(self.test_source.status, TestSource.Status.FORTH)
 
     def test_increment_status_and_execute(self):
         self.assertEquals(self.test_source.status, TestSource.Status.FIRST)
-        Commander(self.test_source, SLEEP_COMMANDER_DRIVER).execute()
+        SleepCommander(self.test_source).execute()
         self.assertEquals(self.test_source.status, TestSource.Status.FORTH)
-        Commander(self.test_source, SLEEP_COMMANDER_DRIVER).increment_status_and_execute()
+        SleepCommander(self.test_source).increment_status_and_execute()

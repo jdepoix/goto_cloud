@@ -1,5 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
+from source_event_logging.public import SourceEventLogger
+
 
 class Command(metaclass=ABCMeta):
     """
@@ -22,9 +24,12 @@ class SourceCommand(Command, metaclass=ABCMeta):
     """
     A Command which specifically executes in the context of a given Source
     """
+    EVENT_LOGGER = SourceEventLogger
+
     def __init__(self, source):
         """
         :param source: the Source in whose context the Command will be executed
         :type source: source.public.Source
         """
         self._source = source
+        self.logger = self.EVENT_LOGGER(source)

@@ -1,7 +1,9 @@
+from abc import ABCMeta, abstractmethod
+
 from command.command import SourceCommand
 
 
-class Commander(SourceCommand):
+class Commander(SourceCommand, metaclass=ABCMeta):
     class Signal():
         """
         a signal can be returned by a Commands execute or rollback method, to trigger a certain behaviour of the
@@ -9,20 +11,16 @@ class Commander(SourceCommand):
         """
         SLEEP = 'SLEEP'
 
-    def __init__(self, source, commander_driver):
+    def __init__(self, source):
         """
         The Commander is initialized with a Source instance and the commander driver.
 
         :param source: the Source in whose context the Command will be executed
         :type source: source.public.Source
-        :param commander_driver: the driver which maps statuses, onto the Commands which should be executed
-        :type commander_driver: dict
         """
         super().__init__(source)
-        self._commander_driver = commander_driver
 
-    # TODO error handling
-    # TODO logging which can be also used for publishing websocket messages later on
+    # TODO error handling and persistent status logging
     def execute(self):
         current_command_class = self._commander_driver.get(self._source.status)
         signal = None
@@ -55,3 +53,14 @@ class Commander(SourceCommand):
         :rtype: SourceCommand
         """
         return command_class(self._source)
+
+    @property
+    @abstractmethod
+    def _commander_driver(self):
+        """
+        returns the mapping of status to command, which is used in this Commander
+        
+        :return: the command mapping
+        :rtype: dict
+        """
+        pass
