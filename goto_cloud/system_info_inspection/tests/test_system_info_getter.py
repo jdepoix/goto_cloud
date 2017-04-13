@@ -1,41 +1,21 @@
 from unittest import TestCase
-from unittest.mock import patch
 
 from operating_system.public import OperatingSystem
 
 from remote_host.public import RemoteHost
 
-from remote_host_mocks.public import UBUNTU_12_04, UBUNTU_16_04, UBUNTU_14_04
+from remote_host_mocks.public import PatchRemoteHostMeta
 
 from ..system_info_inspection import RemoteHostSystemInfoGetter
 
 
-def vm_mock_execution_factory(hostname_mapping):
-    def execute_vm_mock(remote_executor, command):
-        return hostname_mapping.get(remote_executor.hostname).execute(command)
-
-    return execute_vm_mock
-
-
-DEBIAN_VMS = {
-    'ubuntu12VM': UBUNTU_12_04,
-    'ubuntu14VM': UBUNTU_14_04,
-    'ubuntu16VM': UBUNTU_16_04,
-}
-
-
-@patch('remote_execution.remote_execution.SshRemoteExecutor.connect', lambda self: None)
-@patch('remote_execution.remote_execution.SshRemoteExecutor.close', lambda self: None)
-@patch('remote_execution.remote_execution.SshRemoteExecutor.is_connected', lambda self: True)
-@patch('remote_execution.remote_execution.SshRemoteExecutor._execute', vm_mock_execution_factory(DEBIAN_VMS))
-class TestSystemInfoGetter(TestCase):
-    TEST_VMS = DEBIAN_VMS
+class TestSystemInfoGetter(TestCase, metaclass=PatchRemoteHostMeta):
     TEST_SYSTEM_INFO_GETTER = RemoteHostSystemInfoGetter
 
     def call_on_all_test_vms(self, call_method, assert_output):
-        for hostname in self.TEST_VMS:
+        for hostname in PatchRemoteHostMeta.MOCKS:
             assert_output(
-                self.TEST_VMS[hostname],
+                PatchRemoteHostMeta.MOCKS[hostname],
                 call_method(
                     self.TEST_SYSTEM_INFO_GETTER(
                         RemoteHost.objects.create(

@@ -1,8 +1,6 @@
-from unittest.mock import patch
-
 from django.test import TestCase
 
-from remote_host_mocks.public import UBUNTU_16_04, UBUNTU_14_04, UBUNTU_12_04
+from remote_host_mocks.public import PatchRemoteHostMeta
 
 from migration_run.public import MigrationRun
 
@@ -17,29 +15,11 @@ from ..migration_plan_parsing import MigrationPlanParser
 from .assets.migration_plan_mock import MIGRATION_PLAN_MOCK
 
 
-def vm_mock_execution_factory(hostname_mapping):
-    def execute_vm_mock(remote_executor, command):
-        return hostname_mapping.get(remote_executor.hostname).execute(command)
-
-    return execute_vm_mock
-
-
 def failing_method(*args, **kwargs):
     raise Exception()
 
 
-DEBIAN_VMS = {
-    'ubuntu12VM': UBUNTU_12_04,
-    'ubuntu14VM': UBUNTU_14_04,
-    'ubuntu16VM': UBUNTU_16_04,
-}
-
-
-@patch('remote_execution.remote_execution.SshRemoteExecutor.connect', lambda self: None)
-@patch('remote_execution.remote_execution.SshRemoteExecutor.close', lambda self: None)
-@patch('remote_execution.remote_execution.SshRemoteExecutor.is_connected', lambda self: True)
-@patch('remote_execution.remote_execution.SshRemoteExecutor._execute', vm_mock_execution_factory(DEBIAN_VMS))
-class TestMigrationPlanParser(TestCase):
+class TestMigrationPlanParser(TestCase, metaclass=PatchRemoteHostMeta):
     def test_parse(self):
         returned_migration_run = MigrationPlanParser().parse(MIGRATION_PLAN_MOCK)
 
