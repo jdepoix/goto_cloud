@@ -44,9 +44,9 @@ class SourceParser(DbItemHandler):
             blueprint = self._resolve_blueprint(source)
             remote_host = self._create_remote_host(source, blueprint)
             system_info = self._get_system_info(remote_host)
-            self._update_remote_host_system_info(remote_host, system_info)
+            self._update_remote_host_with_system_info(remote_host, system_info)
             target = self._create_target(blueprint)
-            return self._create_source(remote_host, system_info, target)
+            return self._create_source(remote_host, target)
         except KeyError:
             raise SourceParser.InvalidSourceException(
                 'the source: {address} is not valid'.format(address=source.get('address', source))
@@ -85,14 +85,12 @@ class SourceParser(DbItemHandler):
         """
         return RemoteHostSystemInfoGetter(remote_host).get_system_info()
 
-    def _create_source(self, remote_host, system_info, target):
+    def _create_source(self, remote_host, target):
         """
         creates the source db entry
         
         :param remote_host: the remote host which is used to connect to the source
         :type remote_host: RemoteHost
-        :param system_info: the system info associated with the source
-        :type system_info: dict
         :param target: the target which the source translates to
         :type target: Target
         :return: the newly created source
@@ -101,12 +99,11 @@ class SourceParser(DbItemHandler):
         return self.add_db_item(
             Source.objects.create(
                 target=target,
-                system_info=system_info,
                 remote_host=remote_host,
             )
         )
 
-    def _update_remote_host_system_info(self, remote_host, system_info):
+    def _update_remote_host_with_system_info(self, remote_host, system_info):
         """
         updates the remote host data, using the retrieved system info
         
@@ -115,6 +112,7 @@ class SourceParser(DbItemHandler):
         :param system_info: the system info used to update the remote host data
         :type system_info: dict
         """
+        remote_host.system_info = system_info
         remote_host.os = system_info['os']['name']
         remote_host.version = system_info['os']['version']
         remote_host.save()

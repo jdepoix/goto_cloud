@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields.jsonb import JSONField
 
 from operating_system.public import OperatingSystem
 
@@ -18,3 +19,4 @@ class RemoteHost(TrackedModel):
     password = models.CharField(max_length=512, null=True, blank=True)
     private_key = models.TextField(null=True, blank=True)
     private_key_file_path = models.CharField(max_length=512, null=True, blank=True)
+    system_info = JSONField(default=dict)

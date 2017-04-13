@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.postgres.fields.jsonb import JSONField
 
 from enums.public import StringEnum
 
@@ -18,11 +17,21 @@ class Source(StatusModel):
     """
     class Status(StringEnum):
         DRAFT = 'DRAFT'
+        GET_TARGET_SYSTEM_INFORMATION = 'GET_TARGET_SYSTEM_INFORMATION'
+        IDENTIFY_DEVICES = 'IDENTIFY_DEVICES'
+        CREATE_PARTITIONS = 'CREATE_PARTITIONS'
+        CREATE_FILESYSTEMS = 'CREATE_FILESYSTEMS'
+        MOUNT_FILESYSTEMS = 'MOUNT_FILESYSTEMS'
         SYNCING = 'SYNCING'
         LIVE = 'LIVE'
 
     _LIFECYCLE = (
         Status.DRAFT,
+        Status.GET_TARGET_SYSTEM_INFORMATION,
+        Status.IDENTIFY_DEVICES,
+        Status.CREATE_PARTITIONS,
+        Status.CREATE_FILESYSTEMS,
+        Status.MOUNT_FILESYSTEMS,
         Status.SYNCING,
         Status.LIVE,
     )
@@ -31,7 +40,6 @@ class Source(StatusModel):
     def lifecycle(self):
         return self._LIFECYCLE
 
-    system_info = JSONField(default=dict)
     migration_run = models.ForeignKey(MigrationRun, related_name='sources', null=True,)
     target = models.OneToOneField(Target, related_name='source', null=True,)
     remote_host = models.ForeignKey(RemoteHost, related_name='sources')

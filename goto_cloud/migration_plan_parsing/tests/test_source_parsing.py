@@ -43,8 +43,9 @@ class TestSourceParsing(TestCase):
         self.assertEquals(source.remote_host.password, 'xxxxxx')
         self.assertEquals(source.remote_host.private_key, 'xxxxx')
         self.assertEquals(source.remote_host.private_key_file_path, '~/.ssh/id_rsa_source')
+        self.assertIsNotNone(source.target)
 
-        self.assertDictEqual(source.system_info, UBUNTU_12_04.get_config())
+        self.assertDictEqual(source.remote_host.system_info, UBUNTU_12_04.get_config())
 
     def test_parse__no_blueprint(self):
         with self.assertRaises(SourceParser.InvalidSourceException):
