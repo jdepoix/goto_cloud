@@ -12,4 +12,8 @@ class Target(TrackedModel):
     of a draft.
     """
     blueprint = JSONField(default=dict)
+    device_mapping = JSONField(default=dict)
+    """
+    a dict which maps which device of the target devices, is represented by which device of the source devices
+    """
     remote_host = models.ForeignKey(RemoteHost, related_name='targets', null=True)
