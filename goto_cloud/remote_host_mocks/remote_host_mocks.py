@@ -90,7 +90,7 @@ UBUNTU_12_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PA
         }
     },
     'network': {
-        'hostname': 'ubuntu12VM',
+        'hostname': 'ubuntu12',
         'interfaces' : {
             'lo': {
                 'ip': '127.0.0.1',
@@ -175,7 +175,7 @@ UBUNTU_14_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PA
         }
     },
     'network': {
-        'hostname': 'ubuntu14VM',
+        'hostname': 'ubuntu14',
         'interfaces' : {
             'lo': {
                 'ip': '127.0.0.1',
@@ -320,7 +320,7 @@ UBUNTU_16_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PA
         },
     },
     'network': {
-        'hostname': 'ubuntu16VM',
+        'hostname': 'ubuntu16',
         'interfaces' : {
             'lo': {
                 'ip': '127.0.0.1',
@@ -366,3 +366,108 @@ UBUNTU_16_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PA
         ]
     }
 })
+
+TARGET__DEVICE_IDENTIFICATION = RemoteHostMock.create_from_file(
+    COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH,
+    'target__device_identification',
+    COMMAND_DIRECTORY_MAP,
+    {
+        'block_devices': {
+            'vda': {
+                'type': 'disk',
+                'fs': '',
+                'uuid': '',
+                'label': '',
+                'mountpoint': '',
+                'size': 10737418240,
+                'children': {
+                    'vda1': {
+                        'type': 'part',
+                        'fs': 'ext4',
+                        'uuid': '549c8755-2757-446e-8c78-f76b50491f21',
+                        'label': '',
+                        'mountpoint': '/',
+                        'size': 3219128320,
+                        'bootable': True,
+                        'start': 2048,
+                        'end': 6289407,
+                        'children': {}
+                    }
+                }
+            },
+            'vdb': {
+                'type': 'disk',
+                'fs': '',
+                'uuid': '',
+                'label': '',
+                'mountpoint': '',
+                'size': 10737418240,
+                'children': {}
+            },
+            'vdc': {
+                'type': 'disk',
+                'fs': '',
+                'uuid': '',
+                'label': '',
+                'mountpoint': '',
+                'size': 10737418240,
+                'children': {}
+            },
+            'vdd': {
+                'type': 'disk',
+                'fs': '',
+                'uuid': '',
+                'label': '',
+                'mountpoint': '',
+                'size': 10737418240,
+                'children': {}
+            }
+        },
+        'network': {
+            'hostname': 'template-jdepoix.smedia.pb-4.smhss.de',
+            'interfaces': {
+                'eth0': {
+                    'ip': '10.17.32.15',
+                    'net_mask': '255.255.255.0',
+                    'routes': [
+                        {
+                            'net': '0.0.0.0',
+                            'gateway': '10.17.32.1',
+                            'net_mask': '0.0.0.0'
+                        },
+                        {
+                            'net': '10.0.0.0',
+                            'gateway': '10.17.32.1',
+                            'net_mask': '255.0.0.0'
+                        },
+                        {
+                            'net': '10.17.32.0',
+                            'gateway': '0.0.0.0',
+                            'net_mask': '255.255.255.0'
+                        }
+                    ]
+                },
+                'lo': {
+                    'ip': '127.0.0.1',
+                    'net_mask': '255.0.0.0',
+                    'routes': []
+                }
+            }
+        },
+        'os': {
+            'name': 'Ubuntu',
+            'version': '16.04'
+        },
+        'hardware': {
+            'cpus': [
+                {
+                    'model': 'AMD Opteron 62xx class CPU',
+                    'mhz': 2799.998
+                }
+            ],
+            'ram': {
+                'size': 1007256000
+            }
+        }
+    }
+)

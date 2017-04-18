@@ -8,9 +8,9 @@ class PatchRemoteHostMeta(type):
     can be used as a metaclass for a TestCase to patch relevant methods, required to mock a RemoteHost
     """
     MOCKS = {
-        'ubuntu12VM': UBUNTU_12_04,
-        'ubuntu14VM': UBUNTU_14_04,
-        'ubuntu16VM': UBUNTU_16_04,
+        'ubuntu12': UBUNTU_12_04,
+        'ubuntu14': UBUNTU_14_04,
+        'ubuntu16': UBUNTU_16_04,
     }
 
     def __init__(cls, *args, **kwargs):
