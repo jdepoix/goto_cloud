@@ -228,7 +228,151 @@ UBUNTU_14_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PA
     }
 })
 
-UBUNTU_16_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubuntu-16.04', COMMAND_DIRECTORY_MAP, {
+UBUNTU_16_04__LVM = RemoteHostMock.create_from_file(
+    COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH,
+    'ubuntu-16.04',
+    COMMAND_DIRECTORY_MAP,
+    {
+        'block_devices': {
+            'vda': {
+                'type': 'disk',
+                'fs': '',
+                'uuid': '',
+                'label': '',
+                'mountpoint': '',
+                'size': 10737418240,
+                'children': {
+                    'vda1': {
+                        'type': 'part',
+                        'fs': 'ext4',
+                        'uuid': '549c8755-2757-446e-8c78-f76b50491f21',
+                        'label': '',
+                        'mountpoint': '/',
+                        'size': 10736369664,
+                        'start': 2048,
+                        'end': 20971519,
+                        'bootable': True,
+                        'children': {},
+                    },
+                },
+            },
+            'vdb': {
+                'type': 'disk',
+                'fs': '',
+                'uuid': '',
+                'label': '',
+                'mountpoint': '',
+                'size': 10737418240,
+                'children': {
+                    'vdb1': {
+                        'type': 'part',
+                        'fs': 'LVM2_member',
+                        'uuid': '25fyrr-TMlE-KoqC-mlFS-BHtQ-oSat-orQK1v',
+                        'label': '',
+                        'mountpoint': '',
+                        'size': 10736369664,
+                        'bootable': False,
+                        'start': 2048,
+                        'end': 20971519,
+                        'children': {
+                            'vol1-lvol1': {
+                                'type': 'lvm',
+                                'fs': '',
+                                'uuid': '',
+                                'label': '',
+                                'mountpoint': '',
+                                'size': 83886080,
+                                'children': {},
+                            },
+                        },
+                    },
+                },
+            },
+            'vdc': {
+                'type': 'disk',
+                'fs': '',
+                'uuid': '',
+                'label': '',
+                'mountpoint': '',
+                'size': 10737418240,
+                'children': {
+                    'vdc1': {
+                        'type': 'part',
+                        'fs': 'ext4',
+                        'uuid': 'f52fdfe8-d862-44f9-b9b7-e35c0ada68cf',
+                        'label': '',
+                        'mountpoint': '',
+                        'size': 5368709120,
+                        'start': 2048,
+                        'end': 10487807,
+                        'bootable': False,
+                        'children': {},
+                    },
+                    'vdc2': {
+                        'type': 'part',
+                        'fs': '',
+                        'uuid': '',
+                        'label': '',
+                        'mountpoint': '',
+                        'size': 5367660544,
+                        'start': 10487808,
+                        'end': 20971519,
+                        'bootable': False,
+                        'children': {},
+                    },
+                }
+            },
+        },
+        'network': {
+            'hostname': 'ubuntu16__lvm',
+            'interfaces' : {
+                'lo': {
+                    'ip': '127.0.0.1',
+                    'net_mask': '255.0.0.0',
+                    'routes': []
+                },
+                'eth0': {
+                    'ip': '10.17.32.4',
+                    'net_mask': '255.255.255.0',
+                    'routes': [
+                        {
+                            'net': '0.0.0.0',
+                            'gateway': '10.17.32.1',
+                            'net_mask': '0.0.0.0',
+                        },
+                        {
+                            'net': '10.0.0.0',
+                            'gateway': '10.17.32.1',
+                            'net_mask': '255.0.0.0',
+                        },
+                        {
+                            'net': '10.17.32.0',
+                            'gateway': '0.0.0.0',
+                            'net_mask': '255.255.255.0',
+                        },
+                    ]
+                },
+            }
+        },
+        'os': {
+            'name': 'Ubuntu',
+            'version': '16.04'
+        },
+        'hardware': {
+            'ram': {
+                'size': 1007264000
+            },
+            'cpus': [
+                {
+                    'model': 'AMD Opteron 62xx class CPU',
+                    'mhz': 2799.980
+                }
+            ]
+        }
+    }
+)
+
+UBUNTU_16_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubuntu16__lvm', COMMAND_DIRECTORY_MAP, {
     'block_devices': {
         'vda': {
             'type': 'disk',
@@ -245,44 +389,22 @@ UBUNTU_16_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PA
                     'label': '',
                     'mountpoint': '/',
                     'size': 10736369664,
+                    'bootable': True,
                     'start': 2048,
                     'end': 20971519,
-                    'bootable': True,
-                    'children': {},
-                },
-            },
+                    'children': {}
+                }
+            }
         },
+
         'vdb': {
             'type': 'disk',
-            'fs': '',
-            'uuid': '',
+            'fs': 'ext3',
+            'uuid': 'd04ba532-cd2d-4406-a5ef-114acf019cc8',
             'label': '',
             'mountpoint': '',
             'size': 10737418240,
-            'children': {
-                'vdb1': {
-                    'type': 'part',
-                    'fs': 'LVM2_member',
-                    'uuid': '25fyrr-TMlE-KoqC-mlFS-BHtQ-oSat-orQK1v',
-                    'label': '',
-                    'mountpoint': '',
-                    'size': 10736369664,
-                    'bootable': False,
-                    'start': 2048,
-                    'end': 20971519,
-                    'children': {
-                        'vol1-lvol1': {
-                            'type': 'lvm',
-                            'fs': '',
-                            'uuid': '',
-                            'label': '',
-                            'mountpoint': '',
-                            'size': 83886080,
-                            'children': {},
-                        },
-                    },
-                },
-            },
+            'children': {}
         },
         'vdc': {
             'type': 'disk',
@@ -295,38 +417,33 @@ UBUNTU_16_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PA
                 'vdc1': {
                     'type': 'part',
                     'fs': 'ext4',
-                    'uuid': 'f52fdfe8-d862-44f9-b9b7-e35c0ada68cf',
+                    'uuid': '53ad2170-488d-481a-a6ab-5ce0e538f247',
                     'label': '',
-                    'mountpoint': '',
+                    'mountpoint': '/mnt/vdc1',
                     'size': 5368709120,
+                    'bootable': False,
                     'start': 2048,
                     'end': 10487807,
-                    'bootable': False,
-                    'children': {},
+                    'children': {}
                 },
                 'vdc2': {
                     'type': 'part',
-                    'fs': '',
-                    'uuid': '',
+                    'fs': 'ext4',
+                    'uuid': 'bcab224c-8407-4783-8cea-f9ea4be3fabf',
                     'label': '',
-                    'mountpoint': '',
+                    'mountpoint': '/mnt/vdc2',
                     'size': 5367660544,
+                    'bootable': False,
                     'start': 10487808,
                     'end': 20971519,
-                    'bootable': False,
-                    'children': {},
-                },
+                    'children': {}
+                }
             }
         },
     },
     'network': {
         'hostname': 'ubuntu16',
-        'interfaces' : {
-            'lo': {
-                'ip': '127.0.0.1',
-                'net_mask': '255.0.0.0',
-                'routes': []
-            },
+        'interfaces': {
             'eth0': {
                 'ip': '10.17.32.4',
                 'net_mask': '255.255.255.0',
@@ -334,20 +451,20 @@ UBUNTU_16_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PA
                     {
                         'net': '0.0.0.0',
                         'gateway': '10.17.32.1',
-                        'net_mask': '0.0.0.0',
-                    },
-                    {
-                        'net': '10.0.0.0',
-                        'gateway': '10.17.32.1',
-                        'net_mask': '255.0.0.0',
+                        'net_mask': '0.0.0.0'
                     },
                     {
                         'net': '10.17.32.0',
                         'gateway': '0.0.0.0',
-                        'net_mask': '255.255.255.0',
-                    },
+                        'net_mask': '255.255.255.0'
+                    }
                 ]
             },
+            'lo': {
+                'ip': '127.0.0.1',
+                'net_mask': '255.0.0.0',
+                'routes': []
+            }
         }
     },
     'os': {
@@ -355,15 +472,15 @@ UBUNTU_16_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PA
         'version': '16.04'
     },
     'hardware': {
-        'ram': {
-            'size': 1007264000
-        },
         'cpus': [
             {
                 'model': 'AMD Opteron 62xx class CPU',
-                'mhz': 2799.980
+                'mhz': 2799.98
             }
-        ]
+        ],
+        'ram': {
+            'size': 1007168000
+        }
     }
 })
 
@@ -424,7 +541,7 @@ TARGET__DEVICE_IDENTIFICATION = RemoteHostMock.create_from_file(
             }
         },
         'network': {
-            'hostname': 'template-jdepoix.smedia.pb-4.smhss.de',
+            'hostname': 'target__device_identification',
             'interfaces': {
                 'eth0': {
                     'ip': '10.17.32.15',
@@ -433,7 +550,7 @@ TARGET__DEVICE_IDENTIFICATION = RemoteHostMock.create_from_file(
                         {
                             'net': '0.0.0.0',
                             'gateway': '10.17.32.1',
-                            'net_mask': '0.0.0.0'
+                            'net_mask': '0.0.0.0',
                         },
                         {
                             'net': '10.0.0.0',
