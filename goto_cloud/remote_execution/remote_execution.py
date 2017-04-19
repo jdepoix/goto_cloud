@@ -184,18 +184,3 @@ class RemoteHostExecutor(AbstractedRemoteHostOperator):
             password=self.remote_host.password if self.remote_host.password else None,
             port=self.remote_host.port if self.remote_host.port else None,
         )
-
-    def close(self):
-        return self.operator.close()
-
-    def connect(self):
-        return self.operator.connect()
-
-    def reconnect(self):
-        return self.operator.reconnect()
-
-    def is_connected(self):
-        return self.operator.is_connected()
-
-    def execute(self, command):
-        return self.operator.execute(command)

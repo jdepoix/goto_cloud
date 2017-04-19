@@ -338,30 +338,3 @@ class RemoteHostSystemInfoGetter(AbstractedRemoteHostOperator):
 
     def _init_operator_class(self, operator_class):
         return operator_class(RemoteHostExecutor(self.remote_host))
-
-    def get_block_devices(self):
-        return self.operator.get_block_devices()
-
-    def get_hardware(self):
-        return self.operator.get_hardware()
-
-    def get_cpus(self):
-        return self.operator.get_cpus()
-
-    def get_ram(self):
-        return self.operator.get_ram()
-
-    def get_network_info(self):
-        return self.operator.get_network_info()
-
-    def get_hostname(self):
-        return self.operator.get_hostname()
-
-    def get_network_interfaces(self):
-        return self.operator.get_network_interfaces()
-
-    def get_os(self):
-        return self.operator.get_os()
-
-    def get_system_info(self):
-        return self.operator.get_system_info()

@@ -60,8 +60,19 @@ class OperatingSystemRelations():
 
 class AbstractedRemoteHostOperator(metaclass=ABCMeta):
     """
-    a operation which executes on a given RemoteHost and abstracts the operating system support away
+    a operation which executes on a given RemoteHost and abstracts the operating system support away. All method calls
+    to an instance of this class, are proxied to the supported operator, which is chosen at runtime.
     """
+    NOT_PROXIED_ATTRIBUTES = (
+        'operator',
+        'remote_host',
+        '_get_supported_operator',
+        '_get_directly_supported_operator',
+        '_get_related_supported_operator',
+        '_get_operating_systems_to_supported_operation_mapping',
+        '_init_operator_class',
+    )
+
     def __init__(self, remote_host):
         """
         takes a RemoteHost and evaluates which operator is supported and initializes it
@@ -109,6 +120,12 @@ class AbstractedRemoteHostOperator(metaclass=ABCMeta):
             ):
                 return self._init_operator_class(operator_class)
         return None
+
+    def __getattribute__(self, item):
+        if item in AbstractedRemoteHostOperator.NOT_PROXIED_ATTRIBUTES:
+            return super().__getattribute__(item)
+
+        return getattr(self.operator, item)
 
     @abstractmethod
     def _get_operating_systems_to_supported_operation_mapping(self):

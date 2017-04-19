@@ -12,6 +12,9 @@ from ..system_info_inspection import RemoteHostSystemInfoGetter
 class TestSystemInfoGetter(TestCase, metaclass=PatchRemoteHostMeta):
     TEST_SYSTEM_INFO_GETTER = RemoteHostSystemInfoGetter
 
+    def setUp(self):
+        self.maxDiff = None
+
     def call_on_all_test_vms(self, call_method, assert_output):
         for hostname in PatchRemoteHostMeta.MOCKS:
             assert_output(
