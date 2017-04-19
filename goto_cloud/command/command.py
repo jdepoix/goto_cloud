@@ -32,4 +32,5 @@ class SourceCommand(Command, metaclass=ABCMeta):
         :type source: source.public.Source
         """
         self._source = source
+        self._target = source.target
         self.logger = self.EVENT_LOGGER(source)
