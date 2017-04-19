@@ -17,7 +17,7 @@ class TestSourceParsing(TestCase, metaclass=PatchRemoteHostMeta):
 
         self.assertEquals(source.remote_host.os, 'Ubuntu')
         self.assertEquals(source.remote_host.version, '12.04')
-        self.assertEquals(source.remote_host.address, 'ubuntu12VM')
+        self.assertEquals(source.remote_host.address, 'ubuntu12')
         self.assertEquals(source.remote_host.port, 22)
         self.assertEquals(source.remote_host.username, 'root')
         self.assertEquals(source.remote_host.password, 'xxxxxx')
@@ -25,10 +25,10 @@ class TestSourceParsing(TestCase, metaclass=PatchRemoteHostMeta):
         self.assertEquals(source.remote_host.private_key_file_path, '~/.ssh/id_rsa_source')
         self.assertIsNotNone(source.target)
 
-        self.assertDictEqual(source.remote_host.system_info, PatchRemoteHostMeta.MOCKS['ubuntu12VM'].get_config())
+        self.assertDictEqual(source.remote_host.system_info, PatchRemoteHostMeta.MOCKS['ubuntu12'].get_config())
 
     def test_parse__no_blueprint(self):
         with self.assertRaises(SourceParser.InvalidSourceException):
             SourceParser(MIGRATION_PLAN_MOCK['blueprints']).parse({
-                "address": "ubuntu12VM",
+                "address": "ubuntu12",
             })

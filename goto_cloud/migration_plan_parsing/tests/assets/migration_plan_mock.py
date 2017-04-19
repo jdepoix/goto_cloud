@@ -43,15 +43,15 @@ MIGRATION_PLAN_MOCK = {
             "commands": {
                 "create_filesystem": {
                     "ext4": {
-                        "command": "mkfs.ext4 {OPTIONS} {DEVICE}",
-                        "options": {
+                        "command": "mkfs.ext4 {OPTIONALS} {DEVICE}",
+                        "optionals": {
                             "uuid": "-u {UUID}",
                             "label": "-l {LABEL}"
                         }
                     },
                     "ext3": {
-                        "command": "mkfs.ext3 {OPTIONS} {DEVICE}",
-                        "options": {
+                        "command": "mkfs.ext3 {OPTIONALS} {DEVICE}",
+                        "optionals": {
                             "uuid": "-u {UUID}",
                             "label": "-l {LABEL}"
                         }
@@ -83,11 +83,11 @@ MIGRATION_PLAN_MOCK = {
     },
     "sources": [
         {
-            "address": "ubuntu12VM",
+            "address": "ubuntu12",
             "blueprint": "default"
         },
         {
-            "address": "ubuntu14VM",
+            "address": "ubuntu14",
             "blueprint": {
                 "parent": "django",
                 "network_mapping": {
@@ -102,7 +102,7 @@ MIGRATION_PLAN_MOCK = {
             }
         },
         {
-            "address": "ubuntu16VM",
+            "address": "ubuntu16",
             "blueprint": {
                 "parent": "django",
                 "network_mapping": {
@@ -130,6 +130,7 @@ MIGRATION_PLAN_MOCK = {
                 "password": "xxxxxx",
                 "port": 22
             },
+            "network": "LAN 0"
         },
         "networks": {
             "LAN 1": {

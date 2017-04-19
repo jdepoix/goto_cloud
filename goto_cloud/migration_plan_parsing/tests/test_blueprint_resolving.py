@@ -77,15 +77,15 @@ class TestBlueprintResolver(TestCase):
                 "commands": {
                     "create_filesystem": {
                         "ext4": {
-                            "command": "mkfs.ext4 {OPTIONS} {DEVICE}",
-                            "options": {
+                            "command": "mkfs.ext4 {OPTIONALS} {DEVICE}",
+                            "optionals": {
                                 "uuid": "-u {UUID}",
                                 "label": "-l {LABEL}"
                             }
                         },
                         "ext3": {
-                            "command": "mkfs.ext3 {OPTIONS} {DEVICE}",
-                            "options": {
+                             "command": "mkfs.ext3 {OPTIONALS} {DEVICE}",
+                            "optionals": {
                                 "uuid": "-u {UUID}",
                                 "label": "-l {LABEL}"
                             }
@@ -145,15 +145,15 @@ class TestBlueprintResolver(TestCase):
                 "commands": {
                     "create_filesystem": {
                         "ext4": {
-                            "command": "mkfs.ext4 {OPTIONS} {DEVICE}",
-                            "options": {
+                            "command": "mkfs.ext4 {OPTIONALS} {DEVICE}",
+                            "optionals": {
                                 "uuid": "-u {UUID}",
                                 "label": "-l {LABEL}"
                             }
                         },
                         "ext3": {
-                            "command": "mkfs.ext3 {OPTIONS} {DEVICE}",
-                            "options": {
+                            "command": "mkfs.ext3 {OPTIONALS} {DEVICE}",
+                            "optionals": {
                                 "uuid": "-u {UUID}",
                                 "label": "-l {LABEL}"
                             }
