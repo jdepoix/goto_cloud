@@ -1,17 +1,17 @@
 from django.test import TestCase
 
-from remote_host_mocks.public import PatchRemoteHostMeta
-
 from source.public import Source
+
+from test_assets.public import TestAsset
 
 from ..source_parsing import SourceParser
 
-from .assets.migration_plan_mock import MIGRATION_PLAN_MOCK
 
-
-class TestSourceParsing(TestCase, metaclass=PatchRemoteHostMeta):
+class TestSourceParsing(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
     def test_parse(self):
-        source = SourceParser(MIGRATION_PLAN_MOCK['blueprints']).parse(MIGRATION_PLAN_MOCK['sources'][0])
+        source = SourceParser(
+            TestAsset.MIGRATION_PLAN_MOCK['blueprints']
+        ).parse(TestAsset.MIGRATION_PLAN_MOCK['sources'][0])
 
         self.assertEquals(Source.objects.first(), source)
 
@@ -25,10 +25,10 @@ class TestSourceParsing(TestCase, metaclass=PatchRemoteHostMeta):
         self.assertEquals(source.remote_host.private_key_file_path, '~/.ssh/id_rsa_source')
         self.assertIsNotNone(source.target)
 
-        self.assertDictEqual(source.remote_host.system_info, PatchRemoteHostMeta.MOCKS['ubuntu12'].get_config())
+        self.assertDictEqual(source.remote_host.system_info, TestAsset.REMOTE_HOST_MOCKS['ubuntu12'].get_config())
 
     def test_parse__no_blueprint(self):
         with self.assertRaises(SourceParser.InvalidSourceException):
-            SourceParser(MIGRATION_PLAN_MOCK['blueprints']).parse({
+            SourceParser(TestAsset.MIGRATION_PLAN_MOCK['blueprints']).parse({
                 "address": "ubuntu12",
             })

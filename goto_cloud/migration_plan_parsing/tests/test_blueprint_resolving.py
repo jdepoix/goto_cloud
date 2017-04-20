@@ -1,13 +1,13 @@
 from unittest import TestCase
 
-from ..blueprint_resolving import BlueprintResolver
+from test_assets.public import TestAsset
 
-from .assets.migration_plan_mock import MIGRATION_PLAN_MOCK
+from ..blueprint_resolving import BlueprintResolver
 
 
 class TestBlueprintResolver(TestCase):
     def setUp(self):
-        self.blueprint_resolver = BlueprintResolver(MIGRATION_PLAN_MOCK['blueprints'])
+        self.blueprint_resolver = BlueprintResolver(TestAsset.MIGRATION_PLAN_MOCK['blueprints'])
 
 
     def test_resolve(self):

@@ -39,7 +39,7 @@ class RemoteHostMock(object):
         return RemoteHostMock(commands, expected_config)
 
 
-COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH = BASE_DIR + '/remote_host_mocks/assets/test_vms_command_output'
+COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH = BASE_DIR + '/test_assets/static_assets/test_vms_command_output'
 COMMAND_DIRECTORY_MAP = {
     'cat /proc/cpuinfo': 'cpuinfo',
     'sudo fdisk -l': 'fdisk',

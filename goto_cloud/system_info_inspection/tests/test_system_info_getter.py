@@ -4,21 +4,21 @@ from operating_system.public import OperatingSystem
 
 from remote_host.public import RemoteHost
 
-from remote_host_mocks.public import PatchRemoteHostMeta
+from test_assets.public import TestAsset
 
 from ..system_info_inspection import RemoteHostSystemInfoGetter
 
 
-class TestSystemInfoGetter(TestCase, metaclass=PatchRemoteHostMeta):
+class TestSystemInfoGetter(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
     TEST_SYSTEM_INFO_GETTER = RemoteHostSystemInfoGetter
 
     def setUp(self):
         self.maxDiff = None
 
     def call_on_all_test_vms(self, call_method, assert_output):
-        for hostname in PatchRemoteHostMeta.MOCKS:
+        for hostname in TestAsset.REMOTE_HOST_MOCKS:
             assert_output(
-                PatchRemoteHostMeta.MOCKS[hostname],
+                TestAsset.REMOTE_HOST_MOCKS[hostname],
                 call_method(
                     self.TEST_SYSTEM_INFO_GETTER(
                         RemoteHost.objects.create(
