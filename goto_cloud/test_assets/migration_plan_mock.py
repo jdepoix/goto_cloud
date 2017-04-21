@@ -43,24 +43,29 @@ MIGRATION_PLAN_MOCK = {
             "commands": {
                 "create_filesystem": {
                     "ext4": {
-                        "command": "mkfs.ext4 {OPTIONALS} {DEVICE}",
+                        "command": "sudo mkfs.ext4 {OPTIONALS} {DEVICE}",
                         "optionals": {
                             "uuid": "-u {UUID}",
                             "label": "-l {LABEL}"
                         }
                     },
                     "ext3": {
-                        "command": "mkfs.ext3 {OPTIONALS} {DEVICE}",
+                        "command": "sudo mkfs.ext3 {OPTIONALS} {DEVICE}",
                         "optionals": {
                             "uuid": "-u {UUID}",
                             "label": "-l {LABEL}"
                         }
                     }
                 },
-                "sync": "rsync -zaXAPx --delete --numeric-ids -e ssh {SOURCE_DIR} {TARGET_DIR}",
-                "reinstall_bootloader": "grub-install --boot-directory=/boot {DEVICE}",
-                "create_partition": "echo -e \"n\n\n\n{START}\n{END}\nw\n\" | fdisk {DEVICE}",
-                "tag_partition_bootable": "echo -e \"a\n{PARTITION_NUMBER}\nw\n\" | fdisk {PARENT_DEVICE}"
+                "sync": "sudo rsync -zaXAPx --delete --numeric-ids -e ssh {SOURCE_DIR} {TARGET_DIR}",
+                "reinstall_bootloader": "sudo grub-install --boot-directory=/boot {DEVICE}",
+                "create_partition": "echo -e \"n\n\n{PARTITION_NUMBER}\n{START}\n{END}\nw\n\" | sudo fdisk {DEVICE}",
+                "tag_partition_bootable": {
+                    "command": "echo -e \"a\n{OPTIONALS}w\n\" | sudo fdisk {PARENT_DEVICE}",
+                    "optionals": {
+                        "partition_number": "{PARTITION_NUMBER}\n"
+                    }
+                }
             }
         },
         "django": {
@@ -113,6 +118,10 @@ MIGRATION_PLAN_MOCK = {
                 }
             }
         },
+        {
+            "address": "ubuntu16__lvm",
+            "blueprint": "default"
+        }
     ],
     "target_cloud": {
         "platform": "pb",

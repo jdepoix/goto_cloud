@@ -10,12 +10,12 @@ class RemoteHostMock(object):
         self.expected_config = expected_config
 
     def execute(self, command):
-        actual_command = next((known_command for known_command in self.commands if known_command in command), None)
+        actual_command = next(known_command for known_command in self.commands if known_command in command)
 
         return (
-            (BytesIO(), BytesIO(self.commands[actual_command].encode()), BytesIO())
-            if actual_command
-            else (BytesIO(), BytesIO(), BytesIO(b'Command does not exist!'))
+            BytesIO(),
+            BytesIO(self.commands[actual_command].encode()) if self.commands[actual_command] else BytesIO(),
+            BytesIO(),
         )
 
     def get_config(self):
@@ -32,10 +32,14 @@ class RemoteHostMock(object):
         commands = {}
 
         for command in command_directory_map:
-            with open(
-                os.path.join(os.path.join(commands_root_directory, command_directory_map[command]), filename)
-            ) as command_output:
-                commands[command] = command_output.read()
+            if command_directory_map[command]:
+                with open(
+                    os.path.join(os.path.join(commands_root_directory, command_directory_map[command]), filename)
+                ) as command_output:
+                    commands[command] = command_output.read()
+            else:
+                commands[command] = None
+
         return RemoteHostMock(commands, expected_config)
 
 
@@ -50,6 +54,7 @@ COMMAND_DIRECTORY_MAP = {
     'route -n': 'route',
     'hostname': 'hostname',
     'lsblk -no NAME': 'lsblkl',
+    '| sudo fdisk': None,
 }
 
 UBUNTU_12_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubuntu-12.04', COMMAND_DIRECTORY_MAP, {
@@ -542,6 +547,149 @@ TARGET__DEVICE_IDENTIFICATION = RemoteHostMock.create_from_file(
         },
         'network': {
             'hostname': 'target__device_identification',
+            'interfaces': {
+                'eth0': {
+                    'ip': '10.17.32.15',
+                    'net_mask': '255.255.255.0',
+                    'routes': [
+                        {
+                            'net': '0.0.0.0',
+                            'gateway': '10.17.32.1',
+                            'net_mask': '0.0.0.0',
+                        },
+                        {
+                            'net': '10.0.0.0',
+                            'gateway': '10.17.32.1',
+                            'net_mask': '255.0.0.0'
+                        },
+                        {
+                            'net': '10.17.32.0',
+                            'gateway': '0.0.0.0',
+                            'net_mask': '255.255.255.0'
+                        }
+                    ]
+                },
+                'lo': {
+                    'ip': '127.0.0.1',
+                    'net_mask': '255.0.0.0',
+                    'routes': []
+                }
+            }
+        },
+        'os': {
+            'name': 'Ubuntu',
+            'version': '16.04'
+        },
+        'hardware': {
+            'cpus': [
+                {
+                    'model': 'AMD Opteron 62xx class CPU',
+                    'mhz': 2799.998
+                }
+            ],
+            'ram': {
+                'size': 1007256000
+            }
+        }
+    }
+)
+
+TARGET__FILESYSTEM_CREATION = RemoteHostMock.create_from_file(
+    COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH,
+    'target__filesystem_creation',
+    COMMAND_DIRECTORY_MAP,
+    {
+        'block_devices': {
+            'vda': {
+                'type': 'disk',
+                'fs': '',
+                'uuid': '',
+                'label': '',
+                'mountpoint': '',
+                'size': 10737418240,
+                'children': {
+                    'vda1': {
+                        'type': 'part',
+                        'fs': 'ext4',
+                        'uuid': '549c8755-2757-446e-8c78-f76b50491f21',
+                        'label': '',
+                        'mountpoint': '/',
+                        'size': 3219128320,
+                        'bootable': True,
+                        'start': 2048,
+                        'end': 6289407,
+                        'children': {}
+                    }
+                }
+            },
+            'vdb': {
+                'type': 'disk',
+                'fs': '',
+                'uuid': '',
+                'label': '',
+                'mountpoint': '',
+                'size': 10737418240,
+                'children': {
+                    'vdb1': {
+                        'type': 'part',
+                        'fs': '',
+                        'uuid': '',
+                        'label': '',
+                        'mountpoint': '',
+                        'size': 10736369664,
+                        'bootable': True,
+                        'start': 2048,
+                        'end': 20971519,
+                        'children': {}
+                    }
+                }
+            },
+            'vdc': {
+                'type': 'disk',
+                'fs': '',
+                'uuid': '',
+                'label': '',
+                'mountpoint': '',
+                'size': 10737418240,
+                'children': {}
+            },
+            'vdd': {
+                'type': 'disk',
+                'fs': '',
+                'uuid': '',
+                'label': '',
+                'mountpoint': '',
+                'size': 10737418240,
+                'children': {
+                    'vdd1': {
+                        'type': 'part',
+                        'fs': '',
+                        'uuid': '',
+                        'label': '',
+                        'mountpoint': '',
+                        'size': 5368709120,
+                        'bootable': False,
+                        'start': 2048,
+                        'end': 10487807,
+                        'children': {}
+                    },
+                    'vdd2': {
+                        'type': 'part',
+                        'fs': '',
+                        'uuid': '',
+                        'label': '',
+                        'mountpoint': '',
+                        'size': 5367660544,
+                        'bootable': False,
+                        'start': 10487808,
+                        'end': 20971519,
+                        'children': {}
+                    }
+                }
+            },
+        },
+        'network': {
+            'hostname': 'target__filesystem_creation',
             'interfaces': {
                 'eth0': {
                     'ip': '10.17.32.15',
