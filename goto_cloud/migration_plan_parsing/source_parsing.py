@@ -65,12 +65,13 @@ class SourceParser(DbItemHandler):
         """
         return self.add_db_item(
             RemoteHost.objects.create(
-                address=source['address'],
-                port=blueprint['ssh'].get('port'),
-                username=blueprint['ssh'].get('username'),
-                password=blueprint['ssh'].get('password'),
-                private_key=blueprint['ssh'].get('private_key'),
-                private_key_file_path=blueprint['ssh'].get('private_key_file_path'),
+                **{
+                    'address': source['address'],
+                    'username': blueprint['ssh'].get('username'),
+                    'password': blueprint['ssh'].get('password'),
+                    'private_key': blueprint['ssh'].get('private_key'),
+                    'private_key_file_path': blueprint['ssh'].get('private_key_file_path'),
+                }, **({'port': blueprint['ssh'].get('port')} if blueprint['ssh'].get('port') else {})
             )
         )
 
