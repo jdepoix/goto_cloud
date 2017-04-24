@@ -34,6 +34,18 @@ class TestRemoteHostCommand(TestCase):
             'ls  firstvar secondvar'
         )
 
+    def test_render__with_partially_used_optionals(self):
+        self.assertEquals(
+            RemoteHostCommand({
+                'command': 'ls {OPTIONALS} {FIRSTVAR} {SECONDVAR}',
+                'optionals': {
+                    'thirdvar': '-3 {THIRDVAR}',
+                    'forthvar': '-4 {FORTHVAR}'
+                }
+            }).render(firstvar='firstvar', secondvar='secondvar', thirdvar='thirdvar'),
+            'ls -3 thirdvar firstvar secondvar'
+        )
+
     def test_render__no_vars(self):
         self.assertEquals(
             RemoteHostCommand('ls').render(),
