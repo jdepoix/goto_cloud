@@ -55,6 +55,10 @@ COMMAND_DIRECTORY_MAP = {
     'hostname': 'hostname',
     'lsblk -no NAME': 'lsblkl',
     '| sudo fdisk': None,
+    'sudo mkfs': None,
+    'rsync': None,
+    'mount': None,
+    'grub-install': None,
 }
 
 UBUNTU_12_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubuntu-12.04', COMMAND_DIRECTORY_MAP, {
