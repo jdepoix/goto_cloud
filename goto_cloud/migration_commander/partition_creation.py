@@ -16,7 +16,7 @@ class CreatePartitionsCommand(DeviceModifyingCommand):
         pass
 
     def execute(self):
-        errors = self._execute_on_every_device(self._create_partition)
+        errors = self._execute_on_every_partition(self._create_partition)
 
         if errors:
             raise CreatePartitionsCommand.CanNotCreatePartitionException(
@@ -70,57 +70,53 @@ class CreatePartitionsCommand(DeviceModifyingCommand):
             )
         )
 
-    def _create_partition(
-        self, remote_executor, source_device, partition_device, partition_device_id, target_device_id
-    ):
+    def _create_partition(self, remote_executor, source_device, target_device, partition_device):
         """
         creates a partition
         
         :param remote_executor: remote executor to use for execution
         :type remote_executor: RemoteHostExecutor 
         :param source_device: the source device
-        :type source_device: dict
+        :type source_device: (str, dict)
+        :param target_device: the target device
+        :type target_device: (str, dict)
         :param partition_device: the original partition device
-        :type partition_device: dict
-        :param partition_device_id: the original partition devices id
-        :type partition_device_id: str
-        :param target_device_id: the id of the target device
-        :type target_device_id: str
+        :type partition_device: (str, dict)
         :return: a error which occurred during execution (in case it did...)
         :rtype: str
         """
-        if partition_device['type'] == 'part':
-            parent_device = '/dev/{device_id}'.format(device_id=target_device_id)
+        if partition_device[1]['type'] == 'part':
+            parent_device = '/dev/{device_id}'.format(device_id=target_device[0])
 
             self._execute_create_partition(
                 remote_executor,
-                partition_device_id[-1],
-                partition_device['start'],
-                partition_device['end'],
+                partition_device[0][-1],
+                partition_device[1]['start'],
+                partition_device[1]['end'],
                 parent_device
             )
 
-            if partition_device['bootable']:
+            if partition_device[1]['bootable']:
                 self._execute_tag_partition_bootable(
-                    remote_executor, source_device, partition_device_id[-1], parent_device,
+                    remote_executor, source_device[1], partition_device[0][-1], parent_device,
                 )
 
-            if partition_device['children']:
+            if partition_device[1]['children']:
                 return (
                     'The device {device_id} seems to have children, which can not be replicated to '
                     '{target_device_id} automatically. '
                     'These children should be replicated:\n{children}'.format(
-                        device_id=partition_device_id,
-                        target_device_id=target_device_id,
-                        children=str(partition_device['children'])
+                        device_id=partition_device[0],
+                        target_device_id=target_device[0],
+                        children=str(partition_device[1]['children'])
                     )
                 )
         else:
             return (
                 'The device {device_id} is not of type partition and therefore can\'t be replicated to '
                 '{target_device_id}'.format(
-                    device_id=partition_device_id,
-                    target_device_id=target_device_id
+                    device_id=partition_device[0],
+                    target_device_id=target_device[0]
                 )
             )
 
