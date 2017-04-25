@@ -11,7 +11,7 @@ class DeviceIdentificationCommand(SourceCommand):
         """
         pass
 
-    def execute(self):
+    def _execute(self):
         self._target.device_mapping = self._map_unallocated_devices_onto_source_devices(
             self._get_unallocated_target_devices()
         )

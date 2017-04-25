@@ -13,7 +13,7 @@ class CreateFilesystemsCommand(DeviceModifyingCommand):
         """
         pass
 
-    def execute(self):
+    def _execute(self):
         errors = self._execute_on_every_device(self._create_filesystem_on_disk, self._create_filesystem_on_partition)
 
         if errors:

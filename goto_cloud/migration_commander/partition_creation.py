@@ -15,7 +15,7 @@ class CreatePartitionsCommand(DeviceModifyingCommand):
         """
         pass
 
-    def execute(self):
+    def _execute(self):
         errors = self._execute_on_every_partition(self._create_partition)
 
         if errors:

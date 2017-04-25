@@ -8,8 +8,18 @@ class Command(metaclass=ABCMeta):
     Represents a executable unit. The execute method can be overwritten, to implement a plugable, self-contained 
     execution
     """
-    @abstractmethod
     def execute(self):
+        """
+        executes the command
+
+        :return: does not return anything, except for a Commander.Signal, in case a Signal is given to the executing
+        unit
+        :rtype: None | str
+        """
+        return self._execute()
+
+    @abstractmethod
+    def _execute(self):
         """
         executes the command
 

@@ -34,12 +34,12 @@ class TestSource(Source):
 
 
 class DefaultCommand(SourceCommand):
-    def execute(self):
+    def _execute(self):
         pass
 
 
 class SleepCommand(SourceCommand):
-    def execute(self):
+    def _execute(self):
         return Commander.Signal.SLEEP
 
 

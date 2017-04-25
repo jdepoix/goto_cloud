@@ -21,7 +21,7 @@ class Commander(SourceCommand, metaclass=ABCMeta):
         super().__init__(source)
 
     # TODO error handling and persistent status logging
-    def execute(self):
+    def _execute(self):
         current_command_class = self._commander_driver.get(self._source.status)
         signal = None
         if current_command_class:
