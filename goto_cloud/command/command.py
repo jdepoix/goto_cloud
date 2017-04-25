@@ -19,7 +19,13 @@ class Command(metaclass=ABCMeta):
         :rtype: None | str
         """
         self.errors = []
-        return self._execute()
+
+        signal = self._execute()
+
+        error_report = self.get_error_report()
+        if error_report: self._handle_error_report(error_report)
+
+        return signal
 
     @abstractmethod
     def _execute(self):
@@ -49,6 +55,16 @@ class Command(metaclass=ABCMeta):
         :type error: str
         """
         self.errors.append(error)
+
+    def _handle_error_report(self, error_report):
+        """
+        This method is called after execution, if there are errors in the error report. This can be overwritten, to
+        define a custom way, a extending Command, handles errors
+        
+        :param error_report: the error report
+        :type error_report: str
+        """
+        pass
 
     @staticmethod
     def _collect_errors(method):

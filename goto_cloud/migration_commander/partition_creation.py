@@ -17,13 +17,12 @@ class CreatePartitionsCommand(DeviceModifyingCommand):
 
     def _execute(self):
         self._execute_on_every_partition(self._create_partition)
-        errors = self.get_error_report()
 
-        if errors:
-            raise CreatePartitionsCommand.CanNotCreatePartitionException(
-                'While trying to create the partitions, the following errors occurred. Please resolves these manually '
-                'and then skip this step:\n{errors}'.format(errors=errors)
-            )
+    def _handle_error_report(self, error_report):
+        raise CreatePartitionsCommand.CanNotCreatePartitionException(
+            'While trying to create the partitions, the following errors occurred. Please resolves these manually '
+            'and then skip this step:\n{errors}'.format(errors=error_report)
+        )
 
     @DeviceModifyingCommand._collect_errors
     def _execute_create_partition(self, remote_executor, partition_number, start, end, parent_device):
