@@ -19,7 +19,9 @@ class CreateFilesystemsCommand(DeviceModifyingCommand):
         if errors:
             raise CreateFilesystemsCommand.UnsupportedFilesystemException(
                 'While trying to create the partitions, the following errors occurred. Please resolves these manually '
-                'and then skip this step:\n{errors}'.format(errors='\n\n'.join(errors))
+                'and then skip this step:\n{errors}'.format(
+                    errors='\n\n-------------------------------------------------------------\n'.join(errors)
+                )
             )
 
     def _create_filesystem_on_partition(self, remote_executor, source_device, target_device, partition_device):
@@ -69,13 +71,15 @@ class CreateFilesystemsCommand(DeviceModifyingCommand):
         """
         if source_device[1]['fs']:
             if source_device[1]['fs'] in self._target.blueprint['commands']['create_filesystem']:
-                remote_executor.execute(
-                    RemoteHostCommand(
-                        self._target.blueprint['commands']['create_filesystem'][source_device[1]['fs']]
-                    ).render(
-                        device='/dev/{device_id}'.format(device_id=target_device_id),
-                        **{'uuid': source_device[1]['uuid']} if source_device[1]['uuid'] else {},
-                        **{'label': source_device[1]['label']} if source_device[1]['label'] else {},
+                return self._execute_and_return_errors(
+                    lambda: remote_executor.execute(
+                        RemoteHostCommand(
+                            self._target.blueprint['commands']['create_filesystem'][source_device[1]['fs']]
+                        ).render(
+                            device='/dev/{device_id}'.format(device_id=target_device_id),
+                            **{'uuid': source_device[1]['uuid']} if source_device[1]['uuid'] else {},
+                            **{'label': source_device[1]['label']} if source_device[1]['label'] else {},
+                        )
                     )
                 )
             else:

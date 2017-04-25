@@ -43,17 +43,17 @@ MIGRATION_PLAN_MOCK = {
             "commands": {
                 "create_filesystem": {
                     "ext4": {
-                        "command": "sudo mkfs.ext4 {OPTIONALS} {DEVICE}",
+                        "command": "sudo mkfs.ext4 {OPTIONALS} -F {DEVICE}",
                         "optionals": {
-                            "uuid": "-u {UUID}",
-                            "label": "-l {LABEL}"
+                            "uuid": "-U {UUID}",
+                            "label": "-L {LABEL}"
                         }
                     },
                     "ext3": {
-                        "command": "sudo mkfs.ext3 {OPTIONALS} {DEVICE}",
+                        "command": "sudo mkfs.ext3 {OPTIONALS} -F {DEVICE}",
                         "optionals": {
-                            "uuid": "-u {UUID}",
-                            "label": "-l {LABEL}"
+                            "uuid": "-U {UUID}",
+                            "label": "-L {LABEL}"
                         }
                     }
                 },

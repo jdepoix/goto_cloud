@@ -26,7 +26,7 @@ class DeviceModifyingCommand(SourceCommand):
 
         for target_device_id, source_device_id in self._target.device_mapping.items():
             if executable_for_disks:
-                self._append_if_not_none(
+                self._add_errors(
                     collected_errors,
                     executable_for_disks(
                         remote_executor,
@@ -38,7 +38,7 @@ class DeviceModifyingCommand(SourceCommand):
             if executable_for_partitions:
                 for partition_device_id, partition_device \
                         in self._source.remote_host.system_info['block_devices'][source_device_id]['children'].items():
-                    self._append_if_not_none(
+                    self._add_errors(
                         collected_errors,
                         executable_for_partitions(
                             remote_executor,
@@ -63,6 +63,24 @@ class DeviceModifyingCommand(SourceCommand):
         """
         return self._execute_on_every_device(None, executable)
 
-    def _append_if_not_none(self, list_to_append_to, value):
-        if value:
-            list_to_append_to.append(value)
+    def _execute_and_return_errors(self, executable):
+        """
+        executes something and in case an exception is thrown, it continues execution and returns the exception as a
+        string
+        
+        :param executable: a callable
+        :type executable: () -> Any
+        :return: error message
+        :rtype: str
+        """
+        try:
+            executable()
+        except Exception as e:
+            return str(e)
+
+    def _add_errors(self, errors, new_error):
+        if new_error:
+            if isinstance(new_error, list):
+                errors.extend(new_error)
+            else:
+                errors.append(new_error)

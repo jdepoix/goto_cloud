@@ -21,7 +21,9 @@ class CreatePartitionsCommand(DeviceModifyingCommand):
         if errors:
             raise CreatePartitionsCommand.CanNotCreatePartitionException(
                 'While trying to create the partitions, the following errors occurred. Please resolves these manually '
-                'and then skip this step:\n{errors}'.format(errors='\n\n'.join(errors))
+                'and then skip this step:\n{errors}'.format(
+                    errors='\n\n-------------------------------------------------------------\n'.join(errors)
+                )
             )
 
     def _execute_create_partition(self, remote_executor, partition_number, start, end, parent_device):
@@ -38,13 +40,17 @@ class CreatePartitionsCommand(DeviceModifyingCommand):
         :type end: int
         :param parent_device: the parent device of the partition
         :type parent_device: str
+        :return: errors which occurred
+        :rtype: str
         """
-        remote_executor.execute(
-            RemoteHostCommand(self._target.blueprint['commands']['create_partition']).render(
-                partition_number=partition_number,
-                start=start,
-                end=end,
-                device=parent_device,
+        return self._execute_and_return_errors(
+            lambda: remote_executor.execute(
+                RemoteHostCommand(self._target.blueprint['commands']['create_partition']).render(
+                    partition_number=partition_number,
+                    start=start,
+                    end=end,
+                    device=parent_device,
+                )
             )
         )
 
@@ -60,13 +66,17 @@ class CreatePartitionsCommand(DeviceModifyingCommand):
         :type partition_number: str
         :param parent_device: the parent device of the partition
         :type parent_device: str
+        :return: errors which occurred
+        :rtype: str
         """
-        remote_executor.execute(
-            RemoteHostCommand(self._target.blueprint['commands']['tag_partition_bootable']).render(
-                parent_device=parent_device,
-                **({
-                    'partition_number': partition_number,
-                } if len(source_device['children']) > 1 else {})
+        return self._execute_and_return_errors(
+            lambda: remote_executor.execute(
+                RemoteHostCommand(self._target.blueprint['commands']['tag_partition_bootable']).render(
+                    parent_device=parent_device,
+                    **({
+                        'partition_number': partition_number,
+                    } if len(source_device['children']) > 1 else {})
+                )
             )
         )
 
@@ -82,27 +92,35 @@ class CreatePartitionsCommand(DeviceModifyingCommand):
         :type target_device: (str, dict)
         :param partition_device: the original partition device
         :type partition_device: (str, dict)
-        :return: a error which occurred during execution (in case it did...)
-        :rtype: str
+        :return: a list of errors which occurred during execution (in case it did...)
+        :rtype: [str]
         """
+        errors = []
+
         if partition_device[1]['type'] == 'part':
             parent_device = '/dev/{device_id}'.format(device_id=target_device[0])
 
-            self._execute_create_partition(
-                remote_executor,
-                partition_device[0][-1],
-                partition_device[1]['start'],
-                partition_device[1]['end'],
-                parent_device
+            self._add_errors(
+                errors,
+                self._execute_create_partition(
+                    remote_executor,
+                    partition_device[0][-1],
+                    partition_device[1]['start'],
+                    partition_device[1]['end'],
+                    parent_device
+                )
             )
 
             if partition_device[1]['bootable']:
-                self._execute_tag_partition_bootable(
-                    remote_executor, source_device[1], partition_device[0][-1], parent_device,
+                self._add_errors(
+                    errors,
+                    self._execute_tag_partition_bootable(
+                        remote_executor, source_device[1], partition_device[0][-1], parent_device,
+                    )
                 )
 
             if partition_device[1]['children']:
-                return (
+                errors.append(
                     'The device {device_id} seems to have children, which can not be replicated to '
                     '{target_device_id} automatically. '
                     'These children should be replicated:\n{children}'.format(
@@ -112,7 +130,7 @@ class CreatePartitionsCommand(DeviceModifyingCommand):
                     )
                 )
         else:
-            return (
+            errors.append(
                 'The device {device_id} is not of type partition and therefore can\'t be replicated to '
                 '{target_device_id}'.format(
                     device_id=partition_device[0],
@@ -120,4 +138,4 @@ class CreatePartitionsCommand(DeviceModifyingCommand):
                 )
             )
 
-        return None
+        return errors
