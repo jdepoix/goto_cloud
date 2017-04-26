@@ -12,11 +12,14 @@ class RemoteHostMock(object):
     def execute(self, command):
         actual_command = next(known_command for known_command in self.commands if known_command in command)
 
-        return (
-            BytesIO(),
-            BytesIO(self.commands[actual_command].encode()) if self.commands[actual_command] else BytesIO(),
-            BytesIO(),
-        )
+        return {
+            'exit_code': 0,
+            'streams': (
+                BytesIO(),
+                BytesIO(self.commands[actual_command].encode()) if self.commands[actual_command] else BytesIO(),
+                BytesIO(),
+            ),
+        }
 
     def get_config(self):
         return self.expected_config

@@ -14,6 +14,25 @@ from remote_host.public import RemoteHost
 from ..remote_execution import RemoteExecutor, SshRemoteExecutor, RemoteHostExecutor
 
 
+class ChannelMock():
+    def __init__(self, failing):
+        self.failing = failing
+
+    def recv_exit_status(self):
+        return 1 if self.failing else 0
+
+
+class ChannelFileMock():
+    def __init__(self, content, failing=False):
+        self.file_object = BytesIO(content.encode())
+        self.channel = ChannelMock(failing)
+
+    def __getattribute__(self, item):
+        if item == 'file_object' or item == 'channel':
+            return super().__getattribute__(item)
+        return getattr(self.file_object, item)
+
+
 def connect_mock(self, *args, **kwargs):
     self.connected = True
 
@@ -24,8 +43,8 @@ def close_mock(self):
 
 def execute_mock(self, command):
     test_commands = {
-        'successful_command': (BytesIO(b''), BytesIO(b'Command Success'), BytesIO(b'')),
-        'error_command': (BytesIO(b''), BytesIO(b''), BytesIO(b'Command Error'))
+        'successful_command': (ChannelFileMock(''), ChannelFileMock('Command Success'), ChannelFileMock('')),
+        'error_command': (ChannelFileMock('', True), ChannelFileMock('', True), ChannelFileMock('Command Error', True))
     }
 
     return test_commands[command]

@@ -112,19 +112,17 @@ class RemoteExecutor(metaclass=ABCMeta):
         if not self.is_connected():
             self.connect()
 
-        _, stdout, stderr = self._execute(command)
+        execution_result = self._execute(command)
 
-        stderr_output = stderr.read()
-
-        if stderr_output:
+        if execution_result['exit_code'] != 0:
             raise RemoteExecutor.ExecutionException(
                 'While executing:\n{command}\n\nThe following Error occurred:\n{error}'.format(
                     command=command,
-                    error=stderr_output.decode(),
+                    error=execution_result['streams'][2].read(),
                 )
             )
 
-        return stdout.read().decode().strip()
+        return execution_result['streams'][1].read().decode().strip()
 
     @abstractmethod
     def _execute(self, command):
@@ -165,7 +163,12 @@ class SshRemoteExecutor(RemoteExecutor):
         return self.remote_client and self.remote_client.get_transport() is not None
 
     def _execute(self, command):
-        return self.remote_client.exec_command(command)
+        streams = self.remote_client.exec_command(command)
+
+        return {
+            'exit_code': streams[1].channel.recv_exit_status(),
+            'streams': streams,
+        }
 
 
 class RemoteHostExecutor(AbstractedRemoteHostOperator):
