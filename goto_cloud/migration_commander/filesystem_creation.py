@@ -22,7 +22,9 @@ class CreateFilesystemsCommand(DeviceModifyingCommand):
             'and then skip this step:\n{errors}'.format(errors=error_report)
         )
 
-    def _create_filesystem_on_partition(self, remote_executor, source_device, target_device, partition_device):
+    def _create_filesystem_on_partition(
+        self, remote_executor, source_device, target_device, partition_device, target_partition_device
+    ):
         """
         creates a filesystem on a partition
         
@@ -34,8 +36,10 @@ class CreateFilesystemsCommand(DeviceModifyingCommand):
         :type target_device_id: (str, dict)
         :param partition_device: the original partition device
         :type partition_device: (str, dict)
+        :param target_partition_device: the target partition device
+        :type target_partition_device: (str, dict)
         """
-        self._create_filesystem(remote_executor, partition_device, target_device[0] + partition_device[0][-1])
+        self._create_filesystem(remote_executor, partition_device, target_partition_device[0])
 
     def _create_filesystem_on_disk(self, remote_executor, source_device, target_device):
         """

@@ -62,6 +62,7 @@ COMMAND_DIRECTORY_MAP = {
     'rsync': None,
     'mount': None,
     'grub-install': None,
+    'echo -e': None,
 }
 
 UBUNTU_12_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PATH, 'ubuntu-12.04', COMMAND_DIRECTORY_MAP, {

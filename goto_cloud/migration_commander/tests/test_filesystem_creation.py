@@ -10,6 +10,7 @@ from test_assets.public import TestAsset
 
 from ..filesystem_creation import CreateFilesystemsCommand
 from ..target_system_info_inspection import GetTargetSystemInfoCommand
+from ..device_identification import DeviceIdentificationCommand
 
 from .utils import PatchTrackedRemoteExecution
 
@@ -23,13 +24,7 @@ class TestCreateFilesystemsCommand(TestCase, metaclass=PatchTrackedRemoteExecuti
         self.source.target.save()
 
         GetTargetSystemInfoCommand(self.source).execute()
-
-        self.source.target.device_mapping = {
-            'vdb': 'vda',
-            'vdc': 'vdb',
-            'vdd': 'vdc',
-        }
-        self.source.target.save()
+        DeviceIdentificationCommand(self.source).execute()
 
     def test_execute(self):
         self._init_test_data('ubuntu16', 'target__device_identification')

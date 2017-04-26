@@ -34,9 +34,35 @@ class TestDeviceIdentificationCommand(TestCase, metaclass=TestAsset.PatchRemoteH
         self.assertDictEqual(
             self.target.device_mapping,
             {
-                'vdb': 'vda',
-                'vdc': 'vdb',
-                'vdd': 'vdc',
+                'vda': {
+                    'id': 'vdb',
+                    'mountpoint': '',
+                    'children': {
+                        'vda1': {
+                            'id': 'vdb1',
+                            'mountpoint': '/mnt/' + str(hash('/')),
+                        }
+                    }
+                },
+                'vdb': {
+                    'id': 'vdc',
+                    'mountpoint': '',
+                    'children': {}
+                },
+                'vdc': {
+                    'id': 'vdd',
+                    'mountpoint': '',
+                    'children': {
+                        'vdc1': {
+                            'id': 'vdd1',
+                            'mountpoint': '/mnt/' + str(hash('/mnt/vdc1')),
+                        },
+                        'vdc2': {
+                            'id': 'vdd2',
+                            'mountpoint': '/mnt/' + str(hash('/mnt/vdc2')),
+                        }
+                    }
+                },
             }
         )
 
