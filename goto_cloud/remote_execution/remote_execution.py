@@ -118,7 +118,7 @@ class RemoteExecutor(metaclass=ABCMeta):
             raise RemoteExecutor.ExecutionException(
                 'While executing:\n{command}\n\nThe following Error occurred:\n{error}'.format(
                     command=command,
-                    error=execution_result['streams'][2].read(),
+                    error=execution_result['streams'][2].read().decode().strip(),
                 )
             )
 

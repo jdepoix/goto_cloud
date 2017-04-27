@@ -1,3 +1,5 @@
+import sys
+
 from command.public import SourceCommand
 
 
@@ -61,7 +63,7 @@ class DeviceIdentificationCommand(SourceCommand):
                 if matching_device_id:
                     device_map[source_device_id] = {
                         'id': matching_device_id,
-                        'mountpoint': self._map_mountpoint(source_device),
+                        'mountpoint': self._map_mountpoint(source_device['mountpoint']),
                         'children': self._map_children(source_device_id, matching_device_id)
                     }
 
@@ -97,20 +99,21 @@ class DeviceIdentificationCommand(SourceCommand):
         for partition_device_id, partition_device in source_device['children'].items():
             children[partition_device_id] = {
                 'id': target_device_id + partition_device_id[-1],
-                'mountpoint': self._map_mountpoint(partition_device)
+                'mountpoint': self._map_mountpoint(partition_device['mountpoint'])
             }
 
         return children
 
-    def _map_mountpoint(self, device):
+    @staticmethod
+    def _map_mountpoint(mountpoint):
         """
-        map the mountpoint of the device to a hashed mountpoint
+        map the mountpoint of a source device to a hashed mountpoint, which can be used on a target device
         
-        :param device: device to hash the mountpoint for
-        :type device: dict
-        :return: the mountpoint containing the hashed path
+        :param mountpoint: mountpoint of the source device
+        :type mountpoint: str
+        :return: the mountpoint containing the hashed path for the target device
         :rtype: str
         """
         return '/mnt/{mountpoint_hash}'.format(
-            mountpoint_hash=str(hash(device['mountpoint']))
-        ) if device['mountpoint'] else ''
+            mountpoint_hash=str(hash(mountpoint) + sys.maxsize + 1)
+        ) if mountpoint else ''

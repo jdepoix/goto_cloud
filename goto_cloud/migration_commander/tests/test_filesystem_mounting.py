@@ -44,28 +44,43 @@ class TestFilesystemMountCommand(TestCase, metaclass=PatchTrackedRemoteExecution
 
         self.assertIn(
             (
-                'sudo echo -e "'
-                'UUID=549c8755-2757-446e-8c78-f76b50491f21\t/mnt/' + str(hash('/')) + '\text4\tdefaults\t0\t2'
-                '" >> /etc/fstab'
+                'sudo bash -c "echo -e \\"'
+                'UUID=549c8755-2757-446e-8c78-f76b50491f21\t'
+                + DeviceIdentificationCommand._map_mountpoint('/')
+                + '\text4\tdefaults\t0\t2'
+                '\\" >> /etc/fstab"'
             ),
             self.executed_commands
         )
         self.assertIn(
             (
-                'sudo echo -e "'
-                'UUID=53ad2170-488d-481a-a6ab-5ce0e538f247\t/mnt/' + str(hash('/mnt/vdc1')) + '\text4\tdefaults\t0\t2'
-                '" >> /etc/fstab'
+                'sudo bash -c "echo -e \\"'
+                'UUID=53ad2170-488d-481a-a6ab-5ce0e538f247\t'
+                + DeviceIdentificationCommand._map_mountpoint('/mnt/vdc1')
+                + '\text4\tdefaults\t0\t2'
+                '\\" >> /etc/fstab"'
             ),
             self.executed_commands
         )
         self.assertIn(
             (
-                'sudo echo -e "'
-                'UUID=bcab224c-8407-4783-8cea-f9ea4be3fabf\t/mnt/' + str(hash('/mnt/vdc2')) + '\text4\tdefaults\t0\t2'
-                '" >> /etc/fstab'
+                'sudo bash -c "echo -e \\"'
+                'UUID=bcab224c-8407-4783-8cea-f9ea4be3fabf\t'
+                + DeviceIdentificationCommand._map_mountpoint('/mnt/vdc2')
+                + '\text4\tdefaults\t0\t2'
+                '\\" >> /etc/fstab"'
             ),
             self.executed_commands
         )
+
+    def test_execute__mount_dirs_created(self):
+        self._init_test_data('ubuntu16', 'target__device_identification')
+
+        FilesystemMountCommand(self.source).execute()
+
+        self.assertIn('sudo mkdir ' + DeviceIdentificationCommand._map_mountpoint('/'), self.executed_commands)
+        self.assertIn('sudo mkdir ' + DeviceIdentificationCommand._map_mountpoint('/mnt/vdc1'), self.executed_commands)
+        self.assertIn('sudo mkdir ' + DeviceIdentificationCommand._map_mountpoint('/mnt/vdc2'), self.executed_commands)
 
     @patch(
         'migration_commander.default_remote_host_commands.DefaultRemoteHostCommand.ADD_FSTAB_ENTRY.render',

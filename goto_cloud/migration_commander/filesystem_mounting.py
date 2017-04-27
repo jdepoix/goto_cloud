@@ -86,12 +86,13 @@ class FilesystemMountCommand(DeviceModifyingCommand):
         :type label: str
         """
         if mountpoint:
+            remote_executor.execute(DefaultRemoteHostCommand.MAKE_DIRECTORY.render(directory=mountpoint))
             remote_executor.execute(
                 DefaultRemoteHostCommand.ADD_FSTAB_ENTRY.render(
                     identifier='UUID={uuid}'.format(uuid=uuid)
                                 if uuid else
                                     'LABEL={label}'.format(label=label)
-                                    if label else device_id,
+                                    if label else '/dev/{device_id}'.format(device_id=device_id),
                     mountpoint=mountpoint,
                     filesystem=filesystem,
                 )

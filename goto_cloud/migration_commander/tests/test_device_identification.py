@@ -1,3 +1,5 @@
+import sys
+
 from unittest import TestCase
 
 from target.public import Target
@@ -40,7 +42,7 @@ class TestDeviceIdentificationCommand(TestCase, metaclass=TestAsset.PatchRemoteH
                     'children': {
                         'vda1': {
                             'id': 'vdb1',
-                            'mountpoint': '/mnt/' + str(hash('/')),
+                            'mountpoint': '/mnt/' + str(hash('/') + sys.maxsize + 1),
                         }
                     }
                 },
@@ -55,11 +57,11 @@ class TestDeviceIdentificationCommand(TestCase, metaclass=TestAsset.PatchRemoteH
                     'children': {
                         'vdc1': {
                             'id': 'vdd1',
-                            'mountpoint': '/mnt/' + str(hash('/mnt/vdc1')),
+                            'mountpoint': '/mnt/' + str(hash('/mnt/vdc1') + sys.maxsize + 1),
                         },
                         'vdc2': {
                             'id': 'vdd2',
-                            'mountpoint': '/mnt/' + str(hash('/mnt/vdc2')),
+                            'mountpoint': '/mnt/' + str(hash('/mnt/vdc2') + sys.maxsize + 1),
                         }
                     }
                 },
