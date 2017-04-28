@@ -1,6 +1,6 @@
-import sys
-
 from command.public import SourceCommand
+
+from .mountpoint_mapping import MountpointMapper
 
 
 class DeviceIdentificationCommand(SourceCommand):
@@ -114,6 +114,4 @@ class DeviceIdentificationCommand(SourceCommand):
         :return: the mountpoint containing the hashed path for the target device
         :rtype: str
         """
-        return '/mnt/{mountpoint_hash}'.format(
-            mountpoint_hash=str(hash(mountpoint) + sys.maxsize + 1)
-        ) if mountpoint else ''
+        return MountpointMapper.map_mountpoint('/mnt', mountpoint) if mountpoint else ''
