@@ -10,14 +10,25 @@ class RemoteHostMock(object):
         self.expected_config = expected_config
 
     def execute(self, command):
-        actual_command = next(known_command for known_command in self.commands if known_command in command)
+        matching_commands = [known_command for known_command in self.commands if known_command in command]
 
+        if matching_commands:
+            return {
+                'exit_code': 0,
+                'streams': (
+                    BytesIO(),
+                    BytesIO(self.commands[matching_commands[0]].encode())
+                        if self.commands[matching_commands[0]]
+                        else BytesIO(),
+                    BytesIO(),
+                ),
+            }
         return {
-            'exit_code': 0,
+            'exit_code': 1,
             'streams': (
                 BytesIO(),
-                BytesIO(self.commands[actual_command].encode()) if self.commands[actual_command] else BytesIO(),
                 BytesIO(),
+                BytesIO('Command {command_name} not known!'.format(command_name=command).encode()),
             ),
         }
 
@@ -410,7 +421,6 @@ UBUNTU_16_04 = RemoteHostMock.create_from_file(COMMANDS_OUTPUT_ROOT_DIRECTORY_PA
                 }
             }
         },
-
         'vdb': {
             'type': 'disk',
             'fs': 'ext3',

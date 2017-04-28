@@ -171,7 +171,7 @@ class SshRemoteExecutor(RemoteExecutor):
         }
 
 
-class RemoteHostExecutor(AbstractedRemoteHostOperator):
+class RemoteHostExecutor(AbstractedRemoteHostOperator, RemoteExecutor):
     """
     takes care of the remote execution for a given RemoteHost
     """
@@ -187,3 +187,23 @@ class RemoteHostExecutor(AbstractedRemoteHostOperator):
             password=self.remote_host.password if self.remote_host.password else None,
             port=self.remote_host.port if self.remote_host.port else None,
         )
+
+    def _execute(self, command):
+        # At runtime the method of the chosen operator is used. This stub is only to implement the abstract method.
+        pass
+
+    def connect(self):
+        # At runtime the method of the chosen operator is used. This stub is only to implement the abstract method.
+        pass
+
+    def is_connected(self):
+        # At runtime the method of the chosen operator is used. This stub is only to implement the abstract method.
+        pass
+
+    def _close(self):
+        # At runtime the method of the chosen operator is used. This stub is only to implement the abstract method.
+        pass
+
+    def __del__(self):
+        # to make sure the close() method is not triggered twice
+        pass
