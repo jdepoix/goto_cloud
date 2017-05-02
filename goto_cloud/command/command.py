@@ -8,7 +8,7 @@ class Command(metaclass=ABCMeta):
     Represents a executable unit. The execute method can be overwritten, to implement a plugable, self-contained 
     execution
     """
-    ERROR_REPORT_LINE_SEPARATOR = '\n\n-------------------------------------------------------------\n'
+    ERROR_REPORT_LINE_SEPARATOR = '\n\n-------------------------------------------------------------\n\n'
 
     def execute(self):
         """
