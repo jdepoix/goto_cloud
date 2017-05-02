@@ -57,7 +57,7 @@ MIGRATION_PLAN_MOCK = {
                         }
                     }
                 },
-                "sync": "sudo rsync -zaXAPx --delete --numeric-ids -e ssh {SOURCE_DIR} {TARGET_DIR}",
+                "sync": "sudo rsync -zaXAPx --delete --numeric-ids -e ssh --rsync-path=\"sudo rsync\" {SOURCE_DIR}/ {TARGET_DIR}",
                 "reinstall_bootloader": "sudo grub-install --boot-directory=/boot {DEVICE}",
                 "create_partition": "echo -e \"n\n\n{PARTITION_NUMBER}\n{START}\n{END}\nw\n\" | sudo fdisk {DEVICE}",
                 "tag_partition_bootable": {

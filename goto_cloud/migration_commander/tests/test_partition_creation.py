@@ -17,6 +17,8 @@ from .utils import PatchTrackedRemoteExecution
 
 class TestCreatePartitionsCommand(TestCase, metaclass=PatchTrackedRemoteExecution):
     def _init_test_data(self, source_host, target_host):
+        self.executed_commands.clear()
+
         MigrationPlanParser().parse(TestAsset.MIGRATION_PLAN_MOCK)
 
         self.source = Source.objects.get(remote_host__address=source_host)

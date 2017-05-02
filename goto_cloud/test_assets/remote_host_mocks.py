@@ -1,5 +1,4 @@
 import os
-from io import BytesIO
 
 from settings.base import BASE_DIR
 
@@ -15,21 +14,13 @@ class RemoteHostMock(object):
         if matching_commands:
             return {
                 'exit_code': 0,
-                'streams': (
-                    BytesIO(),
-                    BytesIO(self.commands[matching_commands[0]].encode())
-                        if self.commands[matching_commands[0]]
-                        else BytesIO(),
-                    BytesIO(),
-                ),
+                'stdout': self.commands[matching_commands[0]].strip() if self.commands[matching_commands[0]] else '',
+                'stderr': 'Command {command_name} not known!'.format(command_name=command).encode(),
             }
         return {
             'exit_code': 1,
-            'streams': (
-                BytesIO(),
-                BytesIO(),
-                BytesIO('Command {command_name} not known!'.format(command_name=command).encode()),
-            ),
+            'stdout': '',
+            'stderr': 'Command {command_name} not known!'.format(command_name=command).encode(),
         }
 
     def get_config(self):

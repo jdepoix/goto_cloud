@@ -118,11 +118,11 @@ class RemoteExecutor(metaclass=ABCMeta):
             raise RemoteExecutor.ExecutionException(
                 'While executing:\n{command}\n\nThe following Error occurred:\n{error}'.format(
                     command=command,
-                    error=execution_result['streams'][2].read().decode().strip(),
+                    error=execution_result['stderr'],
                 )
             )
 
-        return execution_result['streams'][1].read().decode().strip()
+        return execution_result['stdout']
 
     @abstractmethod
     def _execute(self, command):
@@ -144,6 +144,18 @@ class SshRemoteExecutor(RemoteExecutor):
     """
     implements RemoteExecutor using SSH as the remote execution client
     """
+    def _execute(self, command):
+        _, stdout, stderr = self.remote_client.exec_command(command)
+
+        stdout_output = stdout.read().decode().strip()
+        stderr_output = stderr.read().decode().strip()
+
+        return {
+            'exit_code': stdout.channel.recv_exit_status(),
+            'stdout': stdout_output,
+            'stderr': stderr_output,
+        }
+
     def connect(self):
         try:
             self.remote_client = SSHClient()
@@ -161,14 +173,6 @@ class SshRemoteExecutor(RemoteExecutor):
 
     def is_connected(self):
         return self.remote_client and self.remote_client.get_transport() is not None
-
-    def _execute(self, command):
-        streams = self.remote_client.exec_command(command)
-
-        return {
-            'exit_code': streams[1].channel.recv_exit_status(),
-            'streams': streams,
-        }
 
 
 class RemoteHostExecutor(AbstractedRemoteHostOperator, RemoteExecutor):
@@ -188,22 +192,22 @@ class RemoteHostExecutor(AbstractedRemoteHostOperator, RemoteExecutor):
             port=self.remote_host.port if self.remote_host.port else None,
         )
 
-    def _execute(self, command):
+    def _execute(self, command): # pragma: no cover
         # At runtime the method of the chosen operator is used. This stub is only to implement the abstract method.
         pass
 
-    def connect(self):
+    def connect(self): # pragma: no cover
         # At runtime the method of the chosen operator is used. This stub is only to implement the abstract method.
         pass
 
-    def is_connected(self):
+    def is_connected(self): # pragma: no cover
         # At runtime the method of the chosen operator is used. This stub is only to implement the abstract method.
         pass
 
-    def _close(self):
+    def _close(self): # pragma: no cover
         # At runtime the method of the chosen operator is used. This stub is only to implement the abstract method.
         pass
 
-    def __del__(self):
+    def __del__(self): # pragma: no cover
         # to make sure the close() method is not triggered twice
         pass
