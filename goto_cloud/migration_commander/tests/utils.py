@@ -29,9 +29,10 @@ class PatchTrackedRemoteExecution(TestAsset.PatchRemoteHostMeta):
 
 
 class MigrationCommanderTestCase(TestCase, metaclass=PatchTrackedRemoteExecution):
-    def _init_test_data(self, source_host, target_host):
+    def setUp(self):
         self.executed_commands.clear()
 
+    def _init_test_data(self, source_host, target_host):
         MigrationPlanParser().parse(TestAsset.MIGRATION_PLAN_MOCK)
 
         self.source = Source.objects.get(remote_host__address=source_host)

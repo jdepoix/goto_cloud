@@ -26,6 +26,9 @@ class RemoteHostMock(object):
     def get_config(self):
         return self.expected_config
 
+    def add_command(self, command_name, command_output):
+        self.commands[command_name] = command_output
+
     @staticmethod
     def create_from_file(
         commands_root_directory_path,
