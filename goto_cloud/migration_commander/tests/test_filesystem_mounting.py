@@ -1,5 +1,6 @@
 from unittest.mock import patch, Mock
 
+from ..default_remote_host_commands import DefaultRemoteHostCommand
 from ..filesystem_mounting import FilesystemMountCommand
 from ..device_identification import DeviceIdentificationCommand
 
@@ -59,8 +60,9 @@ class TestFilesystemMountCommand(MigrationCommanderTestCase):
         self.assertIn('sudo mkdir ' + DeviceIdentificationCommand._map_mountpoint('/mnt/vdc1'), self.executed_commands)
         self.assertIn('sudo mkdir ' + DeviceIdentificationCommand._map_mountpoint('/mnt/vdc2'), self.executed_commands)
 
-    @patch(
-        'migration_commander.default_remote_host_commands.DefaultRemoteHostCommand.ADD_FSTAB_ENTRY.render',
+    @patch.object(
+        DefaultRemoteHostCommand.ADD_FSTAB_ENTRY,
+        'render',
         Mock(side_effect=Exception())
     )
     def test_execute__failed(self):
