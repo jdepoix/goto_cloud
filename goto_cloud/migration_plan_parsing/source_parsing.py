@@ -6,6 +6,7 @@ from system_info_inspection.public import RemoteHostSystemInfoGetter
 
 from target.public import Target
 
+from .network_mapping import NetworkMapper
 from .db_item_handling import DbItemHandler
 from .blueprint_resolving import BlueprintResolver
 
@@ -23,13 +24,16 @@ class SourceParser(DbItemHandler):
         """
         pass
 
-    def __init__(self, blueprints):
+    def __init__(self, blueprints, network_settings):
         """
         :param blueprints: the blueprints which should be used to resolve the sources blueprints
         :type blueprints: dict
+        :param network_settings: the network settings which are used to map the interfaces to the targets
+        :type network_settings: dict
         """
         super().__init__()
         self._blueprint_resolver = BlueprintResolver(blueprints)
+        self._network_mapper = NetworkMapper(network_settings)
 
     def parse(self, source):
         """
@@ -45,7 +49,7 @@ class SourceParser(DbItemHandler):
             remote_host = self._create_remote_host(source, blueprint)
             system_info = self._get_system_info(remote_host)
             self._update_remote_host_with_system_info(remote_host, system_info)
-            target = self._create_target(blueprint)
+            target = self._create_target(blueprint, system_info)
             return self._create_source(remote_host, target)
         except KeyError:
             raise SourceParser.InvalidSourceException(
@@ -118,16 +122,27 @@ class SourceParser(DbItemHandler):
         remote_host.version = system_info['os']['version']
         remote_host.save()
 
-    def _create_target(self, blueprint):
+    def _create_target(self, blueprint, system_info):
         """
         creates a target db entry, using a provided blueprint
         
         :param blueprint: the resolved blueprint to create the target with
         :type blueprint: dict
+        :param system_info: sources system info, used to find out the interfaces
+        :type system_info: dict
         :return: the newly created target
         :rtype: Target
         """
-        return self.add_db_item(Target.objects.create(blueprint=blueprint))
+        blueprint_with_network_interfaces = {
+            'network_interfaces': self._network_mapper.map_interfaces(system_info['network']['interfaces'], blueprint),
+            **blueprint,
+        }
+        blueprint_with_network_interfaces.pop('network_mapping')
+        return self.add_db_item(
+            Target.objects.create(
+                blueprint=blueprint_with_network_interfaces
+            )
+        )
 
     def _resolve_blueprint(self, source):
         """
