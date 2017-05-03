@@ -24,6 +24,19 @@ class TestSourceFileLocationResolver(MigrationCommanderTestCase):
             self.source.target.device_mapping['vdc']['children']['vdc2']['mountpoint'] + '/test/path/file'
         )
 
+    def test_resolve__device_mountpoint(self):
+        self._init_test_data('ubuntu16', 'target__device_identification')
+
+        self.source.remote_host.system_info['block_devices']['vdb']['mountpoint'] = '/var'
+        self.source.remote_host.save()
+        self.source.target.device_mapping['vdb']['mountpoint'] = '/mnt/test'
+        self.source.target.save()
+
+        self.assertEqual(
+            self.resolver.resolve('/var'),
+            self.source.target.device_mapping['vdb']['mountpoint']
+        )
+
     def test_resolve__fail_on_relative_path(self):
         self._init_test_data('ubuntu16', 'target__device_identification')
 

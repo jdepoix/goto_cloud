@@ -37,9 +37,9 @@ class SourceFileLocationResolver():
 
         return '{mountpoint}{path}'.format(
             mountpoint=mountpoints[best_matching_mountpoint],
-            path=path_relative_to_mountpoint
-                if path_relative_to_mountpoint.startswith('/')
-                else ('/' + path_relative_to_mountpoint)
+            path=('/' + path_relative_to_mountpoint)
+                if path_relative_to_mountpoint and path_relative_to_mountpoint[0] != '/'
+                else path_relative_to_mountpoint
         )
 
     def _get_mountpoint_mapping(self):
