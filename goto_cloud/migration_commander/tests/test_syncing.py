@@ -4,39 +4,16 @@ from django.test import TestCase
 
 from commander.public import Commander
 
-from migration_plan_parsing.public import MigrationPlanParser
-
-from remote_host.public import RemoteHost
-
-from source.public import Source
-
-from test_assets.public import TestAsset
-
 from remote_host_command.public import RemoteHostCommand
 
 from ..default_remote_host_commands import DefaultRemoteHostCommand
-from ..device_identification import DeviceIdentificationCommand
-from ..target_system_info_inspection import GetTargetSystemInfoCommand
-from ..syncing import SyncCommand
+from ..syncing import SyncCommand, FinalSyncCommand
 from ..mountpoint_mapping import MountpointMapper
 
-from .utils import PatchTrackedRemoteExecution
+from .utils import MigrationCommanderTestCase
 
 
-class TestSyncCommand(TestCase, metaclass=PatchTrackedRemoteExecution):
-    def _init_test_data(self, source_host, target_host):
-        self.executed_commands.clear()
-        MigrationPlanParser().parse(TestAsset.MIGRATION_PLAN_MOCK)
-
-        self.source = Source.objects.get(remote_host__address=source_host)
-        self.source.target.remote_host = RemoteHost.objects.create(address=target_host)
-        self.source.target.save()
-
-        GetTargetSystemInfoCommand(self.source).execute()
-        DeviceIdentificationCommand(self.source).execute()
-
-        self.source.target.save()
-
+class TestSyncCommand(MigrationCommanderTestCase):
     def test_execute__sync(self):
         self._init_test_data('ubuntu16', 'target__device_identification')
 
@@ -201,3 +178,10 @@ class TestSyncCommand(TestCase, metaclass=PatchTrackedRemoteExecution):
 
         with self.assertRaises(SyncCommand.SyncingException):
             SyncCommand(self.source).execute()
+
+
+class TestFinalSyncCommand(MigrationCommanderTestCase):
+    def test_execute__no_sleep(self):
+        self._init_test_data('ubuntu16', 'target__device_identification')
+
+        self.assertIsNone(FinalSyncCommand(self.source).execute())
