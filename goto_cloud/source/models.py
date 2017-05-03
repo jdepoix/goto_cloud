@@ -23,6 +23,11 @@ class Source(StatusModel):
         CREATE_FILESYSTEMS = 'CREATE_FILESYSTEMS'
         MOUNT_FILESYSTEMS = 'MOUNT_FILESYSTEMS'
         SYNCING = 'SYNCING'
+        FINAL_SYNC = 'FINAL_SYNC'
+        ADJUST_NETWORK_CONFIG = 'ADJUST_NETWORK_CONFIG'
+        ADJUST_SSH_CONFIG = 'ADJUST_SSH_CONFIG'
+        ADJUST_FSTAB = 'ADJUST_FSTAB'
+        REINSTALL_BOOTLOADER = 'REINSTALL_BOOTLOADER'
         LIVE = 'LIVE'
 
     _LIFECYCLE = (
@@ -33,6 +38,11 @@ class Source(StatusModel):
         Status.CREATE_FILESYSTEMS,
         Status.MOUNT_FILESYSTEMS,
         Status.SYNCING,
+        Status.FINAL_SYNC,
+        Status.ADJUST_NETWORK_CONFIG,
+        Status.ADJUST_SSH_CONFIG,
+        Status.ADJUST_FSTAB,
+        Status.REINSTALL_BOOTLOADER,
         Status.LIVE,
     )
 
