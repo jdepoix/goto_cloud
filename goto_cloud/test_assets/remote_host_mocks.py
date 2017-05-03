@@ -15,7 +15,7 @@ class RemoteHostMock(object):
             return {
                 'exit_code': 0,
                 'stdout': self.commands[matching_commands[0]].strip() if self.commands[matching_commands[0]] else '',
-                'stderr': 'Command {command_name} not known!'.format(command_name=command).encode(),
+                'stderr': '',
             }
         return {
             'exit_code': 1,
