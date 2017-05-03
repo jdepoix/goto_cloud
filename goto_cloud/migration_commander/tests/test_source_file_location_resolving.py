@@ -29,3 +29,12 @@ class TestSourceFileLocationResolver(MigrationCommanderTestCase):
 
         with self.assertRaises(SourceFileLocationResolver.InvalidPathException):
             self.resolver.resolve('relative/path')
+
+    def test_resolve__fail_no_root_mountpoint(self):
+        self._init_test_data('ubuntu16', 'target__device_identification')
+
+        self.source.remote_host.system_info['block_devices']['vda']['children']['vda1']['mountpoint'] = ''
+        self.source.remote_host.save()
+
+        with self.assertRaises(SourceFileLocationResolver.InvalidPathException):
+            self.resolver.resolve('/etc')
