@@ -8,7 +8,25 @@ class Command(metaclass=ABCMeta):
     Represents a executable unit. The execute method can be overwritten, to implement a plugable, self-contained 
     execution
     """
+    class CommandExecutionException(Exception):
+        """
+        base exception for exception which occur during command execution and take an error report, to provide a 
+        (hopefully) helpful error message
+        
+        """
+        COMMAND_DOES = 'execute something'
+
+        def __init__(self, error_report):
+            super().__init__(
+                'While trying to {command_does}, the following errors occurred. Please resolves these '
+                'manually and then skip this step:\n{errors}'.format(
+                    errors=error_report,
+                    command_does=self.COMMAND_DOES
+                )
+            )
+
     ERROR_REPORT_LINE_SEPARATOR = '\n\n-------------------------------------------------------------\n\n'
+    ERROR_REPORT_EXCEPTION_CLASS = CommandExecutionException
 
     def execute(self):
         """
@@ -64,7 +82,7 @@ class Command(metaclass=ABCMeta):
         :param error_report: the error report
         :type error_report: str
         """
-        pass
+        raise self.ERROR_REPORT_EXCEPTION_CLASS(error_report)
 
     @staticmethod
     def _collect_errors(method):

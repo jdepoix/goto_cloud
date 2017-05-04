@@ -7,23 +7,19 @@ class DeviceIdentificationCommand(SourceCommand):
     """
     takes care of identifying, which of the targets devices, should replicated, which device of the source system
     """
-    class NoMatchingDevicesException(Exception):
+    class NoMatchingDevicesException(SourceCommand.CommandExecutionException):
         """
         raised if no matching devices were found
         """
-        pass
+        COMMAND_DOES = 'match the target and source devices'
+
+    ERROR_REPORT_EXCEPTION_CLASS = NoMatchingDevicesException
 
     def _execute(self):
         self._target.device_mapping = self._map_unallocated_devices_onto_source_devices(
             self._get_unallocated_target_devices()
         )
         self._target.save()
-
-    def _handle_error_report(self, error_report):
-        raise DeviceIdentificationCommand.NoMatchingDevicesException(
-            'While trying to match the target and source devices, the following errors occurred. Please resolves these '
-            'manually and then skip this step:\n{errors}'.format(errors=error_report)
-        )
 
     def _get_unallocated_target_devices(self):
         """

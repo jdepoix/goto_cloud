@@ -14,23 +14,19 @@ class SyncCommand(DeviceModifyingCommand):
     does the actual sync and makes sure, that temp mounts are created and used, to avoid problems introduced by 
     overlapping mountpoints.
     """
-    class SyncingException(Exception):
+    class SyncingException(DeviceModifyingCommand.CommandExecutionException):
         """
         raised if an error occurs during the sync
         """
-        pass
+        COMMAND_DOES = 'syncing'
+
+    ERROR_REPORT_EXCEPTION_CLASS = SyncingException
 
     def _execute(self):
         self.source_remote_executor = RemoteHostExecutor(self._source.remote_host)
         self._execute_on_every_device(self._sync_disk, self._sync_partition)
 
         return Commander.Signal.SLEEP
-
-    def _handle_error_report(self, error_report):
-        raise SyncCommand.SyncingException(
-            'While trying syncing, the following errors occurred. Please resolves these manually '
-            'and then skip this step, or retry:\n{errors}'.format(errors=error_report)
-        )
 
     def _sync_disk(self, remote_executor, source_device, target_device):
         self._sync_device(self.source_remote_executor, source_device[1]['mountpoint'], target_device[1]['mountpoint'])

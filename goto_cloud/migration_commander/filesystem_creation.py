@@ -7,20 +7,16 @@ class CreateFilesystemsCommand(DeviceModifyingCommand):
     """
     takes care, of creating the filesystems
     """
-    class UnsupportedFilesystemException(Exception):
+    class UnsupportedFilesystemException(DeviceModifyingCommand.CommandExecutionException):
         """
         raised if a filesystem is not supported
         """
-        pass
+        COMMAND_DOES = 'create the partitions'
+
+    ERROR_REPORT_EXCEPTION_CLASS = UnsupportedFilesystemException
 
     def _execute(self):
         self._execute_on_every_device(self._create_filesystem_on_disk, self._create_filesystem_on_partition)
-
-    def _handle_error_report(self, error_report):
-        raise CreateFilesystemsCommand.UnsupportedFilesystemException(
-            'While trying to create the partitions, the following errors occurred. Please resolves these manually '
-            'and then skip this step:\n{errors}'.format(errors=error_report)
-        )
 
     def _create_filesystem_on_partition(
         self, remote_executor, source_device, target_device, partition_device, target_partition_device

@@ -6,13 +6,20 @@ from .device_modification import DeviceModifyingCommand
 from .remote_file_edit import RemoteFileEditor
 from .source_file_location_resolving import SourceFileLocationResolver
 
-
+# TODO docs!
 class SshConfigAdjustmentCommand(SourceCommand):
+    class SshConfigAdjustmentException(DeviceModifyingCommand.CommandExecutionException):
+        COMMAND_DOES = 'adjust ssh config'
+
+    ERROR_REPORT_EXCEPTION_CLASS = SshConfigAdjustmentException
     SSHD_CONFIG_LOCATION = '/etc/ssh/sshd_config'
 
-    # TODO fail inidividually
     def _execute(self):
         self._replace_ips_in_sshd_config()
+
+    def _handle_error_report(self, error_report):
+        # TODO
+        raise Exception(error_report)
 
     def _replace_ips_in_sshd_config(self):
         remote_executor = RemoteHostExecutor(self._target.remote_host)
@@ -32,15 +39,17 @@ class SshConfigAdjustmentCommand(SourceCommand):
         )
 
 
+# TODO docs!
 class FstabAdjustmentCommand(DeviceModifyingCommand):
+    class FstabAdjustmentException(DeviceModifyingCommand.CommandExecutionException):
+        COMMAND_DOES = 'adjust fstab'
+
+    ERROR_REPORT_EXCEPTION_CLASS = FstabAdjustmentException
     FSTAB_LOCATION = '/etc/fstab'
 
     def _execute(self):
         self._execute_on_every_partition(self._replace_partition_in_fstab)
         self._execute_on_every_device(self._replace_disk_in_fstab)
-
-    def _handle_error_report(self, error_report):
-        raise Exception(error_report)
 
     def _replace_disk_in_fstab(
         self, remote_executor, source_device, target_device
@@ -60,7 +69,7 @@ class FstabAdjustmentCommand(DeviceModifyingCommand):
             source_device[0],
             target_device[0],
             source_device[1]['uuid'],
-            source_device[1]['label']
+            source_device[1]['label'],
         )
 
     def _replace_partition_in_fstab(
@@ -85,7 +94,7 @@ class FstabAdjustmentCommand(DeviceModifyingCommand):
             partition_device[0],
             target_partition_device[0],
             partition_device[1]['uuid'],
-            partition_device[1]['label']
+            partition_device[1]['label'],
         )
 
     @DeviceModifyingCommand._collect_errors

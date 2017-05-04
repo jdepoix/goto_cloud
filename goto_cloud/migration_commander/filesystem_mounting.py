@@ -7,17 +7,13 @@ class FilesystemMountCommand(DeviceModifyingCommand):
     """
     takes care of mounting the filesystems correctly
     """
-    class MountingException(Exception):
+    class MountingException(DeviceModifyingCommand.CommandExecutionException):
         """
         raised if an error occurs while mounting
         """
-        pass
+        COMMAND_DOES = 'mount the filesystems'
 
-    def _handle_error_report(self, error_report):
-        raise FilesystemMountCommand.MountingException(
-            'While trying to mount the filesystems, the following errors occurred. Please resolves these manually '
-            'and then skip this step:\n{errors}'.format(errors=error_report)
-        )
+    ERROR_REPORT_EXCEPTION_CLASS = MountingException
 
     def _execute(self):
         self._mount_filesystems()

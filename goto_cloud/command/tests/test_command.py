@@ -24,9 +24,18 @@ class NoErrorCommand(Command):
 class TestCommand(TestCase):
     def test_collect_errors(self):
         command = ErrorCommand()
-        command.execute()
+        try:
+            command.execute()
+        except:
+            pass
 
         self.assertEqual(command.get_error_report(), 'FAILED')
+
+    def test_collect_errors__throws_commadn_execution_excpetion(self):
+        command = ErrorCommand()
+
+        with self.assertRaises(Command.CommandExecutionException):
+            command.execute()
 
     def test_collect_errors__not_failed(self):
         command = NoErrorCommand()
