@@ -29,12 +29,13 @@ class RemoteFileEditor():
         :param text_to_replace_with: the text to replace the text with
         :type text_to_replace_with: str
         """
-        self.write(
-            file,
-            self.remote_executor.execute(
-                self._READ_FILE.render(file=file)
-            ).replace(text_to_replace, text_to_replace_with),
-        )
+        file_content = self.remote_executor.execute(self._READ_FILE.render(file=file))
+
+        if text_to_replace in file_content:
+            self.write(
+                file,
+                file_content.replace(text_to_replace, text_to_replace_with),
+            )
 
     def append(self, file, text_to_append):
         """

@@ -38,6 +38,18 @@ class TestRemoteFileEditor(MigrationCommanderTestCase):
             self.executed_commands
         )
 
+    def test_edit__no_write_if_replacement_is_not_contained(self):
+        self._init_test_data()
+
+        RemoteFileEditor(self.remote_executor).edit('/etc/testfile.txt', 'I_AM_NOT_CONTAINED', 'REPLACED')
+
+        self.assertNotIn(
+            'sudo bash -c "echo -e \\"{new_file_content}\\" > /etc/testfile.txt"'.format(
+                new_file_content=self.TEST_FILE_CONTENT
+            ),
+            self.executed_commands
+        )
+
     def test_append(self):
         self._init_test_data()
 
