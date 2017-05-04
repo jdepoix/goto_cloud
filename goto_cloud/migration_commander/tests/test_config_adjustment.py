@@ -38,7 +38,6 @@ class TestSshConfigAdjustment(MigrationCommanderTestCase):
 
     def _init_test_data(self, source_host, target_host):
         super()._init_test_data(source_host, target_host)
-        self.executed_commands.clear()
         TestAsset.REMOTE_HOST_MOCKS['target__device_identification'].add_command(
             'sudo cat {mountpoint}{config_path}'.format(
                 mountpoint=self.source.target.device_mapping['vda']['children']['vda1']['mountpoint'],
@@ -73,8 +72,18 @@ class TestFstabAdjustment(MigrationCommanderTestCase):
     FSTAB = (
         '/dev/vda1	/		ext4    errors=remount-ro 	0       1\n'
         '/dev/vdc1	/mnt/vdc1	ext4	defaults		0	2\n'
-        '/dev/vdc2	/mnt/vdc2	ext4	defaults		0	2\n'
+        '/dev/vdc2	/mnt/vdc2	ext4	defaults		0	2'
     )
+
+    def _init_test_data(self, source_host, target_host):
+        super()._init_test_data(source_host, target_host)
+        TestAsset.REMOTE_HOST_MOCKS['target__device_identification'].add_command(
+            'sudo cat {mountpoint}{config_path}'.format(
+                mountpoint=self.source.target.device_mapping['vda']['children']['vda1']['mountpoint'],
+                config_path=FstabAdjustmentCommand.FSTAB_LOCATION,
+            ),
+            self.FSTAB
+        )
 
     def test_execute(self):
         self._init_test_data('ubuntu16', 'target__device_identification')
@@ -87,9 +96,25 @@ class TestFstabAdjustment(MigrationCommanderTestCase):
                     + FstabAdjustmentCommand.FSTAB_LOCATION,
                 file_content=self.FSTAB.replace(
                     '/dev/vda1', 'UUID=549c8755-2757-446e-8c78-f76b50491f21'
-                ).replace(
+                )
+            ),
+            self.executed_commands
+        )
+        self.assertIn(
+            RemoteFileEditor._WRITE_FILE.render(
+                file=self.source.target.device_mapping['vda']['children']['vda1']['mountpoint']
+                     + FstabAdjustmentCommand.FSTAB_LOCATION,
+                file_content=self.FSTAB.replace(
                     '/dev/vdc1', 'UUID=53ad2170-488d-481a-a6ab-5ce0e538f247'
-                ).replace(
+                )
+            ),
+            self.executed_commands
+        )
+        self.assertIn(
+            RemoteFileEditor._WRITE_FILE.render(
+                file=self.source.target.device_mapping['vda']['children']['vda1']['mountpoint']
+                     + FstabAdjustmentCommand.FSTAB_LOCATION,
+                file_content=self.FSTAB.replace(
                     '/dev/vdc2', 'UUID=bcab224c-8407-4783-8cea-f9ea4be3fabf'
                 )
             ),

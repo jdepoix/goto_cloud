@@ -7,7 +7,7 @@ class DeviceModifyingCommand(SourceCommand):
     """
     a command supplying utility methods for command which iterate over the devices of the source and target
     """
-    def _execute_on_every_device(self, executable_for_disks, executable_for_partitions):
+    def _execute_on_every_device(self, executable_for_disks, executable_for_partitions=None):
         """
         execute the given executable with all devices.
         
