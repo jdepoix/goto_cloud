@@ -1,5 +1,3 @@
-from remote_execution.public import RemoteHostExecutor
-
 from remote_host_command.public import RemoteHostCommand
 
 
@@ -11,14 +9,14 @@ class RemoteFileEditor():
     _WRITE_FILE = RemoteHostCommand('sudo bash -c "echo -e \\"{FILE_CONTENT}\\" > {FILE}"')
     _APPEND_FILE = RemoteHostCommand('sudo bash -c "echo -e \\"{FILE_CONTENT}\\" >> {FILE}"')
     
-    def __init__(self, remote_host):
+    def __init__(self, remote_executor):
         """
-        is initialized with the remote host the files are edited for
+        is initialized with the remote executor the files are edited with
         
-        :param remote_host: remote host files are eidted for
-        :type remote_host: remote_host.public.RemoteHost
+        :param remote_executor: remote executor the files are edited with
+        :type remote_executor: remote_execution.public.RemoteHostExecutor
         """
-        self.remote_executor = RemoteHostExecutor(remote_host)
+        self.remote_executor = remote_executor
 
     def edit(self, file, text_to_replace, text_to_replace_with):
         """

@@ -1,5 +1,8 @@
+from migration_commander.remote_file_edit import RemoteFileEditor
 from .default_remote_host_commands import DefaultRemoteHostCommand
 from .device_modification import DeviceModifyingCommand
+
+S = '/etc/fstab'
 
 
 class FilesystemMountCommand(DeviceModifyingCommand):
@@ -87,8 +90,8 @@ class FilesystemMountCommand(DeviceModifyingCommand):
         """
         if mountpoint:
             remote_executor.execute(DefaultRemoteHostCommand.MAKE_DIRECTORY.render(directory=mountpoint))
-            remote_executor.execute(
-                DefaultRemoteHostCommand.ADD_FSTAB_ENTRY.render(
+            RemoteFileEditor(remote_executor).append(
+                '/etc/fstab', '{identifier}\t{mountpoint}\t{filesystem}\tdefaults\t0\t2'.format(
                     identifier='UUID={uuid}'.format(uuid=uuid)
                                 if uuid else
                                     'LABEL={label}'.format(label=label)
