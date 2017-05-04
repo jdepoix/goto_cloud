@@ -40,3 +40,11 @@ class TestRemoteFileEditor(MigrationCommanderTestCase):
             'sudo bash -c "echo -e \\"append this\\" >> /etc/testfile.txt"',
             self.executed_commands
         )
+
+    def test_write(self):
+        RemoteFileEditor(self.remote_host).write('/etc/testfile.txt', 'write this')
+
+        self.assertIn(
+            'sudo bash -c "echo -e \\"write this\\" > /etc/testfile.txt"',
+            self.executed_commands
+        )
