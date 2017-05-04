@@ -2,8 +2,6 @@ from migration_commander.remote_file_edit import RemoteFileEditor
 from .default_remote_host_commands import DefaultRemoteHostCommand
 from .device_modification import DeviceModifyingCommand
 
-S = '/etc/fstab'
-
 
 class FilesystemMountCommand(DeviceModifyingCommand):
     """
