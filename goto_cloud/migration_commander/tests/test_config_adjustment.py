@@ -1,6 +1,6 @@
 from test_assets.public import TestAsset
 
-from ..config_adjustment import SshConfigAdjustmentCommand
+from ..config_adjustment import SshConfigAdjustmentCommand, FstabAdjustmentCommand
 from ..remote_file_edit import RemoteFileEditor
 from ..tests.utils import MigrationCommanderTestCase
 
@@ -64,6 +64,34 @@ class TestSshConfigAdjustment(MigrationCommanderTestCase):
                         if interface['source_interface'] == 'eth0'
                     )
                 ),
+            ),
+            self.executed_commands
+        )
+
+
+class TestFstabAdjustment(MigrationCommanderTestCase):
+    FSTAB = (
+        '/dev/vda1	/		ext4    errors=remount-ro 	0       1\n'
+        '/dev/vdc1	/mnt/vdc1	ext4	defaults		0	2\n'
+        '/dev/vdc2	/mnt/vdc2	ext4	defaults		0	2\n'
+    )
+
+    def test_execute(self):
+        self._init_test_data('ubuntu16', 'target__device_identification')
+
+        FstabAdjustmentCommand(self.source).execute()
+
+        self.assertIn(
+            RemoteFileEditor._WRITE_FILE.render(
+                file=self.source.target.device_mapping['vda']['children']['vda1']['mountpoint']
+                    + FstabAdjustmentCommand.FSTAB_LOCATION,
+                file_content=self.FSTAB.replace(
+                    '/dev/vda1', 'UUID=549c8755-2757-446e-8c78-f76b50491f21'
+                ).replace(
+                    '/dev/vdc1', 'UUID=53ad2170-488d-481a-a6ab-5ce0e538f247'
+                ).replace(
+                    '/dev/vdc2', 'UUID=bcab224c-8407-4783-8cea-f9ea4be3fabf'
+                )
             ),
             self.executed_commands
         )

@@ -41,3 +41,5 @@ class MigrationCommanderTestCase(TestCase, metaclass=PatchTrackedRemoteExecution
 
         GetTargetSystemInfoCommand(self.source).execute()
         DeviceIdentificationCommand(self.source).execute()
+
+        self.executed_commands.clear()
