@@ -6,9 +6,15 @@ from .device_modification import DeviceModifyingCommand
 from .remote_file_edit import RemoteFileEditor
 from .source_file_location_resolving import SourceFileLocationResolver
 
-# TODO docs!
+
 class SshConfigAdjustmentCommand(SourceCommand):
+    """
+    takes care of adjusting the ssh configs of the copied data on the target machine, before the machine goes live
+    """
     class SshConfigAdjustmentException(DeviceModifyingCommand.CommandExecutionException):
+        """
+        raised in case something goes wrong, while adjusting the ssh config
+        """
         COMMAND_DOES = 'adjust ssh config'
 
     ERROR_REPORT_EXCEPTION_CLASS = SshConfigAdjustmentException
@@ -17,11 +23,10 @@ class SshConfigAdjustmentCommand(SourceCommand):
     def _execute(self):
         self._replace_ips_in_sshd_config()
 
-    def _handle_error_report(self, error_report):
-        # TODO
-        raise Exception(error_report)
-
     def _replace_ips_in_sshd_config(self):
+        """
+        replaces the sshd config for all interfaces
+        """
         remote_executor = RemoteHostExecutor(self._target.remote_host)
 
         for interface in self._target.blueprint['network_interfaces']:
@@ -32,6 +37,16 @@ class SshConfigAdjustmentCommand(SourceCommand):
             )
 
     def _replace_ip_in_sshd_config(self, remote_executor, old_ip, new_ip):
+        """
+        replaces the sshd config for a given interface
+        
+        :param remote_executor: the remote executor to edit the file with
+        :type remote_executor: RemoteExecutor
+        :param old_ip: the ip the interface used to have on the source machine
+        :type old_ip: str
+        :param new_ip: the ip the interface will have on the target machine
+        :type new_ip: str
+        """
         RemoteFileEditor(remote_executor).edit(
             SourceFileLocationResolver(self._source).resolve(self.SSHD_CONFIG_LOCATION),
             old_ip,
@@ -39,8 +54,14 @@ class SshConfigAdjustmentCommand(SourceCommand):
         )
 
 
-# TODO docs!
 class FstabAdjustmentCommand(DeviceModifyingCommand):
+    """
+    Takes care of adjusting the /etc/fstab, to make sure, that the correct devices are mounted with the correct 
+    mountpoints, to make sure, the machine will actually be able to boot, after go live.
+    
+    It will try to replace all occurrences, of all device ids with their UUIDs or Labels. If no UUID or Lable is set,
+    the new device id will be used.
+    """
     class FstabAdjustmentException(DeviceModifyingCommand.CommandExecutionException):
         COMMAND_DOES = 'adjust fstab'
 
