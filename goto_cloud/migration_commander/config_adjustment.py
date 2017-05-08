@@ -9,7 +9,8 @@ from .source_file_location_resolving import SourceFileLocationResolver
 
 class SshConfigAdjustmentCommand(SourceCommand):
     """
-    takes care of adjusting the ssh configs of the copied data on the target machine, before the machine goes live
+    Takes care of adjusting the ssh configs of the copied data on the target machine, before the machine goes live. This
+    is needed to make sure, that it will be possible to access the target machine via ssh after golive.
     """
     class SshConfigAdjustmentException(DeviceModifyingCommand.CommandExecutionException):
         """
@@ -21,36 +22,16 @@ class SshConfigAdjustmentCommand(SourceCommand):
     SSHD_CONFIG_LOCATION = '/etc/ssh/sshd_config'
 
     def _execute(self):
-        self._replace_ips_in_sshd_config()
+        self._comment_out_listen_address()
 
-    def _replace_ips_in_sshd_config(self):
+    def _comment_out_listen_address(self):
         """
-        replaces the sshd config for all interfaces
+        comments out the ListenAddress line in the sshd_config file
         """
-        remote_executor = RemoteHostExecutor(self._target.remote_host)
-
-        for interface in self._target.blueprint['network_interfaces']:
-            self._replace_ip_in_sshd_config(
-                remote_executor,
-                self._source.remote_host.system_info['network']['interfaces'][interface['source_interface']]['ip'],
-                interface['ip']
-            )
-
-    def _replace_ip_in_sshd_config(self, remote_executor, old_ip, new_ip):
-        """
-        replaces the sshd config for a given interface
-        
-        :param remote_executor: the remote executor to edit the file with
-        :type remote_executor: RemoteExecutor
-        :param old_ip: the ip the interface used to have on the source machine
-        :type old_ip: str
-        :param new_ip: the ip the interface will have on the target machine
-        :type new_ip: str
-        """
-        RemoteFileEditor(remote_executor).edit(
+        RemoteFileEditor(RemoteHostExecutor(self._target.remote_host)).edit(
             SourceFileLocationResolver(self._source).resolve(self.SSHD_CONFIG_LOCATION),
-            old_ip,
-            new_ip
+            'ListenAddress',
+            '# ListenAddress'
         )
 
 

@@ -56,12 +56,8 @@ class TestSshConfigAdjustment(MigrationCommanderTestCase):
                 file=self.source.target.device_mapping['vda']['children']['vda1']['mountpoint']
                     + SshConfigAdjustmentCommand.SSHD_CONFIG_LOCATION,
                 file_content=self.SSHD_CONFIG.replace(
-                    '10.17.32.4',
-                    next(
-                        interface['ip']
-                        for interface in self.source.target.blueprint['network_interfaces']
-                        if interface['source_interface'] == 'eth0'
-                    )
+                    'ListenAddress',
+                    '# ListenAddress'
                 ),
             ),
             self.executed_commands
