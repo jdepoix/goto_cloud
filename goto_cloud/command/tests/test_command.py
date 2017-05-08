@@ -31,7 +31,7 @@ class TestCommand(TestCase):
 
         self.assertEqual(command.get_error_report(), 'FAILED')
 
-    def test_collect_errors__throws_commadn_execution_excpetion(self):
+    def test_collect_errors__throws_command_execution_exception(self):
         command = ErrorCommand()
 
         with self.assertRaises(Command.CommandExecutionException):
