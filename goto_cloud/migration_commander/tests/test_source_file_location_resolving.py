@@ -24,6 +24,22 @@ class TestSourceFileLocationResolver(MigrationCommanderTestCase):
             self.source.target.device_mapping['vdc']['children']['vdc2']['mountpoint'] + '/test/path/file'
         )
 
+    def test_resolve__trailing_slash(self):
+        self._init_test_data('ubuntu16', 'target__device_identification')
+
+        self.assertEqual(
+            self.resolver.resolve('/mnt/vdc2/test/path/file/'),
+            self.source.target.device_mapping['vdc']['children']['vdc2']['mountpoint'] + '/test/path/file/'
+        )
+
+    def test_resolve__root(self):
+        self._init_test_data('ubuntu16', 'target__device_identification')
+
+        self.assertEqual(
+            self.resolver.resolve('/'),
+            self.source.target.device_mapping['vda']['children']['vda1']['mountpoint']
+        )
+
     def test_resolve__device_mountpoint(self):
         self._init_test_data('ubuntu16', 'target__device_identification')
 
