@@ -56,10 +56,11 @@ class SyncCommand(DeviceModifyingCommand):
     def _create_temp_bind_mount(self, remote_executor, source_directory):
         temp_mountpoint = MountpointMapper.map_mountpoint('/tmp', source_directory)
 
-        try:
-            remote_executor.execute(DefaultRemoteHostCommand.MAKE_DIRECTORY.render(directory=temp_mountpoint))
-        except RemoteHostExecutor.ExecutionException:
-            pass
+        remote_executor.execute(
+            DefaultRemoteHostCommand.MAKE_DIRECTORY.render(directory=temp_mountpoint),
+            raise_exception_on_failure=False
+        )
+
         try:
             remote_executor.execute(DefaultRemoteHostCommand.CHECK_MOUNTPOINT.render(directory=temp_mountpoint))
         except RemoteHostExecutor.ExecutionException:

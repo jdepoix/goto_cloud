@@ -99,12 +99,15 @@ class RemoteExecutor(metaclass=ABCMeta):
         """
         pass
 
-    def execute(self, command):
+    def execute(self, command, raise_exception_on_failure=True):
         """
         executes the given command on the remote host and parses the returned output
         
         :param command: the command to execute
         :type command: str
+        :param raise_exception_on_failure: if this is true and the command will return an exit code different than 0,
+        an exception will be thrown, if false execution won't be interrupted and stderr is returned
+        :type raise_exception_on_failure: bool
         :return: the output the command produced
         :rtype: str
         :raises RemoteExecutor.ExecutionException: in case something goes wrong during execution 
@@ -115,12 +118,15 @@ class RemoteExecutor(metaclass=ABCMeta):
         execution_result = self._execute(command)
 
         if execution_result['exit_code'] != 0:
-            raise RemoteExecutor.ExecutionException(
-                'While executing:\n{command}\n\nThe following Error occurred:\n{error}'.format(
-                    command=command,
-                    error=execution_result['stderr'],
+            if raise_exception_on_failure:
+                raise RemoteExecutor.ExecutionException(
+                    'While executing:\n{command}\n\nThe following Error occurred:\n{error}'.format(
+                        command=command,
+                        error=execution_result['stderr'],
+                    )
                 )
-            )
+            else:
+                return execution_result['stderr']
 
         return execution_result['stdout']
 

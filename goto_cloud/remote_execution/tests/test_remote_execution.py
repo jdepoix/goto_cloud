@@ -116,6 +116,12 @@ class TestSshRemoteExecutor(unittest.TestCase):
         with self.assertRaises(RemoteExecutor.NoValidConnectionException):
             SshRemoteExecutor('test')
 
+    def test_execute__raise_no_exception_on_failure(self):
+        self.assertEqual(
+            self.remote_executor.execute('error_command', raise_exception_on_failure=False),
+            'Command Error'
+        )
+
 
 @patch('paramiko.SSHClient.connect', connect_mock)
 @patch('paramiko.SSHClient.close', close_mock)
