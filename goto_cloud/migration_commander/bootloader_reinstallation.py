@@ -8,7 +8,7 @@ from .default_remote_host_commands import DefaultRemoteHostCommand
 from .source_file_location_resolving import SourceFileLocationResolver
 
 
-class BootloaderReinstallation(SourceCommand):
+class BootloaderReinstallationCommand(SourceCommand):
     """
     Takes care of reinstalling in the target environment before go live. To do this, the copied source root directory
     will be chrooted and then the bootloader reinstall command from the migration plan will be executed. To avoid errors
