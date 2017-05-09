@@ -110,3 +110,66 @@ class FstabAdjustmentCommand(DeviceModifyingCommand):
                     if label
                     else '/dev/{device_id}'.format(device_id=device_id),
         )
+
+
+class NetworkConfigAdjustmentCommand(SourceCommand):
+    """
+    takes care of applying a dhcp default network setting, to make sure that networking works, after going live
+    """
+    class NetworkConfigAdjustmentException(SourceCommand.CommandExecutionException):
+        """
+        raised if something goes wrong, while trying to adjust the network config
+        """
+        COMMAND_DOES = 'adjust the network settings'
+
+    ERROR_REPORT_EXCEPTION_CLASS = NetworkConfigAdjustmentException
+    NETWORK_CONFIG_FILE_LOCATION = '/etc/network/interfaces'
+    NETWORK_CONFIG_ENTRY = 'auto {interface_name}\niface {interface_name} inet {interface_type}\n\n'
+
+    @SourceCommand._collect_errors
+    def _execute(self):
+        self._write_network_config(self._generate_network_config())
+
+    def _write_network_config(self, network_config):
+        """
+        wirtes a given network config to the network config file
+        
+        :param network_config: the network config to persist
+        :type network_config: str
+        """
+        RemoteFileEditor(RemoteHostExecutor(self._target.remote_host)).write(
+            SourceFileLocationResolver(self._source).resolve(self.NETWORK_CONFIG_FILE_LOCATION),
+            network_config
+        )
+
+    def _generate_network_config(self):
+        """
+        generates the network config from the targets blueprint
+        
+        :return: the generated network config
+        :rtype: str
+        """
+        network_config = self._generate_network_config_entry('lo', 'loopback')
+
+        for network_interface_number in range(len(self._target.blueprint['network_interfaces'])):
+            network_config += self._generate_network_config_entry(
+                'eth{network_interface_number}'.format(
+                    network_interface_number=network_interface_number
+                ),
+                'dhcp'
+            )
+
+        return network_config
+
+    def _generate_network_config_entry(self, interface_name, interface_type):
+        """
+        generates a single network config entry using the given network interface data
+        
+        :param interface_name: the name of the interface
+        :type interface_name: str
+        :param interface_type: the type of the interface (dhcp, lo etc.)
+        :type interface_type: str
+        :return: the generated network config entry
+        :rtype: str
+        """
+        return self.NETWORK_CONFIG_ENTRY.format(interface_name=interface_name, interface_type=interface_type)
