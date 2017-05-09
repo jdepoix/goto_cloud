@@ -1,6 +1,7 @@
+from migration_commander.source_file_location_resolving import SourceFileLocationResolver
 from test_assets.public import TestAsset
 
-from ..config_adjustment import SshConfigAdjustmentCommand, FstabAdjustmentCommand
+from ..config_adjustment import SshConfigAdjustmentCommand, FstabAdjustmentCommand, NetworkConfigAdjustmentCommand
 from ..remote_file_edit import RemoteFileEditor
 from ..tests.utils import MigrationCommanderTestCase
 
@@ -113,6 +114,27 @@ class TestFstabAdjustment(MigrationCommanderTestCase):
                 file_content=self.FSTAB.replace(
                     '/dev/vdc2', 'UUID=bcab224c-8407-4783-8cea-f9ea4be3fabf'
                 )
+            ),
+            self.executed_commands
+        )
+
+
+class TestNetworkConfigAdjustment(MigrationCommanderTestCase):
+    def test_execute(self):
+        self._init_test_data('ubuntu16', 'target__device_identification')
+
+        NetworkConfigAdjustmentCommand(self.source).execute()
+
+        self.assertIn(
+            (
+                'sudo bash -c "echo -e \\"'
+                'auto lo\n'
+                'iface lo inet loopback\n'
+                '\n'
+                'auto eth0\n'
+                'iface eth0 inet dhcp\n'
+                '\n'
+                '\\" > {file}"'.format(file=SourceFileLocationResolver(self.source).resolve('/etc/network/interfaces'))
             ),
             self.executed_commands
         )
