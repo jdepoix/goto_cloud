@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 from django.test import TestCase
 
 from migration_plan_parsing.public import MigrationPlanParser
@@ -14,21 +12,7 @@ from ..device_identification import DeviceIdentificationCommand
 from ..target_system_info_inspection import GetTargetSystemInfoCommand
 
 
-class PatchTrackedRemoteExecution(TestAsset.PatchRemoteHostMeta):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.executed_commands = set()
-        def tracked_mocked_execute(remote_host, command):
-            self.executed_commands.add(command)
-            return TestAsset.PatchRemoteHostMeta.MOCKED_EXECUTE(remote_host, command)
-
-        patch(
-            'remote_execution.remote_execution.SshRemoteExecutor._execute',
-            tracked_mocked_execute
-        )(self)
-
-
-class MigrationCommanderTestCase(TestCase, metaclass=PatchTrackedRemoteExecution):
+class MigrationCommanderTestCase(TestCase, metaclass=TestAsset.PatchTrackedRemoteExecutionMeta):
     def setUp(self):
         self.executed_commands.clear()
 

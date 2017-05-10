@@ -22,3 +22,17 @@ class PatchRemoteHostMeta(type):
             'remote_execution.remote_execution.SshRemoteExecutor._execute',
             PatchRemoteHostMeta.MOCKED_EXECUTE
         )(self)
+
+
+class PatchTrackedRemoteExecutionMeta(PatchRemoteHostMeta):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.executed_commands = set()
+        def tracked_mocked_execute(remote_host, command):
+            self.executed_commands.add(command)
+            return PatchRemoteHostMeta.MOCKED_EXECUTE(remote_host, command)
+
+        patch(
+            'remote_execution.remote_execution.SshRemoteExecutor._execute',
+            tracked_mocked_execute
+        )(self)
