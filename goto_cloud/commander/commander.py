@@ -1,6 +1,8 @@
 from abc import ABCMeta, abstractmethod
 
-from command.command import SourceCommand
+from command.public import SourceCommand
+
+from hook_handling.public import HookEventHandler
 
 
 class Commander(SourceCommand, metaclass=ABCMeta):
@@ -19,6 +21,7 @@ class Commander(SourceCommand, metaclass=ABCMeta):
         :type source: source.public.Source
         """
         super().__init__(source)
+        self.hook_event_handler = HookEventHandler(source)
 
     # TODO error handling and persistent status logging
     def _execute(self):
@@ -26,7 +29,9 @@ class Commander(SourceCommand, metaclass=ABCMeta):
         signal = None
         if current_command_class:
             current_command = self._initialize_command(current_command_class)
+            self.hook_event_handler.emit(HookEventHandler.EventType.BEFORE)
             signal = current_command.execute()
+            self.hook_event_handler.emit(HookEventHandler.EventType.AFTER)
         if (
             self._source.status != self._source.lifecycle[-1]
             and (signal is None or signal is not None and signal != Commander.Signal.SLEEP)
