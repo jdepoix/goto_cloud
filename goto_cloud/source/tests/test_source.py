@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 
 from source.public import Source
@@ -13,8 +15,8 @@ TEST_LIFECYCLE = (
 
 
 class TestSource(TestCase):
+    @patch('source.models.Source._LIFECYCLE', TEST_LIFECYCLE)
     def setUp(self):
-        Source._LIFECYCLE = TEST_LIFECYCLE
         self.test_source = Source.objects.create(remote_host=RemoteHost.objects.create())
 
     def test_init__default_value(self):
