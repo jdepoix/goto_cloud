@@ -14,27 +14,32 @@ from ..hook_handling import HookEventHandler
 
 class TestHookHandling(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
     TEST_HOOKS = {
-        "GET_TARGET_SYSTEM_INFORMATION_AFTER": {
-            "location": "TARGET",
-            "execute": "GET_TARGET_SYSTEM_INFORMATION_AFTER",
+        'GET_TARGET_SYSTEM_INFORMATION_AFTER': {
+            'location': 'TARGET',
+            'execute': 'GET_TARGET_SYSTEM_INFORMATION_AFTER',
         },
-        "GET_TARGET_SYSTEM_INFORMATION_BEFORE": {
-            "location": "SOURCE",
-            "execute": "GET_TARGET_SYSTEM_INFORMATION_BEFORE",
+        'GET_TARGET_SYSTEM_INFORMATION_BEFORE': {
+            'location': 'SOURCE',
+            'execute': 'GET_TARGET_SYSTEM_INFORMATION_BEFORE',
         }
     }
 
     def setUp(self):
         self.source = Source.objects.create(
             remote_host=RemoteHost.objects.create(address='ubuntu16'),
-            target=Target.objects.create(remote_host=RemoteHost.objects.create(address='target__device_identification'))
+            target=Target.objects.create(
+                remote_host=RemoteHost.objects.create(address='target__device_identification'),
+                blueprint={
+                    'hooks': self.TEST_HOOKS
+                }
+            )
         )
 
         self.triggered_script = None
         self.execution_location = None
         self.execution_env = None
 
-        self.hook_event_handler = HookEventHandler(self.TEST_HOOKS)
+        self.hook_event_handler = HookEventHandler(self.source)
 
     def get_mocked_script_execution_decorator(self):
         def mocked_script_execution(remote_script_executor, script, env=None):
@@ -48,7 +53,7 @@ class TestHookHandling(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
             'remote_script_execution.remote_script_execution.RemoteScriptExecutor.execute',
             self.get_mocked_script_execution_decorator()
         ):
-            self.hook_event_handler.emit(self.source, HookEventHandler.EventType.BEFORE)
+            self.hook_event_handler.emit(HookEventHandler.EventType.BEFORE)
 
             self.assertIsNone(self.triggered_script)
 
@@ -58,11 +63,11 @@ class TestHookHandling(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
             self.get_mocked_script_execution_decorator()
         ):
             self.source.increment_status()
-            self.hook_event_handler.emit(self.source, HookEventHandler.EventType.BEFORE)
+            self.hook_event_handler.emit(HookEventHandler.EventType.BEFORE)
 
             self.assertEqual(self.triggered_script, 'GET_TARGET_SYSTEM_INFORMATION_BEFORE')
 
-            self.hook_event_handler.emit(self.source, HookEventHandler.EventType.AFTER)
+            self.hook_event_handler.emit(HookEventHandler.EventType.AFTER)
 
             self.assertEqual(self.triggered_script, 'GET_TARGET_SYSTEM_INFORMATION_AFTER')
 
@@ -72,11 +77,11 @@ class TestHookHandling(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
             self.get_mocked_script_execution_decorator()
         ):
             self.source.increment_status()
-            self.hook_event_handler.emit(self.source, HookEventHandler.EventType.BEFORE)
+            self.hook_event_handler.emit(HookEventHandler.EventType.BEFORE)
 
             self.assertEqual(self.execution_location, 'ubuntu16')
 
-            self.hook_event_handler.emit(self.source, HookEventHandler.EventType.AFTER)
+            self.hook_event_handler.emit(HookEventHandler.EventType.AFTER)
 
             self.assertEqual(self.execution_location, 'target__device_identification')
 

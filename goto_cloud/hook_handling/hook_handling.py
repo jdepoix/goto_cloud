@@ -24,57 +24,58 @@ class HookEventHandler():
         SOURCE = 'SOURCE'
         TARGET = 'TARGET'
 
-    def __init__(self, hooks):
+    def __init__(self, source):
         """
         is initialized with a dict of hooks
         
         :param hooks: mapping of events onto the hooks which should be triggered, when the event is emitted
         :type hooks: dict
         """
-        self.hooks = hooks
+        self._source = source
+        self._cached_hooks = None
 
-    def emit(self, source, event_type):
+    @property
+    def _hooks(self):
+        if not self._cached_hooks:
+            self._cached_hooks = self._source.target.blueprint['hooks']
+
+        return self._cached_hooks
+
+    def emit(self, event_type):
         """
         Emits a event and therefore the listening hooks, if there are any. Which event is emitted eventually, is 
         determined by the event type plus the status the given source is currently in.
         
-        :param source: source the event is about
-        :type source: source.public.Source
         :param event_type: specifies the type of event
         :type event_type: str
         """
-        hook_name = '_'.join((source.status, event_type))
+        hook_name = '_'.join((self._source.status, event_type))
 
-        if hook_name in self.hooks:
+        if hook_name in self._hooks:
             self._get_remote_script_executor(
-                self.hooks[hook_name],
-                source
+                self._hooks[hook_name],
             ).execute(
-                self.hooks[hook_name]['execute'],
-                self._load_script_env(source)
+                self._hooks[hook_name]['execute'],
+                self._load_script_env()
             )
 
-    def _get_remote_script_executor(self, hook, source):
+    def _get_remote_script_executor(self, hook):
         """
         returns the remote script executor which will be used to execute a hook
         
         :param hook: the hook to execute
         :type hook: dict
-        :param source: the source to execute the hook for
-        :type source: source.public.Source
         :return: 
         """
         if hook['location'] == self.ExecutionLocations.TARGET:
-            return RemoteScriptExecutor(source.target.remote_host)
+            return RemoteScriptExecutor(self._source.target.remote_host)
 
-        return RemoteScriptExecutor(source.remote_host)
+        return RemoteScriptExecutor(self._source.remote_host)
 
-    def _load_script_env(self, source):
+    def _load_script_env(self):
         """
         loads the environment variables which will be injected into the script execution
         
-        :param source: the source to load the environment variables for
-        :type source: source.public.Source
         :return: the loaded env
         :rtype: dict
         """
