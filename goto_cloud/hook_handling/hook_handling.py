@@ -32,12 +32,12 @@ class HookEventHandler():
         :type hooks: dict
         """
         self._source = source
-        self._cached_hooks = None
+        self._cached_hooks = {}
 
     @property
     def _hooks(self):
-        if not self._cached_hooks:
-            self._cached_hooks = self._source.target.blueprint['hooks']
+        if not self._cached_hooks and self._source.target:
+            self._cached_hooks = self._source.target.blueprint.get('hooks', {})
 
         return self._cached_hooks
 
