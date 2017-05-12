@@ -7,5 +7,5 @@ class DefaultRemoteHostCommand():
     """
     RELOAD_MOUNTS = RemoteHostCommand('sudo mount -a')
     BIND_MOUNT = RemoteHostCommand('sudo mount -o bind {DIRECTORY} {MOUNTPOINT}')
-    MAKE_DIRECTORY = RemoteHostCommand('sudo mkdir {DIRECTORY}')
+    MAKE_DIRECTORY = RemoteHostCommand('sudo mkdir -p {DIRECTORY}')
     CHECK_MOUNTPOINT = RemoteHostCommand('sudo mountpoint {DIRECTORY}')

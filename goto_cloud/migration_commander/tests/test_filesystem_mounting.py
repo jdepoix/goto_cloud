@@ -55,9 +55,18 @@ class TestFilesystemMountCommand(MigrationCommanderTestCase):
 
         FilesystemMountCommand(self.source).execute()
 
-        self.assertIn('sudo mkdir ' + DeviceIdentificationCommand._map_mountpoint('/'), self.executed_commands)
-        self.assertIn('sudo mkdir ' + DeviceIdentificationCommand._map_mountpoint('/mnt/vdc1'), self.executed_commands)
-        self.assertIn('sudo mkdir ' + DeviceIdentificationCommand._map_mountpoint('/mnt/vdc2'), self.executed_commands)
+        self.assertIn(
+            'sudo mkdir -p ' + DeviceIdentificationCommand._map_mountpoint('/'),
+            self.executed_commands
+        )
+        self.assertIn(
+            'sudo mkdir -p ' + DeviceIdentificationCommand._map_mountpoint('/mnt/vdc1'),
+            self.executed_commands
+        )
+        self.assertIn(
+            'sudo mkdir -p ' + DeviceIdentificationCommand._map_mountpoint('/mnt/vdc2'),
+            self.executed_commands
+        )
 
     @patch(
         'migration_commander.remote_file_edit.RemoteFileEditor.append',

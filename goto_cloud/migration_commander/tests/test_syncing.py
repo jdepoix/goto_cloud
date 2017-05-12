@@ -92,19 +92,19 @@ class TestSyncCommand(MigrationCommanderTestCase):
         SyncCommand(self.source).execute()
 
         self.assertIn(
-            'sudo mkdir {temp_mountpoint}'.format(
+            'sudo mkdir -p {temp_mountpoint}'.format(
                 temp_mountpoint=MountpointMapper.map_mountpoint('/tmp', '/'),
             ),
             self.executed_commands
         )
         self.assertIn(
-            'sudo mkdir {temp_mountpoint}'.format(
+            'sudo mkdir -p {temp_mountpoint}'.format(
                 temp_mountpoint=MountpointMapper.map_mountpoint('/tmp', '/mnt/vdc1'),
             ),
             self.executed_commands
         )
         self.assertIn(
-            'sudo mkdir {temp_mountpoint}'.format(
+            'sudo mkdir -p {temp_mountpoint}'.format(
                 temp_mountpoint=MountpointMapper.map_mountpoint('/tmp', '/mnt/vdc2'),
             ),
             self.executed_commands

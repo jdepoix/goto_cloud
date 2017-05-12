@@ -10,7 +10,7 @@ class TestBootloaderReinstallation(MigrationCommanderTestCase):
         BootloaderReinstallationCommand(self.source).execute()
 
         self.assertIn(
-            'sudo mkdir {mounted_root}/proc'.format(
+            'sudo mkdir -p {mounted_root}/proc'.format(
                 mounted_root=self.source.target.device_mapping['vda']['children']['vda1']['mountpoint']
              ),
             self.executed_commands
@@ -22,7 +22,7 @@ class TestBootloaderReinstallation(MigrationCommanderTestCase):
         BootloaderReinstallationCommand(self.source).execute()
 
         self.assertIn(
-            'sudo mkdir {mounted_root}/sys'.format(
+            'sudo mkdir -p {mounted_root}/sys'.format(
                 mounted_root=self.source.target.device_mapping['vda']['children']['vda1']['mountpoint']
              ),
             self.executed_commands
@@ -34,7 +34,7 @@ class TestBootloaderReinstallation(MigrationCommanderTestCase):
         BootloaderReinstallationCommand(self.source).execute()
 
         self.assertIn(
-            'sudo mkdir {mounted_root}/dev'.format(
+            'sudo mkdir -p {mounted_root}/dev'.format(
                 mounted_root=self.source.target.device_mapping['vda']['children']['vda1']['mountpoint']
              ),
             self.executed_commands

@@ -36,6 +36,12 @@ class HookEventHandler():
 
     @property
     def _hooks(self):
+        """
+        a dict mapping a event to the hook which should be triggered
+        
+        :return: event to hook mapping
+        :rtype: dict
+        """
         if not self._cached_hooks and self._source.target:
             self._cached_hooks = self._source.target.blueprint.get('hooks', {})
 
