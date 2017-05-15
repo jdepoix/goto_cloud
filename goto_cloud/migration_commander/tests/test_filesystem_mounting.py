@@ -77,3 +77,8 @@ class TestFilesystemMountCommand(MigrationCommanderTestCase):
 
         with self.assertRaises(FilesystemMountCommand.MountingException):
             FilesystemMountCommand(self.source).execute()
+
+    def test_execute__with_swap(self):
+        self._init_test_data('ubuntu12', 'target__device_identification')
+
+        FilesystemMountCommand(self.source).execute()

@@ -22,7 +22,7 @@ class CreatePartitionsCommand(DeviceModifyingCommand):
 
     def _execute(self):
         self.source_remote_executor = RemoteHostExecutor(self._source.remote_host)
-        self._execute_on_every_device(self._replicate_partition_table)
+        self._execute_on_every_device(self._replicate_partition_table, None, include_swap=True)
         self.source_remote_executor.close()
         self.source_remote_executor = None
 
