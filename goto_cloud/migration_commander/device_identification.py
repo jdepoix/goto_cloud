@@ -110,4 +110,4 @@ class DeviceIdentificationCommand(SourceCommand):
         :return: the mountpoint containing the hashed path for the target device
         :rtype: str
         """
-        return MountpointMapper.map_mountpoint('/mnt', mountpoint) if mountpoint else ''
+        return MountpointMapper.map_mountpoint('/mnt', mountpoint) if mountpoint and mountpoint != '[SWAP]' else ''

@@ -136,3 +136,40 @@ class TestDeviceIdentificationCommand(TestCase, metaclass=TestAsset.PatchRemoteH
 
         with self.assertRaises(DeviceIdentificationCommand.NoMatchingDevicesException):
             DeviceIdentificationCommand(self.source).execute()
+
+    def test_execute__dont_map_swap_device(self):
+        source_remote_host = RemoteHost.objects.create(address='ubuntu12')
+        target_remote_host = RemoteHost.objects.create(address='target__device_identification')
+
+        source_remote_host.system_info = RemoteHostSystemInfoGetter(source_remote_host).get_system_info()
+        target_remote_host.system_info = RemoteHostSystemInfoGetter(target_remote_host).get_system_info()
+
+        self.source = Source.objects.create(remote_host=source_remote_host)
+        self.target = Target.objects.create(
+            source=self.source,
+            remote_host=target_remote_host,
+        )
+
+        DeviceIdentificationCommand(self.source).execute()
+
+        self.target.refresh_from_db()
+
+        self.assertDictEqual(
+            self.target.device_mapping,
+            {
+                'vda': {
+                    'id': 'vdb',
+                    'mountpoint': '',
+                    'children': {
+                        'vda1': {
+                            'id': 'vdb1',
+                            'mountpoint': '/mnt/' + str(hash('/') + sys.maxsize + 1),
+                        },
+                        'vda2': {
+                            'id': 'vdb2',
+                            'mountpoint': '',
+                        }
+                    }
+                }
+            }
+        )
