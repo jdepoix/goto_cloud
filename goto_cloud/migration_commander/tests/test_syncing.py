@@ -110,12 +110,6 @@ class TestSyncCommand(MigrationCommanderTestCase):
             self.executed_commands
         )
 
-    @patch.object(DefaultRemoteHostCommand, 'MAKE_DIRECTORY', RemoteHostCommand('I_WILL_FAIL'))
-    def test_execute__temp_mount_folder_already_exists(self):
-        self._init_test_data('ubuntu16', 'target__device_identification')
-
-        SyncCommand(self.source).execute()
-
     @patch.object(DefaultRemoteHostCommand, 'CHECK_MOUNTPOINT', RemoteHostCommand('I_WILL_FAIL'))
     def test_execute__temp_mounts_mounted(self):
         self._init_test_data('ubuntu16', 'target__device_identification')

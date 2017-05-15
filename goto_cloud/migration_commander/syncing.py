@@ -57,8 +57,7 @@ class SyncCommand(DeviceModifyingCommand):
         temp_mountpoint = MountpointMapper.map_mountpoint('/tmp', source_directory)
 
         remote_executor.execute(
-            DefaultRemoteHostCommand.MAKE_DIRECTORY.render(directory=temp_mountpoint),
-            raise_exception_on_failure=False
+            DefaultRemoteHostCommand.MAKE_DIRECTORY.render(directory=temp_mountpoint)
         )
 
         try:

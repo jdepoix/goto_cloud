@@ -35,6 +35,7 @@ class BootloaderReinstallationCommand(SourceCommand):
         remote_executor = RemoteHostExecutor(self._target.remote_host)
         self._create_source_environment_mountpoints(remote_executor, root_source_mountpoint)
         self._mount_source_environment(remote_executor, root_source_mountpoint)
+        self._mount_source_mountpoints(remote_executor, root_source_mountpoint)
         self._reinstall_bootloader(remote_executor, root_source_mountpoint)
 
     def _mount_source_environment(self, remote_executor, root_source_mountpoint):
@@ -108,8 +109,7 @@ class BootloaderReinstallationCommand(SourceCommand):
             remote_executor.execute(
                 DefaultRemoteHostCommand.MAKE_DIRECTORY.render(
                     directory=root_source_mountpoint + source_environment_dir
-                ),
-                raise_exception_on_failure=False,
+                )
             )
 
     def _find_target_device_id_by_mountpoint(self, mountpoint):
@@ -128,3 +128,27 @@ class BootloaderReinstallationCommand(SourceCommand):
             for partition in device['children'].values():
                 if partition['mountpoint'] == mountpoint:
                     return device['id']
+
+    def _mount_source_mountpoints(self, remote_executor, root_source_mountpoint):
+        for device in self._source.remote_host.system_info['block_devices'].values():
+            if device['mountpoint'] and device['mountpoint'] != '/':
+                self._mount_source_mountpoint(remote_executor, root_source_mountpoint, device['mountpoint'])
+
+            for partition in device['children'].values():
+                if partition['mountpoint'] and partition['mountpoint'] != '/':
+                    self._mount_source_mountpoint(remote_executor, root_source_mountpoint, partition['mountpoint'])
+
+    def _mount_source_mountpoint(self, remote_executor, root_source_mountpoint, mountpoint):
+        chrooted_env_location = root_source_mountpoint + mountpoint
+
+        remote_executor.execute(
+            DefaultRemoteHostCommand.MAKE_DIRECTORY.render(
+                directory=chrooted_env_location
+            )
+        )
+        remote_executor.execute(
+            DefaultRemoteHostCommand.BIND_MOUNT.render(
+                directory=self.source_file_location_resolver.resolve(mountpoint),
+                mountpoint=chrooted_env_location
+            )
+        )
