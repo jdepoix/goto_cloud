@@ -143,3 +143,8 @@ class TestBootloaderReinstallation(MigrationCommanderTestCase):
             ),
             self.executed_commands
         )
+
+    def test_execute__swap_not_mounted_in_env(self):
+        self._init_test_data('ubuntu12', 'target__device_identification')
+
+        BootloaderReinstallationCommand(self.source).execute()

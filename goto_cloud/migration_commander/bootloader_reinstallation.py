@@ -141,14 +141,18 @@ class BootloaderReinstallationCommand(SourceCommand):
     def _mount_source_mountpoint(self, remote_executor, root_source_mountpoint, mountpoint):
         chrooted_env_location = root_source_mountpoint + mountpoint
 
-        remote_executor.execute(
-            DefaultRemoteHostCommand.MAKE_DIRECTORY.render(
-                directory=chrooted_env_location
+        try:
+            resolved_base_path = self.source_file_location_resolver.resolve(mountpoint)
+            remote_executor.execute(
+                DefaultRemoteHostCommand.MAKE_DIRECTORY.render(
+                    directory=chrooted_env_location
+                )
             )
-        )
-        remote_executor.execute(
-            DefaultRemoteHostCommand.BIND_MOUNT.render(
-                directory=self.source_file_location_resolver.resolve(mountpoint),
-                mountpoint=chrooted_env_location
+            remote_executor.execute(
+                DefaultRemoteHostCommand.BIND_MOUNT.render(
+                    directory=resolved_base_path,
+                    mountpoint=chrooted_env_location
+                )
             )
-        )
+        except SourceFileLocationResolver.InvalidPathException:
+            pass
