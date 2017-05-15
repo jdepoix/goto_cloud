@@ -137,15 +137,15 @@ class DebianSystemInfoGetter(SystemInfoGetter):
         """
         Commands which are executed to retrieved the relevant information
         """
-        CPU_INFO = 'cat /proc/cpuinfo'
+        CPU_INFO = 'sudo cat /proc/cpuinfo'
         FDISK = 'sudo fdisk -l {devices}'
-        HOSTNAME = 'hostname'
-        IFCONFIG = 'ifconfig'
-        LSBLK = 'lsblk -bPo NAME,FSTYPE,LABEL,UUID,MOUNTPOINT,TYPE,SIZE'
-        LSBLK_TREE = 'lsblk -no NAME'
-        MEM_INFO = 'cat /proc/meminfo | grep MemTotal:'
-        OS_RELEASE = 'cat /etc/os-release'
-        ROUTE = 'route -n'
+        HOSTNAME = 'sudo hostname'
+        IFCONFIG = 'sudo ifconfig'
+        LSBLK = 'sudo lsblk -bPo NAME,FSTYPE,LABEL,UUID,MOUNTPOINT,TYPE,SIZE'
+        LSBLK_TREE = 'sudo lsblk -no NAME'
+        MEM_INFO = 'sudo cat /proc/meminfo | grep MemTotal:'
+        OS_RELEASE = 'sudo cat /etc/os-release'
+        ROUTE = 'sudo route -n'
 
     def _get_unordered_block_devices(self):
         unordered_devices = {}
