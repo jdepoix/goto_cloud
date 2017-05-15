@@ -124,3 +124,22 @@ class TestBootloaderReinstallation(MigrationCommanderTestCase):
             ),
             self.executed_commands
         )
+
+    def test_execute__mount_disk_mountpoint_into_env(self):
+        self._init_test_data('ubuntu16', 'target__device_identification')
+
+        self.source.remote_host.system_info['block_devices']['vda']['mountpoint'] = \
+            self.source.remote_host.system_info['block_devices']['vdc']['children']['vdc1']['mountpoint']
+        self.source.target.device_mapping['vda']['mountpoint'] = \
+            self.source.target.device_mapping['vdc']['children']['vdc1']['mountpoint']
+        self.source.target.save()
+
+        BootloaderReinstallationCommand(self.source).execute()
+
+        self.assertIn(
+            'sudo mount -o bind {directory} {mounted_root}/mnt/vdc1'.format(
+                mounted_root=self.source.target.device_mapping['vda']['children']['vda1']['mountpoint'],
+                directory=self.source.target.device_mapping['vdc']['children']['vdc1']['mountpoint'],
+            ),
+            self.executed_commands
+        )
