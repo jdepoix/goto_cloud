@@ -7,7 +7,7 @@ class DeviceModifyingCommand(SourceCommand):
     """
     a command supplying utility methods for command which iterate over the devices of the source and target
     """
-    def _execute_on_every_device(self, executable_for_disks, executable_for_partitions=None):
+    def _execute_on_every_device(self, executable_for_disks, executable_for_partitions=None, include_swap=False):
         """
         execute the given executable with all devices.
         
@@ -18,34 +18,37 @@ class DeviceModifyingCommand(SourceCommand):
         target_device, source_partition_device, target_partition_device
         :type executable_for_partitions: (self: Any, RemoteExecutor, (str, dict), (str, dict), (str, dict), (str, dict)
         ) -> None
+        :param include_swap: should a swap device also be iterated over
+        :type include_swap: bool
         :return: the used remote_executor, for extended use
         :rtype: RemoteHostExecutor
         """
         remote_executor = RemoteHostExecutor(self._target.remote_host)
 
         for source_device_id, target_device in self._target.device_mapping.items():
-            if executable_for_disks:
+            source_device = self._source.remote_host.system_info['block_devices'][source_device_id]
+
+            if executable_for_disks  and (include_swap or not include_swap and source_device['fs'] != 'swap'):
                 executable_for_disks(
                     remote_executor,
-                    (source_device_id, self._source.remote_host.system_info['block_devices'][source_device_id]),
+                    (source_device_id, source_device),
                     (target_device['id'], target_device),
                 )
 
             if executable_for_partitions:
                 for source_partition_id, target_partition in target_device['children'].items():
-                    executable_for_partitions(
-                        remote_executor,
-                        (source_device_id, self._source.remote_host.system_info['block_devices'][source_device_id]),
-                        (target_device['id'], target_device),
-                        (
-                            source_partition_id,
-                            self
-                                ._source
-                                .remote_host
-                                .system_info['block_devices'][source_device_id]['children'][source_partition_id]
-                        ),
-                        (target_partition['id'], target_partition),
-                    )
+                    source_partition = source_device['children'][source_partition_id]
+                    if (include_swap or not include_swap and source_partition['fs'] != 'swap'):
+                        executable_for_partitions(
+                            remote_executor,
+                            (source_device_id, source_device),
+                            (target_device['id'], target_device),
+                            (
+                                source_partition_id,
+                                source_partition
+                            ),
+                            (target_partition['id'], target_partition),
+                        )
 
         return remote_executor
 

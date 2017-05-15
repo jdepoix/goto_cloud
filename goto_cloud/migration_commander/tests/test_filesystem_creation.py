@@ -19,3 +19,8 @@ class TestCreateFilesystemsCommand(MigrationCommanderTestCase):
 
         with self.assertRaises(CreateFilesystemsCommand.UnsupportedFilesystemException):
             CreateFilesystemsCommand(self.source).execute()
+
+    def test_execute__swap_not_created(self):
+        self._init_test_data('ubuntu12', 'target__device_identification')
+
+        CreateFilesystemsCommand(self.source).execute()
