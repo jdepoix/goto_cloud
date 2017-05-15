@@ -1,44 +1,36 @@
+from test_assets.public import TestAsset
+
 from ..partition_creation import CreatePartitionsCommand
 
 from .utils import MigrationCommanderTestCase
 
 
 class TestCreatePartitionsCommand(MigrationCommanderTestCase):
-    def test_execute(self):
+    def _init_test_data(self, source_host, target_host):
+        super()._init_test_data(source_host, target_host)
+        TestAsset.REMOTE_HOST_MOCKS['ubuntu16'].add_command(
+            'sudo sfdisk -d',
+            'PART "TABLE"'
+        )
+        TestAsset.REMOTE_HOST_MOCKS['target__device_identification'].add_command(
+            'sfdisk',
+            ''
+        )
+
+    def test_execute__source_part_table_read(self):
         self._init_test_data('ubuntu16', 'target__device_identification')
 
         CreatePartitionsCommand(self.source).execute()
 
-        self.assertIn('echo -e \"n\n\n1\n2048\n20971519\nw\n\" | sudo fdisk /dev/vdb', self.executed_commands)
-        self.assertIn('echo -e \"n\n\n1\n2048\n10487807\nw\n\" | sudo fdisk /dev/vdd', self.executed_commands)
-        self.assertIn('echo -e \"n\n\n2\n10487808\n20971519\nw\n\" | sudo fdisk /dev/vdd', self.executed_commands)
-        self.assertIn('echo -e \"a\nw\n\" | sudo fdisk /dev/vdb', self.executed_commands)
+        self.assertIn('sudo sfdisk -d /dev/vda', self.executed_commands)
+        self.assertIn('sudo sfdisk -d /dev/vdb', self.executed_commands)
+        self.assertIn('sudo sfdisk -d /dev/vdc', self.executed_commands)
 
-    def test_execute__booatable_flag_with_multiple_partitions(self):
+    def test_execute__target_part_table_write(self):
         self._init_test_data('ubuntu16', 'target__device_identification')
-
-        self.source.remote_host.system_info['block_devices']['vda']['children']['vda2'] = \
-            self.source.remote_host.system_info['block_devices']['vda']['children']['vda1']
 
         CreatePartitionsCommand(self.source).execute()
 
-        self.assertIn('echo -e \"n\n\n1\n2048\n20971519\nw\n\" | sudo fdisk /dev/vdb', self.executed_commands)
-        self.assertIn('echo -e \"n\n\n1\n2048\n10487807\nw\n\" | sudo fdisk /dev/vdd', self.executed_commands)
-        self.assertIn('echo -e \"n\n\n2\n10487808\n20971519\nw\n\" | sudo fdisk /dev/vdd', self.executed_commands)
-        self.assertIn('echo -e \"a\n1\nw\n\" | sudo fdisk /dev/vdb', self.executed_commands)
-
-    def test_execute__can_not_create_children(self):
-        self._init_test_data('ubuntu16__lvm', 'target__device_identification')
-
-        with self.assertRaises(CreatePartitionsCommand.CanNotCreatePartitionException):
-            CreatePartitionsCommand(self.source).execute()
-
-    def test_execute__invalid_partition_type(self):
-        self._init_test_data('ubuntu16', 'target__device_identification')
-
-        source_remote_host = self.source.remote_host
-        source_remote_host.system_info['block_devices']['vda']['children']['vda1']['type'] = 'unknown'
-        source_remote_host.save()
-
-        with self.assertRaises(CreatePartitionsCommand.CanNotCreatePartitionException):
-            CreatePartitionsCommand(self.source).execute()
+        self.assertIn('echo "PART \\"TABLE\\"" | sudo sfdisk /dev/vdb', self.executed_commands)
+        self.assertIn('echo "PART \\"TABLE\\"" | sudo sfdisk /dev/vdc', self.executed_commands)
+        self.assertIn('echo "PART \\"TABLE\\"" | sudo sfdisk /dev/vdd', self.executed_commands)

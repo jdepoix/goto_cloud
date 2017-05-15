@@ -19,6 +19,15 @@ class TestMigrationCommander(MigrationCommanderTestCase):
         self.source.target.remote_host = RemoteHost.objects.create(address=target_host)
         self.source.target.save()
 
+        TestAsset.REMOTE_HOST_MOCKS['ubuntu16'].add_command(
+            'sudo sfdisk -d',
+            'PART "TABLE"'
+        )
+        TestAsset.REMOTE_HOST_MOCKS['target__device_identification'].add_command(
+            'sfdisk',
+            ''
+        )
+
     def test_execute(self):
         self._init_test_data('ubuntu16', 'target__device_identification')
 

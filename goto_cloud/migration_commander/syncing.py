@@ -25,6 +25,8 @@ class SyncCommand(DeviceModifyingCommand):
     def _execute(self):
         self.source_remote_executor = RemoteHostExecutor(self._source.remote_host)
         self._execute_on_every_device(self._sync_disk, self._sync_partition)
+        self.source_remote_executor.close()
+        self.source_remote_executor = None
 
         return Commander.Signal.SLEEP
 
