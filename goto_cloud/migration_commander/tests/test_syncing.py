@@ -20,7 +20,7 @@ class TestSyncCommand(MigrationCommanderTestCase):
         SyncCommand(self.source).execute()
 
         self.assertIn(
-            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa" '
+            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no" '
             '--rsync-path="sudo rsync" {source_dir}/ '
             '{remote_host_address}:{target_dir}'.format(
                 source_dir=MountpointMapper.map_mountpoint('/tmp', '/'),
@@ -31,7 +31,7 @@ class TestSyncCommand(MigrationCommanderTestCase):
             self.executed_commands
         )
         self.assertIn(
-            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa" '
+            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no" '
             '--rsync-path="sudo rsync" {source_dir}/ '
             '{remote_host_address}:{target_dir}'.format(
                 source_dir=MountpointMapper.map_mountpoint('/tmp', '/mnt/vdc1'),
@@ -41,7 +41,7 @@ class TestSyncCommand(MigrationCommanderTestCase):
             self.executed_commands
         )
         self.assertIn(
-            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa" '
+            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no" '
             '--rsync-path="sudo rsync" {source_dir}/ '
             '{remote_host_address}:{target_dir}'.format(
                 source_dir=MountpointMapper.map_mountpoint('/tmp', '/mnt/vdc2'),
@@ -59,7 +59,7 @@ class TestSyncCommand(MigrationCommanderTestCase):
         SyncCommand(self.source).execute()
 
         self.assertIn(
-            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa" '
+            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no" '
             '--rsync-path="sudo rsync" {source_dir}/ '
             'testuser@{remote_host_address}:{target_dir}'
                 .format(
@@ -70,7 +70,7 @@ class TestSyncCommand(MigrationCommanderTestCase):
             self.executed_commands
         )
         self.assertIn(
-            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa" '
+            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no" '
             '--rsync-path="sudo rsync" {source_dir}/ '
             'testuser@{remote_host_address}:{target_dir}'
             .format(
@@ -81,7 +81,7 @@ class TestSyncCommand(MigrationCommanderTestCase):
             self.executed_commands
         )
         self.assertIn(
-            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa" '
+            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no" '
             '--rsync-path="sudo rsync" {source_dir}/ '
             'testuser@{remote_host_address}:{target_dir}'
                 .format(

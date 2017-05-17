@@ -100,10 +100,18 @@ class TestBlueprintResolver(TestCase):
                                 "uuid": "-U {UUID}",
                                 "label": "-L {LABEL}"
                             }
-                        }
+                        },
+                        "ext2": {
+                            "command": "sudo mkfs.ext2 {OPTIONALS} -F {DEVICE}",
+                            "optionals": {
+                                "uuid": "-U {UUID}",
+                                "label": "-L {LABEL}"
+                            }
+                        },
                     },
                     "sync":
-                        "sudo rsync -zaXAPx --delete --numeric-ids -e \"ssh -i $HOME/.ssh/id_rsa\" "
+                        "sudo rsync -zaXAPx --delete --numeric-ids "
+                        "-e \"ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no\" "
                         "--rsync-path=\"sudo rsync\" {SOURCE_DIR}/ {TARGET_DIR}",
                     "reinstall_bootloader": "sudo grub-install --boot-directory=/boot {DEVICE}",
                     "tag_partition_bootable": {
@@ -181,10 +189,18 @@ class TestBlueprintResolver(TestCase):
                                 "uuid": "-U {UUID}",
                                 "label": "-L {LABEL}"
                             }
-                        }
+                        },
+                        "ext2": {
+                            "command": "sudo mkfs.ext2 {OPTIONALS} -F {DEVICE}",
+                            "optionals": {
+                                "uuid": "-U {UUID}",
+                                "label": "-L {LABEL}"
+                            }
+                        },
                     },
                     "sync":
-                        "sudo rsync -zaXAPx --delete --numeric-ids -e \"ssh -i $HOME/.ssh/id_rsa\" "
+                        "sudo rsync -zaXAPx --delete --numeric-ids "
+                        "-e \"ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no\" "
                         "--rsync-path=\"sudo rsync\" {SOURCE_DIR}/ {TARGET_DIR}",
                     "reinstall_bootloader": "sudo grub-install --boot-directory=/boot {DEVICE}",
                     "tag_partition_bootable": {

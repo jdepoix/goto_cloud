@@ -62,9 +62,16 @@ MIGRATION_PLAN_MOCK = {
                             "uuid": "-U {UUID}",
                             "label": "-L {LABEL}"
                         }
+                    },
+                    "ext2": {
+                        "command": "sudo mkfs.ext2 {OPTIONALS} -F {DEVICE}",
+                        "optionals": {
+                            "uuid": "-U {UUID}",
+                            "label": "-L {LABEL}"
+                        }
                     }
                 },
-                "sync": "sudo rsync -zaXAPx --delete --numeric-ids -e \"ssh -i $HOME/.ssh/id_rsa\" --rsync-path=\"sudo rsync\" {SOURCE_DIR}/ {TARGET_DIR}",
+                "sync": "sudo rsync -zaXAPx --delete --numeric-ids -e \"ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no\" --rsync-path=\"sudo rsync\" {SOURCE_DIR}/ {TARGET_DIR}",
                 "reinstall_bootloader": "sudo grub-install --boot-directory=/boot {DEVICE}",
                 "tag_partition_bootable": {
                     "command": "echo -e \"a\n{OPTIONALS}w\n\" | sudo fdisk {PARENT_DEVICE}",
