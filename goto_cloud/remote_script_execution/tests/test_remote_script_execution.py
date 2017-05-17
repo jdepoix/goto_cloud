@@ -20,8 +20,7 @@ class TestRemoteScriptExecutor(TestCase, metaclass=TestAsset.PatchTrackedRemoteE
         remote_script_executor.execute('script', env)
 
         self.assertIn(
-            # TODO add env stuff
-            '(script)',
+            'printf "import json\nCONTEXT = json.loads(\'{\\"1\\": 1, \\"2\\": 2, \\"3\\": 3}\')\nscript" | python',
             self.executed_commands
         )
 
@@ -31,6 +30,6 @@ class TestRemoteScriptExecutor(TestCase, metaclass=TestAsset.PatchTrackedRemoteE
         remote_script_executor.execute('script')
 
         self.assertIn(
-            '(script)',
+            'printf "import json\nCONTEXT = json.loads(\'{}\')\nscript" | python',
             self.executed_commands
         )
