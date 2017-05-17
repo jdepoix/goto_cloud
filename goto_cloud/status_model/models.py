@@ -2,6 +2,8 @@ from abc import abstractmethod
 
 from django.db import models
 
+from enums.public import StringEnum
+
 from tracked_model.public import TrackedModel
 
 from .lifecycle_management import ObjectStatusLifecycleManager, StatusLifecycle
@@ -18,6 +20,9 @@ class StatusModel(TrackedModel):
         """
         pass
 
+    class Status(StringEnum):
+        pass
+
     @property
     @abstractmethod
     def lifecycle(self):
@@ -31,6 +36,7 @@ class StatusModel(TrackedModel):
         self._status_lifecycle = StatusLifecycle(*self.lifecycle)
         self._lifecycle_manager = ObjectStatusLifecycleManager(self._status_lifecycle, self, 'status')
         self._meta.get_field('status').default = self._status_lifecycle.statuses[0]
+        self._meta.get_field('status').choices = self.Status.get_django_choices()
         super().__init__(*args, **kwargs)
 
     def save(self, *args, **kwargs):
