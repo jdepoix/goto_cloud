@@ -60,6 +60,16 @@ class TestRemoteFileEditor(MigrationCommanderTestCase):
             self.executed_commands
         )
 
+    def test_append__text_contains_quotation_marks(self):
+        self._init_test_data()
+
+        RemoteFileEditor(self.remote_executor).append('/etc/testfile.txt', 'append "this"')
+
+        self.assertIn(
+            'sudo bash -c "echo -e \\"append \\"this\\"\\" >> /etc/testfile.txt"',
+            self.executed_commands
+        )
+
     def test_write(self):
         self._init_test_data()
 
@@ -67,5 +77,15 @@ class TestRemoteFileEditor(MigrationCommanderTestCase):
 
         self.assertIn(
             'sudo bash -c "echo -e \\"write this\\" > /etc/testfile.txt"',
+            self.executed_commands
+        )
+
+    def test_write__text_contains_quotation_marks(self):
+        self._init_test_data()
+
+        RemoteFileEditor(self.remote_executor).write('/etc/testfile.txt', 'write "this"')
+
+        self.assertIn(
+            'sudo bash -c "echo -e \\"write \\"this\\"\\" > /etc/testfile.txt"',
             self.executed_commands
         )

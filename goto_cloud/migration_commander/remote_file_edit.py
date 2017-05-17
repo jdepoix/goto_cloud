@@ -47,7 +47,7 @@ class RemoteFileEditor():
         :type text_to_append: str
         """
         self.remote_executor.execute(
-            self._APPEND_FILE.render(file=file, file_content=text_to_append)
+            self._APPEND_FILE.render(file=file, file_content=self._make_string_echo_safe(text_to_append))
         )
 
     def write(self, file, text_to_write):
@@ -60,5 +60,8 @@ class RemoteFileEditor():
         :type text_to_write: str 
         """
         self.remote_executor.execute(
-            self._WRITE_FILE.render(file=file, file_content=text_to_write)
+            self._WRITE_FILE.render(file=file, file_content=self._make_string_echo_safe(text_to_write))
         )
+
+    def _make_string_echo_safe(self, string):
+        return string.replace('"', '\\"')
