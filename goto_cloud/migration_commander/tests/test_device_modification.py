@@ -4,7 +4,7 @@ from .utils import MigrationCommanderTestCase
 
 
 class TestDeviceModifyingCommand(DeviceModifyingCommand):
-    def _execute(self):
+    def _execute(self): # pragma: no cover
         pass
 
     def execute_with_swap_included(self):
