@@ -19,7 +19,7 @@ class MigrationCommander(Commander):
         Source.Status.CREATE_PARTITIONS: CreatePartitionsCommand,
         Source.Status.CREATE_FILESYSTEMS: CreateFilesystemsCommand,
         Source.Status.MOUNT_FILESYSTEMS: FilesystemMountCommand,
-        Source.Status.SYNCING: SyncCommand,
+        Source.Status.SYNC: SyncCommand,
         Source.Status.FINAL_SYNC: FinalSyncCommand,
         Source.Status.ADJUST_NETWORK_CONFIG: NetworkConfigAdjustmentCommand,
         Source.Status.ADJUST_SSH_CONFIG: SshConfigAdjustmentCommand,

@@ -80,4 +80,4 @@ class FinalSyncCommand(SyncCommand):
     does a sync like the SyncCommand, but does not return a sleep signal
     """
     def _execute(self):
-        super(FinalSyncCommand, self)._execute()
+        super()._execute()

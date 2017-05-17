@@ -57,7 +57,6 @@ class RemoteHostCommand():
                 del context[relevant_optional]
 
             context['optionals'] = ' '.join(optional_strings)
-
         try:
             return self.command.format(**{key.upper(): value for key, value in context.items()})
         except KeyError:

@@ -72,14 +72,18 @@ class TestBlueprintResolver(TestCase):
                     },
                 },
                 "hooks": {
-                    "go_live_before": {
-                        "location": "target",
-                        "execute": "systemctl stop nginx gunicorn celery-main celery-beat",
+                    "SYNC_AFTER": {
+                        "execute": "touch ~/hook_was_executed.txt",
+                        "location": "TARGET"
                     },
-                    "go_live_after": {
-                        "location": "target",
+                    "FINAL_SYNC_BEFORE": {
                         "execute": "systemctl start nginx gunicorn celery-main celery-beat",
-                    }
+                        "location": "SOURCE",
+                    },
+                    "FINAL_SYNC_AFTER": {
+                        "execute": "systemctl start nginx gunicorn celery-main celery-beat",
+                        "location": "SOURCE",
+                    },
                 },
                 "commands": {
                     "create_filesystem": {
@@ -99,11 +103,9 @@ class TestBlueprintResolver(TestCase):
                         }
                     },
                     "sync":
-                        "sudo rsync -zaXAPx --delete --numeric-ids -e ssh --rsync-path=\"sudo rsync\" {SOURCE_DIR}/ "
-                        "{TARGET_DIR}",
+                        "sudo rsync -zaXAPx --delete --numeric-ids -e \"ssh -i $HOME/.ssh/id_rsa\" "
+                        "--rsync-path=\"sudo rsync\" {SOURCE_DIR}/ {TARGET_DIR}",
                     "reinstall_bootloader": "sudo grub-install --boot-directory=/boot {DEVICE}",
-                    "create_partition":
-                        "echo -e \"n\n\n{PARTITION_NUMBER}\n{START}\n{END}\nw\n\" | sudo fdisk {DEVICE}",
                     "tag_partition_bootable": {
                         "command": "echo -e \"a\n{OPTIONALS}w\n\" | sudo fdisk {PARENT_DEVICE}",
                         "optionals": {
@@ -159,9 +161,9 @@ class TestBlueprintResolver(TestCase):
                     },
                 },
                 "hooks": {
-                    "go_live_after": {
-                        "location": "target",
-                        "execute": "ls",
+                    "SYNC_AFTER": {
+                        "execute": "touch ~/hook_was_executed.txt",
+                        "location": "TARGET"
                     }
                 },
                 "commands": {
@@ -182,11 +184,9 @@ class TestBlueprintResolver(TestCase):
                         }
                     },
                     "sync":
-                        "sudo rsync -zaXAPx --delete --numeric-ids -e ssh --rsync-path=\"sudo rsync\" {SOURCE_DIR}/ "
-                        "{TARGET_DIR}",
+                        "sudo rsync -zaXAPx --delete --numeric-ids -e \"ssh -i $HOME/.ssh/id_rsa\" "
+                        "--rsync-path=\"sudo rsync\" {SOURCE_DIR}/ {TARGET_DIR}",
                     "reinstall_bootloader": "sudo grub-install --boot-directory=/boot {DEVICE}",
-                    "create_partition":
-                        "echo -e \"n\n\n{PARTITION_NUMBER}\n{START}\n{END}\nw\n\" | sudo fdisk {DEVICE}",
                     "tag_partition_bootable": {
                         "command": "echo -e \"a\n{OPTIONALS}w\n\" | sudo fdisk {PARENT_DEVICE}",
                         "optionals": {

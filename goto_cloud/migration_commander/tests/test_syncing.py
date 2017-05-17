@@ -20,7 +20,8 @@ class TestSyncCommand(MigrationCommanderTestCase):
         SyncCommand(self.source).execute()
 
         self.assertIn(
-            'sudo rsync -zaXAPx --delete --numeric-ids -e ssh --rsync-path="sudo rsync" {source_dir}/ '
+            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa" '
+            '--rsync-path="sudo rsync" {source_dir}/ '
             '{remote_host_address}:{target_dir}'.format(
                 source_dir=MountpointMapper.map_mountpoint('/tmp', '/'),
                 target_dir=MountpointMapper.map_mountpoint('/mnt', '/'),
@@ -30,7 +31,8 @@ class TestSyncCommand(MigrationCommanderTestCase):
             self.executed_commands
         )
         self.assertIn(
-            'sudo rsync -zaXAPx --delete --numeric-ids -e ssh --rsync-path="sudo rsync" {source_dir}/ '
+            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa" '
+            '--rsync-path="sudo rsync" {source_dir}/ '
             '{remote_host_address}:{target_dir}'.format(
                 source_dir=MountpointMapper.map_mountpoint('/tmp', '/mnt/vdc1'),
                 target_dir=MountpointMapper.map_mountpoint('/mnt', '/mnt/vdc1'),
@@ -39,7 +41,8 @@ class TestSyncCommand(MigrationCommanderTestCase):
             self.executed_commands
         )
         self.assertIn(
-            'sudo rsync -zaXAPx --delete --numeric-ids -e ssh --rsync-path="sudo rsync" {source_dir}/ '
+            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa" '
+            '--rsync-path="sudo rsync" {source_dir}/ '
             '{remote_host_address}:{target_dir}'.format(
                 source_dir=MountpointMapper.map_mountpoint('/tmp', '/mnt/vdc2'),
                 target_dir=MountpointMapper.map_mountpoint('/mnt', '/mnt/vdc2'),
@@ -56,7 +59,8 @@ class TestSyncCommand(MigrationCommanderTestCase):
         SyncCommand(self.source).execute()
 
         self.assertIn(
-            'sudo rsync -zaXAPx --delete --numeric-ids -e ssh --rsync-path="sudo rsync" {source_dir}/ '
+            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa" '
+            '--rsync-path="sudo rsync" {source_dir}/ '
             'testuser@{remote_host_address}:{target_dir}'
                 .format(
                     source_dir=MountpointMapper.map_mountpoint('/tmp', '/'),
@@ -66,7 +70,8 @@ class TestSyncCommand(MigrationCommanderTestCase):
             self.executed_commands
         )
         self.assertIn(
-            'sudo rsync -zaXAPx --delete --numeric-ids -e ssh --rsync-path="sudo rsync" {source_dir}/ '
+            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa" '
+            '--rsync-path="sudo rsync" {source_dir}/ '
             'testuser@{remote_host_address}:{target_dir}'
             .format(
                 source_dir=MountpointMapper.map_mountpoint('/tmp', '/mnt/vdc1'),
@@ -76,7 +81,8 @@ class TestSyncCommand(MigrationCommanderTestCase):
             self.executed_commands
         )
         self.assertIn(
-            'sudo rsync -zaXAPx --delete --numeric-ids -e ssh --rsync-path="sudo rsync" {source_dir}/ '
+            'sudo rsync -zaXAPx --delete --numeric-ids -e "ssh -i $HOME/.ssh/id_rsa" '
+            '--rsync-path="sudo rsync" {source_dir}/ '
             'testuser@{remote_host_address}:{target_dir}'
                 .format(
                     source_dir=MountpointMapper.map_mountpoint('/tmp', '/mnt/vdc2'),

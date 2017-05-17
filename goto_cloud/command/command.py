@@ -1,3 +1,7 @@
+import logging
+
+import traceback
+
 from abc import ABCMeta, abstractmethod
 
 from source_event_logging.public import SourceEventLogger
@@ -19,7 +23,7 @@ class Command(metaclass=ABCMeta):
         def __init__(self, error_report):
             super().__init__(
                 'While trying to {command_does}, the following errors occurred. Please resolves these '
-                'manually and then skip this step:\n{errors}'.format(
+                'manually and then skip this step:\n\n{errors}'.format(
                     errors=error_report,
                     command_does=self.COMMAND_DOES
                 )
@@ -27,6 +31,9 @@ class Command(metaclass=ABCMeta):
 
     ERROR_REPORT_LINE_SEPARATOR = '\n\n-------------------------------------------------------------\n\n'
     ERROR_REPORT_EXCEPTION_CLASS = CommandExecutionException
+
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
 
     def execute(self):
         """
@@ -98,6 +105,7 @@ class Command(metaclass=ABCMeta):
             try:
                 return method(self, *args, **kwargs)
             except Exception as e:
+                self.logger.error(traceback.format_exc())
                 self._add_error(str(e))
 
         return wrapped_method
@@ -114,6 +122,7 @@ class SourceCommand(Command, metaclass=ABCMeta):
         :param source: the Source in whose context the Command will be executed
         :type source: source.public.Source
         """
+        super().__init__()
         self._source = source
         self._target = source.target
         self.logger = self.EVENT_LOGGER(source)
