@@ -32,6 +32,6 @@ class TestMigrationCommander(MigrationCommanderTestCase):
         self._init_test_data('ubuntu16', 'target__device_identification')
 
         MigrationCommander(self.source).execute()
-        self.assertEqual(self.source.status, Source.Status.SYNCING)
+        self.assertEqual(self.source.status, Source.Status.SYNC)
         MigrationCommander(self.source).increment_status_and_execute()
         self.assertEqual(self.source.status, Source.Status.LIVE)

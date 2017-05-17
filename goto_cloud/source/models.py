@@ -1,7 +1,5 @@
 from django.db import models
 
-from enums.public import StringEnum
-
 from migration_run.public import MigrationRun
 
 from remote_host.public import RemoteHost
@@ -15,14 +13,14 @@ class Source(StatusModel):
     """
     represents a source system, which will be migrated to a Target during the migration
     """
-    class Status(StringEnum):
+    class Status(StatusModel.Status):
         DRAFT = 'DRAFT'
         GET_TARGET_SYSTEM_INFORMATION = 'GET_TARGET_SYSTEM_INFORMATION'
         IDENTIFY_DEVICES = 'IDENTIFY_DEVICES'
         CREATE_PARTITIONS = 'CREATE_PARTITIONS'
         CREATE_FILESYSTEMS = 'CREATE_FILESYSTEMS'
         MOUNT_FILESYSTEMS = 'MOUNT_FILESYSTEMS'
-        SYNCING = 'SYNCING'
+        SYNC = 'SYNC'
         FINAL_SYNC = 'FINAL_SYNC'
         ADJUST_NETWORK_CONFIG = 'ADJUST_NETWORK_CONFIG'
         ADJUST_SSH_CONFIG = 'ADJUST_SSH_CONFIG'
@@ -37,7 +35,7 @@ class Source(StatusModel):
         Status.CREATE_PARTITIONS,
         Status.CREATE_FILESYSTEMS,
         Status.MOUNT_FILESYSTEMS,
-        Status.SYNCING,
+        Status.SYNC,
         Status.FINAL_SYNC,
         Status.ADJUST_NETWORK_CONFIG,
         Status.ADJUST_SSH_CONFIG,
