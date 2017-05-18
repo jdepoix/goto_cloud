@@ -1,1 +1,3 @@
 -r local.txt
+
+coveralls
