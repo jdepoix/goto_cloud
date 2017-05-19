@@ -68,19 +68,6 @@ class TestSourceParsing(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
             TestAsset.MIGRATION_PLAN_MOCK['target_cloud']['networks'],
         ).parse(TestAsset.MIGRATION_PLAN_MOCK['sources'][0])
 
-        # TODO
-        # self.assertEqual(
-        #     source.target.blueprint['network_interfaces'],
-        #     [
-        #         {
-        #             'network_id': 'LAN 2',
-        #             'ip': '10.17.33.10',
-        #             'gateway': '10.17.33.1',
-        #             'net_mask': '255.255.255.0',
-        #             'source_interface': 'eth0',
-        #         },
-        #     ]
-        # )
         self.assertIn('network_interfaces', source.target.blueprint)
 
     def test_parse__no_blueprint(self):
