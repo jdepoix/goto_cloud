@@ -1,3 +1,7 @@
+import json
+
+import base64
+
 from django.test import TestCase
 
 from test_assets.public import TestAsset
@@ -14,13 +18,16 @@ class TestRemoteScriptExecutor(TestCase, metaclass=TestAsset.PatchTrackedRemoteE
         env = {
             '1': 1,
             '2': 2,
-            '3': 3
+            '3': 3,
+            '4': '{"test_new_line": "\n"}'
         }
 
         remote_script_executor.execute('script', env)
 
         self.assertIn(
-            'printf "import json\nCONTEXT = json.loads(\'{\\"1\\": 1, \\"2\\": 2, \\"3\\": 3}\')\nscript" | python',
+            'python -c "import base64;import json;'
+            'CONTEXT = json.loads(base64.b64decode({encoded_env}));'
+            'script"'.format(encoded_env=base64.b64encode(json.dumps(env).encode())),
             self.executed_commands
         )
 
@@ -30,6 +37,8 @@ class TestRemoteScriptExecutor(TestCase, metaclass=TestAsset.PatchTrackedRemoteE
         remote_script_executor.execute('script')
 
         self.assertIn(
-            'printf "import json\nCONTEXT = json.loads(\'{}\')\nscript" | python',
+            'python -c "import base64;import json;'
+            'CONTEXT = json.loads(base64.b64decode({encoded_env}));'
+            'script"'.format(encoded_env=base64.b64encode(json.dumps({}).encode())),
             self.executed_commands
         )
