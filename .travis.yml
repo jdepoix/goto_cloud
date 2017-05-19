@@ -10,5 +10,5 @@ before_script:
   - psql -c 'create database goto_cloud;' -U postgres
 script:
   - coverage run manage.py test
-#after_success:
-#  - coveralls
+after_success:
+  - coveralls
