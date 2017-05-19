@@ -90,5 +90,30 @@ class TestHookHandling(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
             'remote_script_execution.remote_script_execution.RemoteScriptExecutor.execute',
             self.get_mocked_script_execution_decorator()
         ):
-            # TODO
-            pass
+            self.source.increment_status()
+            self.hook_event_handler.emit(HookEventHandler.EventType.BEFORE)
+
+            self.assertDictEqual(self.execution_env, {
+                'blueprint': self.source.target.blueprint,
+                'device_mapping': self.source.target.device_mapping,
+                'source_system_info': self.source.remote_host.system_info,
+                'target_system_info': self.source.target.remote_host.system_info
+            })
+
+
+    def test_emit__env_loaded_without_target_remote_host(self):
+        with patch(
+            'remote_script_execution.remote_script_execution.RemoteScriptExecutor.execute',
+            self.get_mocked_script_execution_decorator()
+        ):
+            self.source.target.remote_host = None
+            self.source.target.save()
+            self.source.increment_status()
+            self.hook_event_handler.emit(HookEventHandler.EventType.BEFORE)
+
+            self.assertDictEqual(self.execution_env, {
+                'blueprint': self.source.target.blueprint,
+                'device_mapping': self.source.target.device_mapping,
+                'source_system_info': self.source.remote_host.system_info,
+                'target_system_info': {}
+            })

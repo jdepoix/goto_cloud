@@ -85,5 +85,10 @@ class HookEventHandler():
         :return: the loaded env
         :rtype: dict
         """
-        # TODO
-        return {}
+        return {
+            'blueprint': self._source.target.blueprint,
+            'device_mapping': self._source.target.device_mapping,
+            'source_system_info': self._source.remote_host.system_info,
+            'target_system_info': self._source.target.remote_host.system_info
+                                    if self._source.target.remote_host else {},
+        }
