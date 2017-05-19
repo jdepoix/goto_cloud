@@ -1,10 +1,10 @@
 from unittest.mock import patch
 
-from django.test import TestCase
-
 from commander.public import Commander
 
 from remote_host_command.public import RemoteHostCommand
+
+from source_event_logging.public import SourceEventLogger
 
 from ..default_remote_host_commands import DefaultRemoteHostCommand
 from ..syncing import SyncCommand, FinalSyncCommand
@@ -176,8 +176,9 @@ class TestSyncCommand(MigrationCommanderTestCase):
         self.source.target.blueprint['commands']['sync'] = 'I_WILL_FAIL'
         self.source.target.save()
 
-        with self.assertRaises(SyncCommand.SyncingException):
-            SyncCommand(self.source).execute()
+        with SourceEventLogger.DisableLoggingContextManager():
+            with self.assertRaises(SyncCommand.SyncingException):
+                SyncCommand(self.source).execute()
 
 
 class TestFinalSyncCommand(MigrationCommanderTestCase):

@@ -1,5 +1,7 @@
 from unittest import TestCase
 
+from source_event_logging.public import SourceEventLogger
+
 from ..command import Command
 
 
@@ -25,7 +27,8 @@ class TestCommand(TestCase):
     def test_collect_errors(self):
         command = ErrorCommand()
         try:
-            command.execute()
+            with SourceEventLogger.DisableLoggingContextManager():
+                command.execute()
         except:
             pass
 
@@ -34,8 +37,9 @@ class TestCommand(TestCase):
     def test_collect_errors__throws_command_execution_exception(self):
         command = ErrorCommand()
 
-        with self.assertRaises(Command.CommandExecutionException):
-            command.execute()
+        with SourceEventLogger.DisableLoggingContextManager():
+            with self.assertRaises(Command.CommandExecutionException):
+                command.execute()
 
     def test_collect_errors__not_failed(self):
         command = NoErrorCommand()

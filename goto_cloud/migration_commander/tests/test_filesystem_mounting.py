@@ -1,5 +1,7 @@
 from unittest.mock import patch, Mock
 
+from source_event_logging.public import SourceEventLogger
+
 from ..filesystem_mounting import FilesystemMountCommand
 from ..device_identification import DeviceIdentificationCommand
 
@@ -75,8 +77,9 @@ class TestFilesystemMountCommand(MigrationCommanderTestCase):
     def test_execute__failed(self):
         self._init_test_data('ubuntu16', 'target__device_identification')
 
-        with self.assertRaises(FilesystemMountCommand.MountingException):
-            FilesystemMountCommand(self.source).execute()
+        with SourceEventLogger.DisableLoggingContextManager():
+            with self.assertRaises(FilesystemMountCommand.MountingException):
+                FilesystemMountCommand(self.source).execute()
 
     def test_execute__with_swap(self):
         self._init_test_data('ubuntu12', 'target__device_identification')

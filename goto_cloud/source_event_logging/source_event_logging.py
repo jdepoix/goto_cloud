@@ -6,6 +6,16 @@ class SourceEventLogger():
     """
     Logs event based on given Source. Supports all log levels of the default Logger. 
     """
+    class DisableLoggingContextManager():
+        """
+        context manager which disables logging in the managed context
+        """
+        def __enter__(self):
+            logging.disable(logging.CRITICAL)
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            logging.disable(logging.NOTSET)
+
     def __init__(self, source):
         """
         initialized with the source which the events are logged for
