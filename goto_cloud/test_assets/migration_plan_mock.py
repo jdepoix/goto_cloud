@@ -43,7 +43,7 @@ MIGRATION_PLAN_MOCK = {
             },
             "hooks": {
                 "SYNC_AFTER": {
-                    "execute": "with open('~/hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
+                    "execute": "with open('hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
                     "location": "TARGET"
                 }
             },
@@ -79,11 +79,11 @@ MIGRATION_PLAN_MOCK = {
             "parent": "default",
             "hooks": {
                 "FINAL_SYNC_BEFORE": {
-                    "execute": "with open('~/hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
+                    "execute": "with open('hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
                     "location": "SOURCE",
                 },
                 "FINAL_SYNC_AFTER": {
-                    "execute": "with open('~/hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
+                    "execute": "with open('hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
                     "location": "SOURCE",
                 },
             },

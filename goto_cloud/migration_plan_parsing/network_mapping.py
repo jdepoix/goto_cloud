@@ -130,6 +130,8 @@ class NetworkMapper():
         """
         pass
 
+    PUBLIC_IP_MATCHER = IpValidation.validate_ip_address('0.0.0.0')
+
     def __init__(self, network_settings):
         """
         is initialized with the network settings it should use
@@ -197,6 +199,12 @@ class NetworkMapper():
             (net_address for net_address in network_mapping if ip in net_address and net_address.netmask == net_mask),
             None
         )
+
+        if net_address is None:
+            net_address = next(
+                (net_address for net_address in network_mapping if self.PUBLIC_IP_MATCHER in net_address),
+                None
+            )
 
         if net_address is None:
             raise NetworkMapper.NoMappingFoundException(

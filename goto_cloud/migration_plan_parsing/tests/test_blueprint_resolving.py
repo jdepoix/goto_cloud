@@ -73,15 +73,15 @@ class TestBlueprintResolver(TestCase):
                 },
                 "hooks": {
                     "SYNC_AFTER": {
-                        "execute": "with open('~/hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
+                        "execute": "with open('hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
                         "location": "TARGET"
                     },
                     "FINAL_SYNC_BEFORE": {
-                        "execute": "with open('~/hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
+                        "execute": "with open('hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
                         "location": "SOURCE",
                     },
                     "FINAL_SYNC_AFTER": {
-                        "execute": "with open('~/hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
+                        "execute": "with open('hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
                         "location": "SOURCE",
                     },
                 },
@@ -164,7 +164,7 @@ class TestBlueprintResolver(TestCase):
                 },
                 "hooks": {
                     "SYNC_AFTER": {
-                        "execute": "with open('~/hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
+                        "execute": "with open('hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
                         "location": "TARGET"
                     }
                 },

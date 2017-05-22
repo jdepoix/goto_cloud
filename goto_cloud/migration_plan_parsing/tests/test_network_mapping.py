@@ -128,6 +128,35 @@ class TestNetworkMapper(TestCase):
             ]
         )
 
+    def test_map_interfaces__match_onto_public_ip_if_not_matched(self):
+        self.assertEquals(
+            self.network_assigner.map_interfaces(
+                {
+                    'eth0': {
+                        'ip': '8.8.8.8',
+                        'net_mask': '255.255.0.0',
+                        'routes': []
+                    },
+                },
+                {
+                    'network_mapping': {
+                        '0.0.0.0/0': {
+                            'network': 'LAN 1',
+                        },
+                    },
+                }
+            ),
+            [
+                {
+                    'network_id': 'LAN 1',
+                    'ip': None,
+                    'gateway': None,
+                    'net_mask': None,
+                    'source_interface': 'eth0'
+                },
+            ]
+        )
+
     def test_map_interfaces(self):
         test_interface_info = {
             'lo': {
