@@ -1,7 +1,5 @@
 import base64
 
-import json
-
 from remote_execution.public import RemoteHostExecutor
 
 from remote_host_command.public import RemoteHostCommand
@@ -12,9 +10,11 @@ class RemoteScriptExecutor():
     takes care of executing a given python script on a remote host and injecting environment variables
     """
     REMOTE_SCRIPT_BASE_TEMPLATE = (
-        'import base64;import json;CONTEXT = json.loads(base64.b64decode({env_string}));{script_string}'
+        'CONTEXT = {env_string}\n{script_string}'
     )
-    PYTHON_SCRIPT_EXECUTION_COMMAND = RemoteHostCommand('python -c "{SCRIPT}"')
+    PYTHON_SCRIPT_EXECUTION_COMMAND = RemoteHostCommand(
+        'python -c "import base64;exec(base64.b64decode({ENCODED_SCRIPT}))"'
+    )
 
     def __init__(self, remote_host):
         """
@@ -39,14 +39,16 @@ class RemoteScriptExecutor():
 
     def _render_script_execution_command(self, script, env):
         return self.PYTHON_SCRIPT_EXECUTION_COMMAND.render(
-            script=self.REMOTE_SCRIPT_BASE_TEMPLATE.format(
-                env_string=self._render_env(env),
-                script_string=self._render_script_string(script),
-            ).replace('"', '\\"')
+            encoded_script=self._encode_script(
+                self.REMOTE_SCRIPT_BASE_TEMPLATE.format(
+                    env_string=self._render_env(env),
+                    script_string=script,
+                )
+            )
         )
 
     def _render_env(self, env):
-        return base64.b64encode(json.dumps(env if env else {}).encode())
+        return str(env if env else {})
 
-    def _render_script_string(self, script):
-        return script.replace('\n', ';')
+    def _encode_script(self, rendered_script):
+        return base64.b64encode(rendered_script.encode())
