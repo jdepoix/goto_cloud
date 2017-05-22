@@ -43,7 +43,7 @@ MIGRATION_PLAN_MOCK = {
             },
             "hooks": {
                 "SYNC_AFTER": {
-                    "execute": "touch ~/hook_was_executed.txt",
+                    "execute": "with open('~/hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
                     "location": "TARGET"
                 }
             },
@@ -79,11 +79,11 @@ MIGRATION_PLAN_MOCK = {
             "parent": "default",
             "hooks": {
                 "FINAL_SYNC_BEFORE": {
-                    "execute": "systemctl start nginx gunicorn celery-main celery-beat",
+                    "execute": "with open('~/hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
                     "location": "SOURCE",
                 },
                 "FINAL_SYNC_AFTER": {
-                    "execute": "systemctl start nginx gunicorn celery-main celery-beat",
+                    "execute": "with open('~/hook_was_executed.txt', 'w+') as f:\n\tf.write('was executed')",
                     "location": "SOURCE",
                 },
             },
