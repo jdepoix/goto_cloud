@@ -86,10 +86,7 @@ class FilesystemMountCommand(DeviceModifyingCommand):
             remote_executor.execute(DefaultRemoteHostCommand.MAKE_DIRECTORY.render(directory=mountpoint))
             RemoteFileEditor(remote_executor).append(
                 '/etc/fstab', '{identifier}\t{mountpoint}\t{filesystem}\tdefaults\t0\t2'.format(
-                    identifier='UUID={uuid}'.format(uuid=uuid)
-                                if uuid else
-                                    'LABEL={label}'.format(label=label)
-                                    if label else '/dev/{device_id}'.format(device_id=device_id),
+                    identifier='UUID={uuid}'.format(uuid=uuid) if uuid else 'LABEL={label}'.format(label=label),
                     mountpoint=mountpoint,
                     filesystem=filesystem,
                 )

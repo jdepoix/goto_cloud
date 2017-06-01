@@ -40,8 +40,7 @@ class FstabAdjustmentCommand(DeviceModifyingCommand):
     Takes care of adjusting the /etc/fstab, to make sure, that the correct devices are mounted with the correct 
     mountpoints, to make sure, the machine will actually be able to boot, after go live.
     
-    It will try to replace all occurrences, of all device ids with their UUIDs or Labels. If no UUID or Label is set,
-    the new device id will be used.
+    It will try to replace all occurrences, of all device ids with their UUIDs or Labels.
     """
     class FstabAdjustmentException(DeviceModifyingCommand.CommandExecutionException):
         COMMAND_DOES = 'adjust fstab'
@@ -104,11 +103,7 @@ class FstabAdjustmentCommand(DeviceModifyingCommand):
         RemoteFileEditor(remote_executor).edit(
             SourceFileLocationResolver(self._source).resolve(self.FSTAB_LOCATION),
             '/dev/{device_id}'.format(device_id=old_device_id),
-            'UUID={uuid}'.format(uuid=uuid)
-                if uuid
-                else 'LABEL={label}'.format(label=label)
-                    if label
-                    else '/dev/{device_id}'.format(device_id=device_id),
+            'UUID={uuid}'.format(uuid=uuid) if uuid else 'LABEL={label}'.format(label=label),
         )
 
 
