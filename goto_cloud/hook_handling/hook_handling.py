@@ -85,6 +85,9 @@ class HookEventHandler():
         :return: the loaded env
         :rtype: dict
         """
+        if self._source.target.remote_host:
+            self._source.target.remote_host.update_system_info()
+
         return {
             'blueprint': self._source.target.blueprint,
             'device_mapping': self._source.target.device_mapping,

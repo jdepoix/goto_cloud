@@ -34,7 +34,7 @@ class Commander(SourceCommand, metaclass=ABCMeta):
             self.hook_event_handler.emit(HookEventHandler.EventType.AFTER)
         if (
             self._source.status != self._source.lifecycle[-1]
-            and (signal is None or signal is not None and signal != Commander.Signal.SLEEP)
+            and (signal is None or signal != Commander.Signal.SLEEP)
         ):
             self._source.increment_status()
             self.execute()

@@ -3,6 +3,8 @@ from django.contrib.postgres.fields.jsonb import JSONField
 
 from operating_system.public import OperatingSystem
 
+from system_info_inspection.public import RemoteHostSystemInfoGetter
+
 from tracked_model.public import TrackedModel
 
 
@@ -20,3 +22,7 @@ class RemoteHost(TrackedModel):
     private_key = models.TextField(null=True, blank=True)
     private_key_file_path = models.CharField(max_length=512, null=True, blank=True)
     system_info = JSONField(default=dict)
+
+    def update_system_info(self):
+        self.system_info = RemoteHostSystemInfoGetter(self).get_system_info()
+        self.save()
