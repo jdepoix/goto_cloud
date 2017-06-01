@@ -131,14 +131,15 @@ MIGRATION_PLAN_MOCK = {
         }
     ],
     "target_cloud": {
-        "platform": "pb",
+        "provider": "PB",
         "datacenter": "pb-4",
         "login": {
             "username": "devnull@seibert-media.net",
             "password": "xxxxxxxxxx"
         },
         "bootstrapping": {
-            "template_snapshot": "template_bootstrap_vm",
+            "template_id": "template_bootstrap_vm",
+            "size": 10,
             "ssh": {
                 "private_key": "xxxxx",
                 "private_key_file_path": "~/.ssh/id_rsa_source",
@@ -146,21 +147,25 @@ MIGRATION_PLAN_MOCK = {
                 "password": "xxxxxx",
                 "port": 22
             },
-            "network": "LAN 0"
+            "network": "LAN 1"
         },
         "networks": {
             "LAN 1": {
+                "cloud_id": "1",
                 "net": "0.0.0.0/0",
             },
             "LAN 2": {
+                "cloud_id": "2",
                 "net": "10.17.32.0/24",
                 "gateway": "10.17.32.1",
             },
             "LAN 3": {
+                "cloud_id": "3",
                 "net": "10.17.33.0/24",
                 "gateway": "10.17.33.1",
             },
             "LAN 4": {
+                "cloud_id": "4",
                 "net": "10.17.34.0/24",
                 "gateway": "10.17.34.1",
             }
