@@ -2,7 +2,7 @@ from test_assets.public import TestAsset
 
 from ..cloud_management import CloudManager, CloudProvider
 
-from .test_cloud_adapter import TestProfitbricksAdapter
+from .test_profitbricks import TestProfitbricksAdapter
 
 
 class TestCloudManager(TestProfitbricksAdapter):

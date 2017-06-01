@@ -1,6 +1,7 @@
 from enums.public import StringEnum
 
-from .cloud_adapter import CloudAdapter, ProfitbricksAdapter
+from .cloud_adapter import CloudAdapter
+from .profitbricks import ProfitbricksAdapter
 
 
 class CloudProvider(StringEnum):
@@ -20,6 +21,9 @@ class CloudProvider(StringEnum):
 
 
 class CloudManager(CloudAdapter):
+    """
+    provides an API to the operations executed in a cloud, but abstracts the actually used provider away
+    """
     _PROVIDER_TO_ADAPTER_MAPPING = {
         CloudProvider.PROFITBRICKS: ProfitbricksAdapter
     }

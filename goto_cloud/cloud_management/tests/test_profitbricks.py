@@ -3,7 +3,8 @@ from unittest.mock import patch
 
 from test_assets.public import TestAsset
 
-from ..cloud_adapter import ProfitbricksAdapter, CloudAdapter
+from ..cloud_adapter import CloudAdapter
+from ..profitbricks import ProfitbricksAdapter
 
 
 class TestProfitbricksAdapter(TestCase):
@@ -198,5 +199,5 @@ class TestProfitbricksAdapter(TestCase):
 class TestProfitbricksAdapterPrivate(TestCase):
     @patch('time.sleep', lambda timeout: None)
     def test__wait_for__cloud_connection_exception(self):
-        with self.assertRaises(ProfitbricksAdapter.CloudConnectionException):
+        with self.assertRaises(CloudAdapter.CloudConnectionException):
             ProfitbricksAdapter(TestAsset.MIGRATION_PLAN_MOCK['target_cloud'])._wait_for(lambda: False, {}, True, 1, 1)
