@@ -181,12 +181,12 @@ class ProfitbricksAdapter(CloudAdapter):
         """
         waits for a given function to retrieve a given state
         
-        :param retrieve_entity_function: the function to retrieve the state
-        :type retrieve_entity_function: (**kwargs) -> Any
-        :param retrieve_entity_function_kwargs: the kwargs used for calling the function
-        :type retrieve_entity_function_kwargs: dict
-        :param expected_entity_state: the expected state
-        :type expected_entity_state: str | (str) -> bool
+        :param retrieve_function: the function to retrieve the state
+        :type retrieve_function: (**kwargs) -> Any
+        :param retrieve_function_kwargs: the kwargs used for calling the function
+        :type retrieve_function_kwargs: dict
+        :param expected_state: the expected state
+        :type expected_state: str | (str) -> bool
         :param timeout: the number of seconds to wait in between tries
         :type timeout: int | float
         :param try_for_mins: the number of minutes to try overall
