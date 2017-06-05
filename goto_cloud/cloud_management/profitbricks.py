@@ -110,7 +110,31 @@ class ProfitbricksAdapter(CloudAdapter):
             )
         self._wait_for_request(response['requestId'])
 
-        return response
+        return {
+            'id': response['id'],
+            'volumes': [
+                {
+                    'id': volume['id'],
+                    'device_number': volume['properties']['deviceNumber'],
+                    'size': volume['properties']['size'],
+                    'name': volume['properties']['name'],
+                }
+                for volume in self._client.get_attached_volumes(
+                    datacenter_id=self._datacenter, server_id=response['id']
+                )['items']
+            ],
+            'network_interfaces': [
+                {
+                    'id': network_interface['id'],
+                    'name': network_interface['properties']['name'],
+                    'lan': network_interface['properties']['lan'],
+                    'ip': network_interface['properties']['ips'][0],
+                }
+                for network_interface in self._client.list_nics(
+                    datacenter_id=self._datacenter, server_id=response['id']
+                )['items']
+            ],
+        }
 
     def delete_volume(self, volume_id):
         return self._client.delete_volume(datacenter_id=self._datacenter, volume_id=volume_id)
