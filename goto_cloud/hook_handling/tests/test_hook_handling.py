@@ -62,7 +62,8 @@ class TestHookHandling(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
             'remote_script_execution.remote_script_execution.RemoteScriptExecutor.execute',
             self.get_mocked_script_execution_decorator()
         ):
-            self.source.increment_status()
+            self.source.status = Source.Status.GET_TARGET_SYSTEM_INFORMATION
+            self.source.save()
             self.hook_event_handler.emit(HookEventHandler.EventType.BEFORE)
 
             self.assertEqual(self.triggered_script, 'GET_TARGET_SYSTEM_INFORMATION_BEFORE')
@@ -76,7 +77,8 @@ class TestHookHandling(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
             'remote_script_execution.remote_script_execution.RemoteScriptExecutor.execute',
             self.get_mocked_script_execution_decorator()
         ):
-            self.source.increment_status()
+            self.source.status = Source.Status.GET_TARGET_SYSTEM_INFORMATION
+            self.source.save()
             self.hook_event_handler.emit(HookEventHandler.EventType.BEFORE)
 
             self.assertEqual(self.execution_location, 'ubuntu16')
@@ -90,14 +92,16 @@ class TestHookHandling(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
             'remote_script_execution.remote_script_execution.RemoteScriptExecutor.execute',
             self.get_mocked_script_execution_decorator()
         ):
-            self.source.increment_status()
+            self.source.status = Source.Status.GET_TARGET_SYSTEM_INFORMATION
+            self.source.save()
             self.hook_event_handler.emit(HookEventHandler.EventType.BEFORE)
 
             self.assertDictEqual(self.execution_env, {
                 'blueprint': self.source.target.blueprint,
                 'device_mapping': self.source.target.device_mapping,
                 'source_system_info': self.source.remote_host.system_info,
-                'target_system_info': self.source.target.remote_host.system_info
+                'target_system_info': self.source.target.remote_host.system_info,
+                'cloud_metadata': self.source.target.remote_host.cloud_metadata,
             })
 
 
@@ -107,13 +111,14 @@ class TestHookHandling(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
             self.get_mocked_script_execution_decorator()
         ):
             self.source.target.remote_host = None
-            self.source.target.save()
-            self.source.increment_status()
+            self.source.status = Source.Status.GET_TARGET_SYSTEM_INFORMATION
+            self.source.save()
             self.hook_event_handler.emit(HookEventHandler.EventType.BEFORE)
 
             self.assertDictEqual(self.execution_env, {
                 'blueprint': self.source.target.blueprint,
                 'device_mapping': self.source.target.device_mapping,
                 'source_system_info': self.source.remote_host.system_info,
-                'target_system_info': {}
+                'target_system_info': {},
+                'cloud_metadata': {},
             })

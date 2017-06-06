@@ -94,4 +94,6 @@ class HookEventHandler():
             'source_system_info': self._source.remote_host.system_info,
             'target_system_info': self._source.target.remote_host.system_info
                                     if self._source.target.remote_host else {},
+            'cloud_metadata': self._source.target.remote_host.cloud_metadata
+                                    if self._source.target.remote_host else {},
         }
