@@ -59,7 +59,7 @@ class ProfitbricksAdapter(CloudAdapter):
     def delete_target(self, server_id):
         return self._client.delete_server(datacenter_id=self._datacenter, server_id=server_id)
 
-    def create_target(self, name, network_interfaces, volumes, ram, cores):
+    def create_target(self, name, bootstrapping_network_interface, network_interfaces, volumes, ram, cores):
         try:
             # noinspection PyTypeChecker
             response = self._client.create_server(
@@ -89,10 +89,12 @@ class ProfitbricksAdapter(CloudAdapter):
                     ],
                     nics=[
                         NIC(
-                            lan=self._settings['networks'][self._settings['bootstrapping']['network']]['cloud_id'],
+                            lan=self._settings['networks'][bootstrapping_network_interface['network_id']]['cloud_id'],
                             name='{hostname}.bootstrap'.format(
                                 hostname=name,
                             ),
+                            **{'ips': [bootstrapping_network_interface['ip']]}
+                            if bootstrapping_network_interface['ip'] else {},
                         ),
                         *[
                             NIC(

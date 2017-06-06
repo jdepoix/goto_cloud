@@ -20,10 +20,11 @@ class CloudAdapter(metaclass=ABCMeta):
         self._settings = settings
 
     @abstractmethod
-    def create_target(self, name, network_interfaces, volumes, ram, cores):
+    def create_target(self, name, bootstrapping_network_interface, network_interfaces, volumes, ram, cores):
         """
         creates a target machine in the cloud
         
+        :param bootstrapping_network_interface:
         :param name: the name of the target machine
         :type name: str
         :param network_interfaces: the network interfaces which should be created
