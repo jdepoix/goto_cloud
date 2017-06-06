@@ -59,7 +59,7 @@ class MigrationPlanParser(DbItemHandler):
         :rtype: list[source.public.Source]
         """
         source_parser = self.add_db_item(
-            SourceParser(migration_plan_dict['blueprints'], migration_plan_dict['target_cloud']['networks'])
+            SourceParser(migration_plan_dict['blueprints'], migration_plan_dict['target_cloud'])
         )
 
         return [source_parser.parse(source_dict) for source_dict in migration_plan_dict['sources']]

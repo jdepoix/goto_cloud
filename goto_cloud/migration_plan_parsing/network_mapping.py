@@ -213,6 +213,7 @@ class NetworkMapper():
 
         return network_mapping[net_address]
 
+    # TODO make public
     def _get_ip(self, network):
         """
         returns the ip for a given blueprints network setting

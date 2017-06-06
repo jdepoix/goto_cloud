@@ -11,7 +11,7 @@ class TestSourceParsing(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
     def test_parse__source_created(self):
         source = SourceParser(
             TestAsset.MIGRATION_PLAN_MOCK['blueprints'],
-            TestAsset.MIGRATION_PLAN_MOCK['target_cloud']['networks'],
+            TestAsset.MIGRATION_PLAN_MOCK['target_cloud'],
         ).parse(TestAsset.MIGRATION_PLAN_MOCK['sources'][0])
 
         self.assertEquals(Source.objects.first(), source)
@@ -19,7 +19,7 @@ class TestSourceParsing(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
     def test_parse__remote_host_created_and_adjusted(self):
         source = SourceParser(
             TestAsset.MIGRATION_PLAN_MOCK['blueprints'],
-            TestAsset.MIGRATION_PLAN_MOCK['target_cloud']['networks'],
+            TestAsset.MIGRATION_PLAN_MOCK['target_cloud'],
         ).parse(TestAsset.MIGRATION_PLAN_MOCK['sources'][0])
 
         self.assertEquals(source.remote_host.os, 'Ubuntu')
@@ -34,14 +34,14 @@ class TestSourceParsing(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
     def test_parse__target_created(self):
         source = SourceParser(
             TestAsset.MIGRATION_PLAN_MOCK['blueprints'],
-            TestAsset.MIGRATION_PLAN_MOCK['target_cloud']['networks'],
+            TestAsset.MIGRATION_PLAN_MOCK['target_cloud'],
         ).parse(TestAsset.MIGRATION_PLAN_MOCK['sources'][0])
         self.assertIsNotNone(source.target)
 
     def test_parse__source_system_info_retrieved(self):
         source = SourceParser(
             TestAsset.MIGRATION_PLAN_MOCK['blueprints'],
-            TestAsset.MIGRATION_PLAN_MOCK['target_cloud']['networks'],
+            TestAsset.MIGRATION_PLAN_MOCK['target_cloud'],
         ).parse(TestAsset.MIGRATION_PLAN_MOCK['sources'][0])
 
         self.assertDictEqual(source.remote_host.system_info, TestAsset.REMOTE_HOST_MOCKS['ubuntu12'].get_config())
@@ -49,7 +49,7 @@ class TestSourceParsing(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
     def test_parse__target_blueprint_resolved(self):
         source = SourceParser(
             TestAsset.MIGRATION_PLAN_MOCK['blueprints'],
-            TestAsset.MIGRATION_PLAN_MOCK['target_cloud']['networks'],
+            TestAsset.MIGRATION_PLAN_MOCK['target_cloud'],
         ).parse(TestAsset.MIGRATION_PLAN_MOCK['sources'][0])
 
         self.assertNotEqual(source.target.blueprint, {})
@@ -57,7 +57,7 @@ class TestSourceParsing(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
     def test_parse__network_mapping_removed_from_blueprint(self):
         source = SourceParser(
             TestAsset.MIGRATION_PLAN_MOCK['blueprints'],
-            TestAsset.MIGRATION_PLAN_MOCK['target_cloud']['networks'],
+            TestAsset.MIGRATION_PLAN_MOCK['target_cloud'],
         ).parse(TestAsset.MIGRATION_PLAN_MOCK['sources'][2])
 
         self.assertNotIn('network_mapping', source.target.blueprint)
@@ -65,7 +65,7 @@ class TestSourceParsing(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
     def test_parse__network_mapped(self):
         source = SourceParser(
             TestAsset.MIGRATION_PLAN_MOCK['blueprints'],
-            TestAsset.MIGRATION_PLAN_MOCK['target_cloud']['networks'],
+            TestAsset.MIGRATION_PLAN_MOCK['target_cloud'],
         ).parse(TestAsset.MIGRATION_PLAN_MOCK['sources'][0])
 
         self.assertIn('network_interfaces', source.target.blueprint)
@@ -74,7 +74,7 @@ class TestSourceParsing(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
         with self.assertRaises(SourceParser.InvalidSourceException):
             SourceParser(
                 TestAsset.MIGRATION_PLAN_MOCK['blueprints'],
-                TestAsset.MIGRATION_PLAN_MOCK['target_cloud']['networks']
+                TestAsset.MIGRATION_PLAN_MOCK['target_cloud'],
             ).parse({
                 "address": "ubuntu12",
             })
