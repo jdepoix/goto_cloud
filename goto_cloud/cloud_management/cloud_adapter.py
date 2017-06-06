@@ -27,8 +27,10 @@ class CloudAdapter(metaclass=ABCMeta):
         :param bootstrapping_network_interface:
         :param name: the name of the target machine
         :type name: str
+        :param bootstrapping_network_interface: the network interface which is used during the migration
+        :type bootstrapping_network_interface: {'ip: str, 'network_id': str}
         :param network_interfaces: the network interfaces which should be created
-        :type network_interfaces: {'ip: str, 'network_id': str}
+        :type network_interfaces: [{'ip: str, 'network_id': str}]
         :param volumes: a list of volume sizes in gb, which should be created
         :type volumes: list[int]
         :param ram: the ram size in mb as a multiple of 256

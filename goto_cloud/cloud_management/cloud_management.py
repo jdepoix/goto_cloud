@@ -64,8 +64,9 @@ class CloudManager(CloudAdapter):
         return self._adapter.delete_target(server_id)
 
     def create_target(self, name, bootstrapping_network_interface, network_interfaces, volumes, ram, cores):
-        return self._adapter.create_target(name, bootstrapping_network_interface, network_interfaces, volumes, ram,
-                                           cores)
+        return self._adapter.create_target(
+            name, bootstrapping_network_interface, network_interfaces, volumes, ram, cores
+        )
 
     def delete_volume(self, volume_id):
         return self._adapter.delete_volume(volume_id)

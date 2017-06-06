@@ -95,14 +95,7 @@ class ProfitbricksAdapter(CloudAdapter):
                             ),
                             **{'ips': [bootstrapping_network_interface['ip']]}
                             if bootstrapping_network_interface['ip'] else {},
-                        ),
-                        *[
-                            NIC(
-                                lan=self._settings['networks'][network_interface['network_id']]['cloud_id'],
-                                **{'ips': [network_interface['ip']]} if network_interface['ip'] else {},
-                            )
-                            for network_interface in network_interfaces
-                        ]
+                        )
                     ],
                 )
             )
@@ -111,6 +104,7 @@ class ProfitbricksAdapter(CloudAdapter):
                 'The target_cloud settings in the migration plan are invalid!'
             )
         self._wait_for_request(response['requestId'])
+        self._create_network_interfaces(response['id'], network_interfaces)
 
         return {
             'id': response['id'],
@@ -154,6 +148,35 @@ class ProfitbricksAdapter(CloudAdapter):
 
     def delete_nic(self, server_id, nic_id):
         return self._client.delete_nic(datacenter_id=self._datacenter, server_id=server_id, nic_id=nic_id)
+
+    def _create_network_interfaces(self, server_id, network_interfaces):
+        """
+        creates the network interfaces for a server
+
+        :param server_id: the id of the server to create the network interfaces for
+        :type server_id: str
+        :param network_interfaces: the network interfaces to create
+        :type network_interfaces: [{'ip: str, 'network_id': str}]
+        :return:
+        """
+        try:
+            # noinspection PyTypeChecker
+            for create_network_interface_request_id in [
+                self._client.create_nic(
+                    datacenter_id=self._datacenter,
+                    server_id=server_id,
+                    nic=NIC(
+                        lan=self._settings['networks'][network_interface['network_id']]['cloud_id'],
+                        **{'ips': [network_interface['ip']]} if network_interface['ip'] else {},
+                    ),
+                )['requestId']
+                for network_interface in network_interfaces
+            ]:
+                self._wait_for_request(create_network_interface_request_id)
+        except KeyError:
+            raise self.InvalidCloudSettingsException(
+                'The target_cloud settings in the migration plan are invalid!'
+            )
 
     def _wait_for_entity_state(
         self,

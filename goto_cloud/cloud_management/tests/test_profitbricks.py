@@ -110,6 +110,7 @@ class TestProfitbricksAdapter(TestCase):
     def setUp(self):
         self.adapter = ProfitbricksAdapter(TestAsset.MIGRATION_PLAN_MOCK['target_cloud'])
 
+    @patch('profitbricks.client.ProfitBricksService.create_nic',lambda *args, **kwargs: {'requestId': 'id'})
     @patch(
         'profitbricks.client.ProfitBricksService.list_nics',
         lambda *args, **kwargs: TestProfitbricksAdapter.LIST_NICS_RETURN_VALUE
@@ -142,6 +143,9 @@ class TestProfitbricksAdapter(TestCase):
         # cant be asserted with assert_called_with, since Server, Volume and NIC don't provide a proper equals method
         self.assertTrue(mocked_create_server.called)
 
+    @patch('profitbricks.client.ProfitBricksService.create_nic', lambda *args, **kwargs: {
+        'requestId': TestProfitbricksAdapter.REQUEST_ID
+    })
     @patch(
         'profitbricks.client.ProfitBricksService.list_nics',
         lambda *args, **kwargs: TestProfitbricksAdapter.LIST_NICS_RETURN_VALUE
@@ -176,6 +180,9 @@ class TestProfitbricksAdapter(TestCase):
             status=True,
         )
 
+    @patch('profitbricks.client.ProfitBricksService.create_nic', lambda *args, **kwargs: {
+        'requestId': TestProfitbricksAdapter.REQUEST_ID
+    })
     @patch('profitbricks.client.ProfitBricksService.list_nics', return_value=LIST_NICS_RETURN_VALUE)
     @patch('profitbricks.client.ProfitBricksService.get_attached_volumes', return_value=LIST_VOLUMES_RETURN_VALUE)
     @patch(
@@ -208,6 +215,9 @@ class TestProfitbricksAdapter(TestCase):
             server_id=self.SERVER_ID
         )
 
+    @patch('profitbricks.client.ProfitBricksService.create_nic', lambda *args, **kwargs: {
+        'requestId': TestProfitbricksAdapter.REQUEST_ID
+    })
     @patch(
         'profitbricks.client.ProfitBricksService.list_nics',
         lambda *args, **kwargs: TestProfitbricksAdapter.LIST_NICS_RETURN_VALUE
@@ -289,10 +299,21 @@ class TestProfitbricksAdapter(TestCase):
             }
         )
 
+    @patch('profitbricks.client.ProfitBricksService.create_nic', lambda *args, **kwargs: {
+        'requestId': TestProfitbricksAdapter.REQUEST_ID
+    })
     @patch('profitbricks.client.ProfitBricksService.create_server', return_value={
         'id': SERVER_ID,
         'requestId': REQUEST_ID,
     })
+    @patch(
+        'profitbricks.client.ProfitBricksService.get_request',
+        lambda *args, **kwargs: {
+            'metadata': {
+                'status': ProfitbricksAdapter.RequestState.DONE
+            }
+        }
+    )
     @patch.dict(TestAsset.MIGRATION_PLAN_MOCK['target_cloud']['networks'], {'LAN 1': {}})
     def test_create_target__invalid_migration_plan__invalid_network_settings(self, mocked_create_server):
             with self.assertRaises(CloudAdapter.InvalidCloudSettingsException):
