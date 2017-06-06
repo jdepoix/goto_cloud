@@ -161,15 +161,7 @@ class NetworkMapper():
             for interface_id, interface in interfaces.items():
                 if not IpValidation.validate_ip_address(interface['ip']).is_loopback:
                     network = self._map_network(interface['ip'], interface['net_mask'], network_mapping)
-                    ip = self._get_ip(network)
-                    mapped_interfaces.append({
-                        'network_id': network['network_id'],
-                        'ip': str(ip) if ip else None,
-                        'gateway': str(self.networks[network['network_id']]['gateway'])
-                                    if self.networks[network['network_id']]['gateway'] else None,
-                        'net_mask': str(self.networks[network['network_id']]['net_address'].netmask) if ip else None,
-                        'source_interface': interface_id,
-                    })
+                    mapped_interfaces.append(self.assign_network_settings(network, interface_id))
 
             return mapped_interfaces
         except KeyError:
@@ -213,7 +205,26 @@ class NetworkMapper():
 
         return network_mapping[net_address]
 
-    # TODO make public
+    def assign_network_settings(self, network, source_interface=None):
+        """
+        assigns concrete network settings for a given network
+
+        :param network: the network you want to get the settings for
+        :type network: dict
+        :param source_interface: the source interface, in case you want it to be part of the setting
+        :type source_interface: dict
+        :return:
+        """
+        ip = self._get_ip(network)
+        return {
+            'network_id': network['network_id'],
+            'ip': str(ip) if ip else None,
+            'gateway': str(self.networks[network['network_id']]['gateway'])
+            if self.networks[network['network_id']]['gateway'] else None,
+            'net_mask': str(self.networks[network['network_id']]['net_address'].netmask) if ip else None,
+            'source_interface': source_interface,
+        }
+
     def _get_ip(self, network):
         """
         returns the ip for a given blueprints network setting
