@@ -39,7 +39,7 @@ class RemoteExecutor(metaclass=ABCMeta):
 
     def __init__(self, hostname, username=None, password=None, port=22):
         """
-        initializes the RemoteExecutor and opens a connection using the implemented remote client
+        initializes the RemoteExecutor using the implemented remote client
         
         :param hostname: the hostname to use
         :type hostname: str
@@ -55,7 +55,6 @@ class RemoteExecutor(metaclass=ABCMeta):
         self.username = username
         self.password = password
         self.port = port
-        self.connect()
 
     def close(self):
         """

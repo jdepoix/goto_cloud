@@ -58,28 +58,32 @@ def raise_exception_mock(exception):
     return raise_exception
 
 
+@patch('paramiko.SSHClient.connect', connect_mock)
 @patch('paramiko.SSHClient.close', close_mock)
 @patch('paramiko.SSHClient.get_transport', lambda self: self.connected if self.connected else None)
 @patch('paramiko.SSHClient.exec_command', execute_mock)
 class TestSshRemoteExecutor(unittest.TestCase):
-    @patch('paramiko.SSHClient.connect', connect_mock)
     def setUp(self):
         self.remote_executor = SshRemoteExecutor('test')
 
     def test_close(self):
+        self.remote_executor.execute('successful_command')
         self.assertTrue(self.remote_executor.remote_client.connected)
         self.remote_executor.close()
         self.assertFalse(self.remote_executor.remote_client.connected)
 
     def test_connect(self):
+        self.remote_executor.execute('successful_command')
         self.assertTrue(self.remote_executor.remote_client.connected)
 
     def test_reconnect(self):
+        self.remote_executor.execute('successful_command')
         self.assertTrue(self.remote_executor.is_connected())
         self.remote_executor.reconnect()
         self.assertTrue(self.remote_executor.is_connected())
 
     def test_is_connected(self):
+        self.remote_executor.execute('successful_command')
         self.assertTrue(self.remote_executor.is_connected())
         self.remote_executor.close()
         self.assertFalse(self.remote_executor.is_connected())
@@ -102,19 +106,19 @@ class TestSshRemoteExecutor(unittest.TestCase):
         SSHClient.connect = raise_exception_mock(SSHException())
 
         with self.assertRaises(RemoteExecutor.ConnectionException):
-            SshRemoteExecutor('test')
+            SshRemoteExecutor('test').execute('successful_command')
 
     def test_connect__authentication_exception(self):
         SSHClient.connect = raise_exception_mock(AuthenticationException())
 
         with self.assertRaises(RemoteExecutor.AuthenticationException):
-            SshRemoteExecutor('test')
+            SshRemoteExecutor('test').execute('successful_command')
 
     def test_connect__no_valid_connection_exception(self):
         SSHClient.connect = raise_exception_mock(NoValidConnectionsError({'127.0.0.1': 22}))
 
         with self.assertRaises(RemoteExecutor.NoValidConnectionException):
-            SshRemoteExecutor('test')
+            SshRemoteExecutor('test').execute('successful_command')
 
     def test_execute__raise_no_exception_on_failure(self):
         self.assertEqual(
@@ -124,11 +128,11 @@ class TestSshRemoteExecutor(unittest.TestCase):
 
 
 @patch('paramiko.SSHClient.connect', connect_mock)
+@patch('paramiko.SSHClient.connect', connect_mock)
 @patch('paramiko.SSHClient.close', close_mock)
 @patch('paramiko.SSHClient.get_transport', lambda self: self.connected if self.connected else None)
 @patch('paramiko.SSHClient.exec_command', execute_mock)
 class TestRemoteHostExecutor(TestCase, TestSshRemoteExecutor):
-    @patch('paramiko.SSHClient.connect', connect_mock)
     def setUp(self):
         self.remote_executor = RemoteHostExecutor(RemoteHost.objects.create(os=OperatingSystem.LINUX))
 
@@ -161,11 +165,13 @@ class TestRemoteHostExecutor(TestCase, TestSshRemoteExecutor):
             RemoteHostExecutor(RemoteHost.objects.create(os=OperatingSystem.WINDOWS))
 
     def test_close(self):
+        self.remote_executor.execute('successful_command')
         self.assertTrue(self.remote_executor.operator.remote_client.connected)
         self.remote_executor.close()
         self.assertFalse(self.remote_executor.operator.remote_client.connected)
 
     def test_connect(self):
+        self.remote_executor.execute('successful_command')
         self.remote_executor.close()
         self.assertFalse(self.remote_executor.operator.remote_client.connected)
         self.remote_executor.connect()
