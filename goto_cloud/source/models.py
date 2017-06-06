@@ -15,6 +15,7 @@ class Source(StatusModel):
     """
     class Status(StatusModel.Status):
         DRAFT = 'DRAFT'
+        CREATE_TARGET = 'CREATE_TARGET'
         GET_TARGET_SYSTEM_INFORMATION = 'GET_TARGET_SYSTEM_INFORMATION'
         IDENTIFY_DEVICES = 'IDENTIFY_DEVICES'
         CREATE_PARTITIONS = 'CREATE_PARTITIONS'
@@ -30,6 +31,7 @@ class Source(StatusModel):
 
     _LIFECYCLE = (
         Status.DRAFT,
+        Status.CREATE_TARGET,
         Status.GET_TARGET_SYSTEM_INFORMATION,
         Status.IDENTIFY_DEVICES,
         Status.CREATE_PARTITIONS,
