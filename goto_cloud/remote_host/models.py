@@ -22,6 +22,7 @@ class RemoteHost(TrackedModel):
     private_key = models.TextField(null=True, blank=True)
     private_key_file_path = models.CharField(max_length=512, null=True, blank=True)
     system_info = JSONField(default=dict)
+    cloud_metadata = JSONField(default=dict)
 
     def update_system_info(self):
         self.system_info = RemoteHostSystemInfoGetter(self).get_system_info()
