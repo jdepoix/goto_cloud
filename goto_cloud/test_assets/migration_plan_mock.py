@@ -147,7 +147,13 @@ MIGRATION_PLAN_MOCK = {
                 "password": "xxxxxx",
                 "port": 22
             },
-            "network": "LAN 1"
+            "network": {
+                "network": "LAN 2",
+                "range": {
+                    "from": "10.17.32.50",
+                    "to": "10.17.32.90"
+                }
+            }
         },
         "networks": {
             "LAN 1": {

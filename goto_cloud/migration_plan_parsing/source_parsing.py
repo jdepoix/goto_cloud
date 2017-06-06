@@ -24,7 +24,6 @@ class SourceParser(DbItemHandler):
         """
         pass
 
-    # TODO pass cloud settings
     def __init__(self, blueprints, cloud_settings):
         """
         :param blueprints: the blueprints which should be used to resolve the sources blueprints
@@ -33,6 +32,7 @@ class SourceParser(DbItemHandler):
         :type cloud_settings: dict
         """
         super().__init__()
+        self._cloud_settings = cloud_settings
         self._blueprint_resolver = BlueprintResolver(blueprints)
         self._network_mapper = NetworkMapper(cloud_settings['networks'])
 
@@ -134,9 +134,11 @@ class SourceParser(DbItemHandler):
         :return: the newly created target
         :rtype: Target
         """
-        # TODO ip distribution for bootstrap out of migration plan, use get_ip()
         blueprint_with_network_interfaces = {
             'network_interfaces': self._network_mapper.map_interfaces(system_info['network']['interfaces'], blueprint),
+            'bootstrapping_network_interface': self._network_mapper.assign_network_settings(
+                self._cloud_settings['bootstrapping']['network']
+            ),
             **blueprint,
         }
         blueprint_with_network_interfaces.pop('network_mapping')

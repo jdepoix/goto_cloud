@@ -217,12 +217,12 @@ class NetworkMapper():
         """
         ip = self._get_ip(network)
         return {
-            'network_id': network['network_id'],
+            'network_id': network['network'],
             'ip': str(ip) if ip else None,
-            'gateway': str(self.networks[network['network_id']]['gateway'])
-            if self.networks[network['network_id']]['gateway'] else None,
-            'net_mask': str(self.networks[network['network_id']]['net_address'].netmask) if ip else None,
-            'source_interface': source_interface,
+            'gateway': str(self.networks[network['network']]['gateway'])
+            if self.networks[network['network']]['gateway'] else None,
+            'net_mask': str(self.networks[network['network']]['net_address'].netmask) if ip else None,
+            **({'source_interface': source_interface} if source_interface else {}),
         }
 
     def _get_ip(self, network):
@@ -237,18 +237,18 @@ class NetworkMapper():
         if 'static' in network:
             static_ip = IpValidation.validate_ip_address(network['static'])
 
-            if static_ip not in self.networks[network['network_id']]['net_address']:
+            if static_ip not in self.networks[network['network']]['net_address']:
                 raise NetworkMapper.InvalidNetworkSettingsException(
                     'static ip "{static_ip}" does not fit into the network "{net_address}"'.format(
                         static_ip=str(static_ip),
-                        net_address=str(self.networks[network['network_id']]['net_address']),
+                        net_address=str(self.networks[network['network']]['net_address']),
                     )
                 )
 
             return static_ip
         if 'range' in network:
             return self._get_ip_distributor(
-                network['network_id'],
+                network['network'],
                 IpValidation.validate_ip_address(network['range']['from']),
                 IpValidation.validate_ip_address(network['range']['to']),
             ).get_next_ip()
@@ -289,7 +289,7 @@ class NetworkMapper():
         for net_address_string, mapping_config in blueprint['network_mapping'].items():
             net_address = IpValidation.validate_net_address(net_address_string)
             network_mapping[net_address] = {
-                'network_id': mapping_config['network']
+                'network': mapping_config['network']
             }
 
             if 'static' in mapping_config:

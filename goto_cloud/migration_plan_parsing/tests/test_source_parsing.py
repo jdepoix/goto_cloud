@@ -70,6 +70,22 @@ class TestSourceParsing(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
 
         self.assertIn('network_interfaces', source.target.blueprint)
 
+    def test_parse__bootstrapping_network_interface_assigned(self):
+        source = SourceParser(
+            TestAsset.MIGRATION_PLAN_MOCK['blueprints'],
+            TestAsset.MIGRATION_PLAN_MOCK['target_cloud'],
+        ).parse(TestAsset.MIGRATION_PLAN_MOCK['sources'][0])
+
+        self.assertDictEqual(
+            {
+                'ip': '10.17.32.50',
+                'gateway': '10.17.32.1',
+                'net_mask': '255.255.255.0',
+                'network_id': 'LAN 2',
+            },
+            source.target.blueprint['bootstrapping_network_interface']
+        )
+
     def test_parse__no_blueprint(self):
         with self.assertRaises(SourceParser.InvalidSourceException):
             SourceParser(
