@@ -29,7 +29,7 @@ class SshConfigAdjustmentCommand(SourceCommand):
         comments out the ListenAddress line in the sshd_config file
         """
         RemoteFileEditor(RemoteHostExecutor(self._target.remote_host)).edit(
-            SourceFileLocationResolver(self._source).resolve(self.SSHD_CONFIG_LOCATION),
+            SourceFileLocationResolver(self._source).resolve_path(self.SSHD_CONFIG_LOCATION),
             'ListenAddress',
             '# ListenAddress'
         )
@@ -101,7 +101,7 @@ class FstabAdjustmentCommand(DeviceModifyingCommand):
     @DeviceModifyingCommand._collect_errors
     def _replace_device_information(self, remote_executor, old_device_id, device_id, uuid=None, label=None):
         RemoteFileEditor(remote_executor).edit(
-            SourceFileLocationResolver(self._source).resolve(self.FSTAB_LOCATION),
+            SourceFileLocationResolver(self._source).resolve_path(self.FSTAB_LOCATION),
             '/dev/{device_id}'.format(device_id=old_device_id),
             'UUID={uuid}'.format(uuid=uuid) if uuid else 'LABEL={label}'.format(label=label),
         )
@@ -133,7 +133,7 @@ class NetworkConfigAdjustmentCommand(SourceCommand):
         :type network_config: str
         """
         RemoteFileEditor(RemoteHostExecutor(self._target.remote_host)).write(
-            SourceFileLocationResolver(self._source).resolve(self.NETWORK_CONFIG_FILE_LOCATION),
+            SourceFileLocationResolver(self._source).resolve_path(self.NETWORK_CONFIG_FILE_LOCATION),
             network_config
         )
 

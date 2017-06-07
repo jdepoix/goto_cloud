@@ -5,14 +5,16 @@ from command.public import SourceCommand
 from remote_host.public import RemoteHost
 
 
-class CreateTargetCommand(SourceCommand):
-    """
-    takes care of creating the the target machine in the cloud
-    """
+class CloudCommand(SourceCommand):
     def __init__(self, source):
         super().__init__(source)
         self._cloud_manager = CloudManager(self._source.migration_run.plan.plan.get('target_cloud', {}))
 
+
+class CreateTargetCommand(CloudCommand):
+    """
+    takes care of creating the the target machine in the cloud
+    """
     def _execute(self):
         self._create_target_remote_host(self._create_target_in_cloud())
 
@@ -53,3 +55,8 @@ class CreateTargetCommand(SourceCommand):
             **self._source.migration_run.plan.plan['target_cloud']['bootstrapping'].get('ssh', {})
         )
         self._target.save()
+
+
+class StopTargetCommand(CloudCommand):
+    def _execute(self):
+        pass

@@ -94,7 +94,7 @@ class BootloaderReinstallationCommand(SourceCommand):
         :return: mountpoint for sources root data
         :rtype: str
         """
-        return self.source_file_location_resolver.resolve('/')
+        return self.source_file_location_resolver.resolve_path('/')
 
     def _create_source_environment_mountpoints(self, remote_executor, root_source_mountpoint):
         """
@@ -142,7 +142,7 @@ class BootloaderReinstallationCommand(SourceCommand):
         chrooted_env_location = root_source_mountpoint + mountpoint
 
         try:
-            resolved_base_path = self.source_file_location_resolver.resolve(mountpoint)
+            resolved_base_path = self.source_file_location_resolver.resolve_path(mountpoint)
             remote_executor.execute(
                 DefaultRemoteHostCommand.MAKE_DIRECTORY.render(
                     directory=chrooted_env_location
