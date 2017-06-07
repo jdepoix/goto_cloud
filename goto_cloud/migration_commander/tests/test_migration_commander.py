@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from remote_host.public import RemoteHost
 
 from migration_plan_parsing.public import MigrationPlanParser
@@ -6,9 +8,17 @@ from source.public import Source
 
 from test_assets.public import TestAsset
 
-from ..migration_commander import MigrationCommander
+from command.public import SourceCommand
+
+from migration_commander.migration_commander import MigrationCommander
 
 from .utils import MigrationCommanderTestCase
+
+
+class CreateTargetCommandMock(SourceCommand):
+    def _execute(self):
+        self._target.remote_host = RemoteHost.objects.create(address='target__device_identification')
+        self._target.save()
 
 
 class TestMigrationCommander(MigrationCommanderTestCase):
@@ -16,18 +26,17 @@ class TestMigrationCommander(MigrationCommanderTestCase):
         MigrationPlanParser().parse(TestAsset.MIGRATION_PLAN_MOCK)
 
         self.source = Source.objects.get(remote_host__address=source_host)
-        self.source.target.remote_host = RemoteHost.objects.create(address=target_host)
-        self.source.target.save()
 
-        TestAsset.REMOTE_HOST_MOCKS['ubuntu16'].add_command(
+        TestAsset.REMOTE_HOST_MOCKS[source_host].add_command(
             'sudo sfdisk -d',
             'PART "TABLE"'
         )
-        TestAsset.REMOTE_HOST_MOCKS['target__device_identification'].add_command(
+        TestAsset.REMOTE_HOST_MOCKS[target_host].add_command(
             'sfdisk',
             ''
         )
 
+    @patch.dict(MigrationCommander._COMMAND_DRIVER, {Source.Status.CREATE_TARGET: CreateTargetCommandMock})
     def test_execute(self):
         self._init_test_data('ubuntu16', 'target__device_identification')
 

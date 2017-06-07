@@ -2,6 +2,7 @@ from commander.public import Commander
 
 from source.public import Source
 
+from migration_commander.target_creation import CreateTargetCommand
 from .target_system_info_inspection import GetTargetSystemInfoCommand
 from .device_identification import DeviceIdentificationCommand
 from .partition_creation import CreatePartitionsCommand
@@ -14,6 +15,7 @@ from .bootloader_reinstallation import BootloaderReinstallationCommand
 
 class MigrationCommander(Commander):
     _COMMAND_DRIVER = {
+        Source.Status.CREATE_TARGET: CreateTargetCommand,
         Source.Status.GET_TARGET_SYSTEM_INFORMATION: GetTargetSystemInfoCommand,
         Source.Status.IDENTIFY_DEVICES: DeviceIdentificationCommand,
         Source.Status.CREATE_PARTITIONS: CreatePartitionsCommand,

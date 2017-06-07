@@ -1,5 +1,4 @@
 from command.command import SourceCommand
-from system_info_inspection.system_info_inspection import RemoteHostSystemInfoGetter
 
 
 class GetTargetSystemInfoCommand(SourceCommand):
