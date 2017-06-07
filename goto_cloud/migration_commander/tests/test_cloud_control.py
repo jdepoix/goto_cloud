@@ -6,7 +6,7 @@ from test_assets.public import TestAsset
 
 from migration_plan_parsing.public import MigrationPlanParser
 
-from ..target_creation import CreateTargetCommand
+from migration_commander.cloud_control import CreateTargetCommand
 
 
 class TestCreateTarget(TestCase, metaclass=TestAsset.PatchTrackedRemoteExecutionMeta):

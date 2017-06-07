@@ -2,7 +2,7 @@ from commander.public import Commander
 
 from source.public import Source
 
-from migration_commander.target_creation import CreateTargetCommand
+from migration_commander.cloud_control import CreateTargetCommand
 from .target_system_info_inspection import GetTargetSystemInfoCommand
 from .device_identification import DeviceIdentificationCommand
 from .partition_creation import CreatePartitionsCommand
