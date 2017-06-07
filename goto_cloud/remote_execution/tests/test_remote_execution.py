@@ -52,7 +52,7 @@ def execute_mock(self, command):
 
 def raise_exception_mock(exception):
     def raise_exception(self, *args, **kwargs):
-        connect_mock(self, *args, **kwargs)
+        close_mock(self)
         raise exception
 
     return raise_exception
@@ -102,18 +102,21 @@ class TestSshRemoteExecutor(unittest.TestCase):
 
         self.assertIn('Command Error', str(context_manager.exception))
 
+    @patch('time.sleep', lambda *args, **kwargs: None)
     def test_connect__connection_exception(self):
         SSHClient.connect = raise_exception_mock(SSHException())
 
         with self.assertRaises(RemoteExecutor.ConnectionException):
             SshRemoteExecutor('test').execute('successful_command')
 
+    @patch('time.sleep', lambda *args, **kwargs: None)
     def test_connect__authentication_exception(self):
         SSHClient.connect = raise_exception_mock(AuthenticationException())
 
         with self.assertRaises(RemoteExecutor.AuthenticationException):
             SshRemoteExecutor('test').execute('successful_command')
 
+    @patch('time.sleep', lambda *args, **kwargs: None)
     def test_connect__no_valid_connection_exception(self):
         SSHClient.connect = raise_exception_mock(NoValidConnectionsError({'127.0.0.1': 22}))
 

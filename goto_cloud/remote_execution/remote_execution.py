@@ -1,3 +1,5 @@
+import time
+
 from abc import ABCMeta, abstractmethod
 
 from paramiko import SSHClient, AutoAddPolicy
@@ -6,6 +8,22 @@ from paramiko.ssh_exception import NoValidConnectionsError, AuthenticationExcept
 from operating_system.public import OperatingSystem
 
 from operating_system_support.public import AbstractedRemoteHostOperator
+
+
+def catch_and_retry_for(exception_type_to_retry_for, timeout=20, max_tries=15):
+    def decorator(function):
+        def decorated_function(*args, **kwargs):
+            tries = 0
+            while True:
+                try:
+                    return function(*args, **kwargs)
+                except exception_type_to_retry_for as exception:
+                    if tries >= max_tries:
+                        raise exception
+                    tries += 1
+                    time.sleep(timeout)
+        return decorated_function
+    return decorator
 
 
 class RemoteExecutor(metaclass=ABCMeta):
@@ -98,6 +116,7 @@ class RemoteExecutor(metaclass=ABCMeta):
         """
         pass
 
+    @catch_and_retry_for(ConnectionException)
     def execute(self, command, raise_exception_on_failure=True):
         """
         executes the given command on the remote host and parses the returned output
