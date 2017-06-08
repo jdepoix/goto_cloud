@@ -23,31 +23,42 @@ class Commander(SourceCommand, metaclass=ABCMeta):
         super().__init__(source)
         self.hook_event_handler = HookEventHandler(source)
 
-    # TODO error handling and persistent status logging
     def _execute(self):
         current_command_class = self._commander_driver.get(self._source.status)
         signal = None
         if current_command_class:
-            current_command = self._initialize_command(current_command_class)
-            self.logger.debug('start executing {command_name} on {source_hostname}'.format(
-                command_name=str(current_command_class),
-                source_hostname=self._source.remote_host.system_info.get('network', {}).get('hostname', 'unknown host')
-                                if self._source.remote_host else 'unknown host'
-            ))
-            self.hook_event_handler.emit(HookEventHandler.EventType.BEFORE)
-            signal = current_command.execute()
-            self.hook_event_handler.emit(HookEventHandler.EventType.AFTER)
-            self.logger.debug('finished executing {command_name} on {source_hostname}'.format(
-                command_name=str(current_command_class),
-                source_hostname=self._source.remote_host.system_info.get('network', {}).get('hostname', 'unknown host')
-                                if self._source.remote_host else 'unknown host'
-            ))
+            signal = self._execute_command(current_command_class)
         if (
             self._source.status != self._source.lifecycle[-1]
             and (signal is None or signal != Commander.Signal.SLEEP)
         ):
             self._source.increment_status()
             self.execute()
+
+    def _execute_command(self, command_class):
+        """
+        initialized and executes the given command class
+
+        :param command_class: the class of the command you want to execute
+        :type command_class: SourceCommand.__class__
+        :return: the signal the executed command returned, in case it did return a signal
+        """
+        # TODO error handling and persistent status logging
+        current_command = self._initialize_command(command_class)
+        self.logger.debug('start executing {command_name} on {source_hostname}'.format(
+            command_name=str(command_class),
+            source_hostname=self._source.remote_host.system_info.get('network', {}).get('hostname', 'unknown host')
+            if self._source.remote_host else 'unknown host'
+        ))
+        self.hook_event_handler.emit(HookEventHandler.EventType.BEFORE)
+        signal = current_command.execute()
+        self.hook_event_handler.emit(HookEventHandler.EventType.AFTER)
+        self.logger.debug('finished executing {command_name} on {source_hostname}'.format(
+            command_name=str(command_class),
+            source_hostname=self._source.remote_host.system_info.get('network', {}).get('hostname', 'unknown host')
+            if self._source.remote_host else 'unknown host'
+        ))
+        return signal
 
     def increment_status_and_execute(self):
         """
