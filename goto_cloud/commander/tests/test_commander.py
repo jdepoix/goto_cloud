@@ -20,6 +20,11 @@ class TestSource(Source):
         FORTH = 'FORTH'
         FIFTH = 'FIFTH'
 
+    def __getattribute__(self, item):
+        if item == 'remote_host':
+            return None
+        return super().__getattribute__(item)
+
     @property
     def lifecycle(self):
         return (

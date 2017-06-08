@@ -44,7 +44,7 @@ class SourceEventLogger():
     @property
     def _logging_message_prefix(self):
         return '[{timestamp}] <{source_address}>: '.format(
-            source_address=self.source.remote_host.address,
+            source_address=self.source.remote_host.address if self.source.remote_host else 'unknown host',
             timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         )
 

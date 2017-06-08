@@ -29,9 +29,19 @@ class Commander(SourceCommand, metaclass=ABCMeta):
         signal = None
         if current_command_class:
             current_command = self._initialize_command(current_command_class)
+            self.logger.debug('start executing {command_name} on {source_hostname}'.format(
+                command_name=str(current_command_class),
+                source_hostname=self._source.remote_host.system_info.get('network', {}).get('hostname', 'unknown host')
+                                if self._source.remote_host else 'unknown host'
+            ))
             self.hook_event_handler.emit(HookEventHandler.EventType.BEFORE)
             signal = current_command.execute()
             self.hook_event_handler.emit(HookEventHandler.EventType.AFTER)
+            self.logger.debug('finished executing {command_name} on {source_hostname}'.format(
+                command_name=str(current_command_class),
+                source_hostname=self._source.remote_host.system_info.get('network', {}).get('hostname', 'unknown host')
+                                if self._source.remote_host else 'unknown host'
+            ))
         if (
             self._source.status != self._source.lifecycle[-1]
             and (signal is None or signal != Commander.Signal.SLEEP)
