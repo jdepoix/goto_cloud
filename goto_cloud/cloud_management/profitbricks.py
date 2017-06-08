@@ -137,13 +137,11 @@ class ProfitbricksAdapter(CloudAdapter):
 
     def make_volume_boot(self, server_id, volume_id):
         response = self._client.update_server(
-            datacenter_id=self._datacenter, server_id=server_id, boot_volume_id=volume_id
+            # According to the profitbricks api docs, the boot_volume field should be called boot_volume_id, but this
+            # only works with boot_volume. So keep an eye out, whether this will change in future releases!
+            datacenter_id=self._datacenter, server_id=server_id, boot_volume=volume_id
         )
-        self._wait_for_entity_state(
-            self._client.get_server,
-            {'server_id': server_id},
-            lambda state: state != ProfitbricksAdapter.EntityState.BUSY
-        )
+        self._wait_for_request(response['requestId'])
         return response
 
     def delete_nic(self, server_id, nic_id):

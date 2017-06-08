@@ -6,22 +6,30 @@ from test_assets.public import TestAsset
 
 from migration_plan_parsing.public import MigrationPlanParser
 
-from migration_commander.cloud_control import CreateTargetCommand
+from migration_commander.cloud_commanding import \
+    CreateTargetCommand, \
+    DeleteBootstrapNetworkInterfaceCommand,\
+    DeleteBootstrapVolumeCommand, \
+    ConfigureBootDeviceCommand, \
+    StopTargetCommand
 
 
-class TestCreateTarget(TestCase, metaclass=TestAsset.PatchTrackedRemoteExecutionMeta):
+class CloudCommandTestCase(TestCase, metaclass=TestAsset.PatchTrackedRemoteExecutionMeta):
     HOSTNAME = 'ubuntu16'
+    BOOTSTRAP_VOLUME_ID = 'BOOTSTRAP_VOLUME_ID'
+    BOOTSTRAP_INTERFACE_ID = 'BOOTSTRAP_INTERFACE_ID'
+    NEW_BOOT_VOLUME_ID = 'NEW_BOOT_VOLUME_ID'
     CLOUD_DATA = {
         'id': 'ID',
         'volumes': [
             {
-                'id': 'ID',
+                'id': BOOTSTRAP_VOLUME_ID,
                 'size': 10,
                 'device_number': 1,
                 'name': '{hostname}.bootstrap'.format(hostname=HOSTNAME),
             },
             {
-                'id': 'ID',
+                'id': NEW_BOOT_VOLUME_ID,
                 'size': 10,
                 'device_number': 2,
                 'name': '{hostname}.clone-0'.format(hostname=HOSTNAME),
@@ -41,16 +49,16 @@ class TestCreateTarget(TestCase, metaclass=TestAsset.PatchTrackedRemoteExecution
         ],
         'network_interfaces': [
             {
+                'id': BOOTSTRAP_INTERFACE_ID,
+                'ip': '10.17.32.50',
+                'lan': 2,
+                'name': '{hostname}.bootstrap'.format(hostname=HOSTNAME),
+            },
+            {
                 'id': 'ID',
                 'ip': '10.17.34.100',
                 'lan': 4,
                 'name': None,
-            },
-            {
-                'id': 'ID',
-                'ip': '9.9.9.9',
-                'lan': 1,
-                'name': '{hostname}.bootstrap'.format(hostname=HOSTNAME),
             },
         ]
     }
@@ -60,7 +68,9 @@ class TestCreateTarget(TestCase, metaclass=TestAsset.PatchTrackedRemoteExecution
         with patch.dict(TestAsset.MIGRATION_PLAN_MOCK, {'sources': [{'address': 'ubuntu16', 'blueprint': 'default'}]}):
             self.source = MigrationPlanParser().parse(TestAsset.MIGRATION_PLAN_MOCK).sources.first()
 
-    @patch('cloud_management.public.CloudManager.create_target', return_value=CLOUD_DATA)
+
+class TestCreateTarget(CloudCommandTestCase):
+    @patch('cloud_management.public.CloudManager.create_target', return_value=CloudCommandTestCase.CLOUD_DATA)
     def test_execute__create_target_executed(self, mocked_create_target):
         self._init_test_data()
         CreateTargetCommand(self.source).execute()
@@ -82,7 +92,7 @@ class TestCreateTarget(TestCase, metaclass=TestAsset.PatchTrackedRemoteExecution
                     'source_interface': 'eth0',
                 },
             ],
-            [10, 10, 10,],
+            [10, 10, 10, ],
             1024,
             1,
         )
@@ -152,3 +162,64 @@ class TestCreateTarget(TestCase, metaclass=TestAsset.PatchTrackedRemoteExecution
             self.source.target.remote_host.port,
             TestAsset.MIGRATION_PLAN_MOCK['target_cloud']['bootstrapping']['ssh']['port']
         )
+
+
+class AfterCreationCoudCommandTestCase(CloudCommandTestCase):
+    @patch('cloud_management.public.CloudManager.create_target', lambda *args, **kwargs: TestCreateTarget.CLOUD_DATA)
+    def _init_test_data(self):
+        super()._init_test_data()
+        CreateTargetCommand(self.source).execute()
+
+
+class TestStopTargetCommand(AfterCreationCoudCommandTestCase):
+    @patch('cloud_management.public.CloudManager.stop_target')
+    def test_execute(self, mocked_stop_target):
+        self._init_test_data()
+        StopTargetCommand(self.source).execute()
+
+        mocked_stop_target.assert_called_with(self.CLOUD_DATA['id'])
+
+
+class TestDeleteBootstrapVolumeCommand(AfterCreationCoudCommandTestCase):
+    @patch('cloud_management.public.CloudManager.delete_volume')
+    def test_execute(self, mocked_delete_volume):
+        self._init_test_data()
+        DeleteBootstrapVolumeCommand(self.source).execute()
+
+        mocked_delete_volume.assert_called_with(self.BOOTSTRAP_VOLUME_ID)
+
+    def test_execute__no_bootstrapping_volume_found(self):
+        self._init_test_data()
+        self.source.target.remote_host.refresh_from_db()
+        self.source.target.remote_host.cloud_metadata['volumes'].pop(0)
+        self.source.target.remote_host.save()
+
+        with self.assertRaises(DeleteBootstrapVolumeCommand.NoBootstrapVolumeFoundException):
+            DeleteBootstrapVolumeCommand(self.source).execute()
+
+
+class TestDeleteBootstrapNetworkInterfaceCommand(AfterCreationCoudCommandTestCase):
+    @patch('cloud_management.public.CloudManager.delete_nic')
+    def test_execute(self, mocked_delete_nic):
+        self._init_test_data()
+        DeleteBootstrapNetworkInterfaceCommand(self.source).execute()
+
+        mocked_delete_nic.assert_called_with(self.CLOUD_DATA['id'], self.BOOTSTRAP_INTERFACE_ID)
+
+    def test_execute__no_bootstrapping_interface_found(self):
+        self._init_test_data()
+        self.source.target.remote_host.refresh_from_db()
+        self.source.target.remote_host.cloud_metadata['network_interfaces'].pop(0)
+        self.source.target.remote_host.save()
+
+        with self.assertRaises(DeleteBootstrapNetworkInterfaceCommand.NoBootstrapNetworkInterfaceFoundException):
+            DeleteBootstrapNetworkInterfaceCommand(self.source).execute()
+
+
+class TestConfigureBootDeviceCommand(AfterCreationCoudCommandTestCase):
+    @patch('cloud_management.public.CloudManager.make_volume_boot')
+    def test_execute(self, mocked_make_volume_boot):
+        self._init_test_data()
+        ConfigureBootDeviceCommand(self.source).execute()
+
+        # mocked_make_volume_boot.assert_called_with(self.CLOUD_DATA['id'], self.NEW_BOOT_VOLUME_ID)

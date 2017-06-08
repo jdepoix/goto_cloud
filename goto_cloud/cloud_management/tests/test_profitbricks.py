@@ -403,25 +403,27 @@ class TestProfitbricksAdapter(TestCase):
         )
 
     @patch(
-        'profitbricks.client.ProfitBricksService.get_server',
+        'profitbricks.client.ProfitBricksService.get_request',
         return_value={
             'metadata': {
-                'state': ProfitbricksAdapter.EntityState.INACTIVE
+                'status': ProfitbricksAdapter.RequestState.DONE
             }
         }
     )
-    @patch('profitbricks.client.ProfitBricksService.update_server')
-    def test_make_volume_boot(self, mocked_update_server, mocked_get_server):
+    @patch('profitbricks.client.ProfitBricksService.update_server', return_value={
+        'requestId': REQUEST_ID
+    })
+    def test_make_volume_boot(self, mocked_update_server, mocked_get_request):
         self.adapter.make_volume_boot(self.SERVER_ID, self.VOLUME_ID)
 
         mocked_update_server.assert_called_with(
             datacenter_id=TestAsset.MIGRATION_PLAN_MOCK['target_cloud']['datacenter'],
             server_id=self.SERVER_ID,
-            boot_volume_id=self.VOLUME_ID,
+            boot_volume=self.VOLUME_ID,
         )
-        mocked_get_server.assert_called_with(
-            datacenter_id=TestAsset.MIGRATION_PLAN_MOCK['target_cloud']['datacenter'],
-            server_id=self.SERVER_ID
+        mocked_get_request.assert_called_with(
+            request_id=self.REQUEST_ID,
+            status=True
         )
 
     @patch('profitbricks.client.ProfitBricksService.delete_nic')
