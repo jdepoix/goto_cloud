@@ -134,7 +134,7 @@ class TestNetworkConfigAdjustment(MigrationCommanderTestCase):
                 'auto eth0\n'
                 'iface eth0 inet dhcp\n'
                 '\n'
-                '\\" > {file}"'.format(file=SourceFileLocationResolver(self.source).resolve('/etc/network/interfaces'))
+                '\\" > {file}"'.format(file=SourceFileLocationResolver(self.source).resolve_path('/etc/network/interfaces'))
             ),
             self.executed_commands
         )

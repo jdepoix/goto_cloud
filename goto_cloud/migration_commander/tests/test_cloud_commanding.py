@@ -6,12 +6,19 @@ from test_assets.public import TestAsset
 
 from migration_plan_parsing.public import MigrationPlanParser
 
-from migration_commander.cloud_commanding import \
+from source.public import Source
+
+from remote_host.public import RemoteHost
+
+from ..cloud_commanding import \
     CreateTargetCommand, \
     DeleteBootstrapNetworkInterfaceCommand,\
     DeleteBootstrapVolumeCommand, \
     ConfigureBootDeviceCommand, \
-    StopTargetCommand
+    StopTargetCommand, \
+    StartTargetCommand
+from ..device_identification import DeviceIdentificationCommand
+from ..target_system_info_inspection import GetTargetSystemInfoCommand
 
 
 class CloudCommandTestCase(TestCase, metaclass=TestAsset.PatchTrackedRemoteExecutionMeta):
@@ -217,9 +224,30 @@ class TestDeleteBootstrapNetworkInterfaceCommand(AfterCreationCoudCommandTestCas
 
 
 class TestConfigureBootDeviceCommand(AfterCreationCoudCommandTestCase):
+    @patch('cloud_management.public.CloudManager.create_target', lambda *args, **kwargs: TestCreateTarget.CLOUD_DATA)
+    def _init_test_data(self):
+        super()._init_test_data()
+
+        self.source = Source.objects.get(remote_host__address='ubuntu16')
+        self.source.target.remote_host = RemoteHost.objects.create(address='target__device_identification')
+        self.source.target.save()
+
+        GetTargetSystemInfoCommand(self.source).execute()
+        DeviceIdentificationCommand(self.source).execute()
+        CreateTargetCommand(self.source).execute()
+
     @patch('cloud_management.public.CloudManager.make_volume_boot')
     def test_execute(self, mocked_make_volume_boot):
         self._init_test_data()
         ConfigureBootDeviceCommand(self.source).execute()
 
-        # mocked_make_volume_boot.assert_called_with(self.CLOUD_DATA['id'], self.NEW_BOOT_VOLUME_ID)
+        mocked_make_volume_boot.assert_called_with(self.CLOUD_DATA['id'], self.NEW_BOOT_VOLUME_ID)
+
+
+class TestStartTargetCommand(AfterCreationCoudCommandTestCase):
+    @patch('cloud_management.public.CloudManager.start_target')
+    def test_execute(self, mocked_start_target):
+        self._init_test_data()
+        StartTargetCommand(self.source).execute()
+
+        mocked_start_target.assert_called_with(self.CLOUD_DATA['id'])

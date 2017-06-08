@@ -2,7 +2,13 @@ from commander.public import Commander
 
 from source.public import Source
 
-from migration_commander.cloud_control import CreateTargetCommand
+from .cloud_commanding import \
+    CreateTargetCommand, \
+    StopTargetCommand, \
+    DeleteBootstrapNetworkInterfaceCommand, \
+    DeleteBootstrapVolumeCommand, \
+    ConfigureBootDeviceCommand, \
+    StartTargetCommand
 from .target_system_info_inspection import GetTargetSystemInfoCommand
 from .device_identification import DeviceIdentificationCommand
 from .partition_creation import CreatePartitionsCommand
@@ -27,6 +33,11 @@ class MigrationCommander(Commander):
         Source.Status.ADJUST_SSH_CONFIG: SshConfigAdjustmentCommand,
         Source.Status.ADJUST_FSTAB: FstabAdjustmentCommand,
         Source.Status.REINSTALL_BOOTLOADER: BootloaderReinstallationCommand,
+        Source.Status.STOP_TARGET: StopTargetCommand,
+        Source.Status.DELETE_BOOTSTRAP_VOLUME: DeleteBootstrapVolumeCommand,
+        Source.Status.DELETE_BOOTSTRAP_NETWORK_INTERFACE: DeleteBootstrapNetworkInterfaceCommand,
+        Source.Status.CONFIGURE_BOOT_DEVICE: ConfigureBootDeviceCommand,
+        Source.Status.START_TARGET: StartTargetCommand,
     }
 
     @property
