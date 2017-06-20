@@ -1,6 +1,6 @@
 import sys
 
-from unittest import TestCase
+from django.test import TestCase
 
 from target.public import Target
 
@@ -171,5 +171,68 @@ class TestDeviceIdentificationCommand(TestCase, metaclass=TestAsset.PatchRemoteH
                         }
                     }
                 }
+            }
+        )
+
+    def test_execute__with_cd_rom_type(self):
+        source_remote_host = RemoteHost.objects.create(address='ubuntu16')
+        target_remote_host = RemoteHost.objects.create(address='target__device_identification')
+
+        source_remote_host.system_info = RemoteHostSystemInfoGetter(source_remote_host).get_system_info()
+        target_remote_host.system_info = RemoteHostSystemInfoGetter(target_remote_host).get_system_info()
+
+        source_remote_host.system_info['block_devices']['sd0'] = {
+            'type': 'rom',
+            'fs': '',
+            'uuid': '',
+            'label': '',
+            'mountpoint': '',
+            'size': 10737418240,
+            'children': {}
+        }
+        source_remote_host.save()
+
+        self.source = Source.objects.create(remote_host=source_remote_host)
+        self.target = Target.objects.create(
+            source=self.source,
+            remote_host=target_remote_host,
+        )
+
+        DeviceIdentificationCommand(self.source).execute()
+
+        self.target.refresh_from_db()
+
+        self.assertDictEqual(
+            self.target.device_mapping,
+            {
+                'vda': {
+                    'id': 'vdb',
+                    'mountpoint': '',
+                    'children': {
+                        'vda1': {
+                            'id': 'vdb1',
+                            'mountpoint': '/mnt/' + str(hash('/') + sys.maxsize + 1),
+                        }
+                    }
+                },
+                'vdb': {
+                    'id': 'vdc',
+                    'mountpoint': '',
+                    'children': {}
+                },
+                'vdc': {
+                    'id': 'vdd',
+                    'mountpoint': '',
+                    'children': {
+                        'vdc1': {
+                            'id': 'vdd1',
+                            'mountpoint': '/mnt/' + str(hash('/mnt/vdc1') + sys.maxsize + 1),
+                        },
+                        'vdc2': {
+                            'id': 'vdd2',
+                            'mountpoint': '/mnt/' + str(hash('/mnt/vdc2') + sys.maxsize + 1),
+                        }
+                    }
+                },
             }
         )
