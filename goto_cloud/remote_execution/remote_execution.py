@@ -1,5 +1,7 @@
 import time
 
+import logging
+
 from abc import ABCMeta, abstractmethod
 
 from paramiko import SSHClient, AutoAddPolicy
@@ -8,6 +10,8 @@ from paramiko.ssh_exception import NoValidConnectionsError, AuthenticationExcept
 from operating_system.public import OperatingSystem
 
 from operating_system_support.public import AbstractedRemoteHostOperator
+
+from remote_host_event_logging.public import RemoteHostEventLogger
 
 
 def catch_and_retry_for(exception_type_to_retry_for, timeout=20, max_tries=15):
@@ -73,6 +77,7 @@ class RemoteExecutor(metaclass=ABCMeta):
         self.username = username
         self.password = password
         self.port = port
+        self._logger = logging.getLogger(__name__)
 
     def close(self):
         """
@@ -136,16 +141,26 @@ class RemoteExecutor(metaclass=ABCMeta):
         execution_result = self._execute(command)
 
         if execution_result['exit_code'] != 0:
+            error_message = 'While executing:\n{command}\n\nThe following Error occurred:\n{error}'.format(
+                command=command,
+                error=execution_result['stderr'],
+            )
             if raise_exception_on_failure:
-                raise RemoteExecutor.ExecutionException(
-                    'While executing:\n{command}\n\nThe following Error occurred:\n{error}'.format(
-                        command=command,
-                        error=execution_result['stderr'],
-                    )
-                )
+                self._logger.critical(error_message)
+                raise RemoteExecutor.ExecutionException(error_message)
             else:
+                self._logger.debug(error_message)
                 return execution_result['stderr']
 
+        self._logger.debug('executed the following command:\n{command}{stdout}{stderr}'.format(
+            command=command,
+            stdout='\n\nSTDOUT:\n{stdout}'.format(
+                stdout=execution_result['stdout']
+            ) if execution_result['stdout'].split() else '',
+            stderr='\n\nSTDERR:\n{stderr}'.format(
+                stderr=execution_result['stderr']
+            ) if execution_result['stderr'].split() else '',
+        ))
         return execution_result['stdout']
 
     @abstractmethod
@@ -203,6 +218,11 @@ class RemoteHostExecutor(AbstractedRemoteHostOperator, RemoteExecutor):
     """
     takes care of the remote execution for a given RemoteHost
     """
+
+    def __init__(self, remote_host):
+        super().__init__(remote_host)
+        self.operator._logger = RemoteHostEventLogger(remote_host)
+
     def _get_operating_systems_to_supported_operation_mapping(self):
         return {
             (OperatingSystem.LINUX,): SshRemoteExecutor

@@ -4,7 +4,7 @@ import traceback
 
 from abc import ABCMeta, abstractmethod
 
-from source_event_logging.public import SourceEventLogger
+from remote_host_event_logging.public import RemoteHostEventLogger
 
 
 class Command(metaclass=ABCMeta):
@@ -115,7 +115,7 @@ class SourceCommand(Command, metaclass=ABCMeta):
     """
     A Command which specifically executes in the context of a given Source
     """
-    EVENT_LOGGER = SourceEventLogger
+    EVENT_LOGGER = RemoteHostEventLogger
 
     def __init__(self, source):
         """
@@ -125,4 +125,4 @@ class SourceCommand(Command, metaclass=ABCMeta):
         super().__init__()
         self._source = source
         self._target = source.target
-        self.logger = self.EVENT_LOGGER(source)
+        self.logger = self.EVENT_LOGGER(source.remote_host)

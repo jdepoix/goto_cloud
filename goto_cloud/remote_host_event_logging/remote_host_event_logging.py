@@ -2,9 +2,9 @@ import datetime
 import logging
 
 
-class SourceEventLogger():
+class RemoteHostEventLogger():
     """
-    Logs event based on given Source. Supports all log levels of the default Logger. 
+    Logs event based on a given RemoteHost. Supports all log levels of the default Logger.
     """
     class DisableLoggingContextManager():
         """
@@ -16,15 +16,15 @@ class SourceEventLogger():
         def __exit__(self, exc_type, exc_val, exc_tb):
             logging.disable(logging.NOTSET)
 
-    def __init__(self, source):
+    def __init__(self, remote_host):
         """
-        initialized with the source which the events are logged for
+        initialized with the remote host which the events are logged for
         
-        :param source: the source to log for
-        :type source: source.public.Source
+        :param remote_host: the remote host to log for
+        :type remote_host: remote_host.public.RemoteHost
         """
         self.logger = logging.getLogger(__name__)
-        self.source = source
+        self.remote_host = remote_host
 
     def debug(self, msg, *args, **kwargs):
         self.logger.debug(self._format_message(msg), *args, **kwargs)
@@ -43,10 +43,19 @@ class SourceEventLogger():
 
     @property
     def _logging_message_prefix(self):
-        return '[{timestamp}] <{source_address}>: '.format(
-            source_address=self.source.remote_host.address if self.source.remote_host else 'unknown host',
+        return '[{timestamp}] <{source_address}>'.format(
+            source_address=self.remote_host.address if self.remote_host else 'unknown host',
             timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         )
 
-    def _format_message(self, msg):
-        return self._logging_message_prefix + msg
+    def _format_message(self, message):
+        formatted_message = '+------------- {message_prefix} -------------'.format(
+            message_prefix=self._logging_message_prefix
+        )
+        if message:
+            for line in message.split('\n'):
+                formatted_message += '\n| {logging_line}'.format(logging_line=line)
+        formatted_message += '\n+--------------{sized_gap}--------------\n'.format(
+            sized_gap='-' * len(self._logging_message_prefix)
+        )
+        return formatted_message

@@ -45,7 +45,7 @@ class Commander(SourceCommand, metaclass=ABCMeta):
         """
         # TODO error handling and persistent status logging
         current_command = self._initialize_command(command_class)
-        self.logger.debug('start executing {command_name} on {source_hostname}'.format(
+        self.logger.info('start executing {command_name} on {source_hostname}'.format(
             command_name=str(command_class),
             source_hostname=self._source.remote_host.system_info.get('network', {}).get('hostname', 'unknown host')
             if self._source.remote_host else 'unknown host'
@@ -53,7 +53,7 @@ class Commander(SourceCommand, metaclass=ABCMeta):
         self.hook_event_handler.emit(HookEventHandler.EventType.BEFORE)
         signal = current_command.execute()
         self.hook_event_handler.emit(HookEventHandler.EventType.AFTER)
-        self.logger.debug('finished executing {command_name} on {source_hostname}'.format(
+        self.logger.info('finished executing {command_name} on {source_hostname}'.format(
             command_name=str(command_class),
             source_hostname=self._source.remote_host.system_info.get('network', {}).get('hostname', 'unknown host')
             if self._source.remote_host else 'unknown host'
