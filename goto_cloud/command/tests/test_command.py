@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from source_event_logging.public import SourceEventLogger
+from remote_host_event_logging.public import RemoteHostEventLogger
 
 from ..command import Command
 
@@ -27,7 +27,7 @@ class TestCommand(TestCase):
     def test_collect_errors(self):
         command = ErrorCommand()
         try:
-            with SourceEventLogger.DisableLoggingContextManager():
+            with RemoteHostEventLogger.DisableLoggingContextManager():
                 command.execute()
         except:
             pass
@@ -37,7 +37,7 @@ class TestCommand(TestCase):
     def test_collect_errors__throws_command_execution_exception(self):
         command = ErrorCommand()
 
-        with SourceEventLogger.DisableLoggingContextManager():
+        with RemoteHostEventLogger.DisableLoggingContextManager():
             with self.assertRaises(Command.CommandExecutionException):
                 command.execute()
 
