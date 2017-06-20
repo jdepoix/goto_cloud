@@ -14,6 +14,7 @@ class DeviceIdentificationCommand(SourceCommand):
         COMMAND_DOES = 'match the target and source devices'
 
     ERROR_REPORT_EXCEPTION_CLASS = NoMatchingDevicesException
+    DEVICE_TYPES_TO_IDENTIFY = ['disk', 'part']
 
     def _execute(self):
         self._target.device_mapping = self._map_unallocated_devices_onto_source_devices(
@@ -45,7 +46,11 @@ class DeviceIdentificationCommand(SourceCommand):
         """
         device_map = {}
 
-        for source_device_id, source_device in self._source.remote_host.system_info['block_devices'].items():
+        for source_device_id, source_device in (
+            (device_id, device)
+            for device_id, device in self._source.remote_host.system_info['block_devices'].items()
+            if device['type'] in self.DEVICE_TYPES_TO_IDENTIFY
+        ):
             if unallocated_devices:
                 matching_device_id = next(
                     (
@@ -63,7 +68,7 @@ class DeviceIdentificationCommand(SourceCommand):
                         'children': self._map_children(source_device_id, matching_device_id)
                     }
 
-                    del unallocated_devices[matching_device_id]
+                    unallocated_devices.pop(matching_device_id)
                 else:
                     self._add_error(
                         'no device of the target system matches the size of {source_device_id} on the source system'

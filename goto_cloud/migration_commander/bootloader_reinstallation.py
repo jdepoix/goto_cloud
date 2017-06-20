@@ -130,13 +130,21 @@ class BootloaderReinstallationCommand(SourceCommand):
                     return device['id']
 
     def _mount_source_mountpoints(self, remote_executor, root_source_mountpoint):
-        for device in self._source.remote_host.system_info['block_devices'].values():
-            if device['mountpoint'] and device['mountpoint'] != '/':
-                self._mount_source_mountpoint(remote_executor, root_source_mountpoint, device['mountpoint'])
+        self._target.device_mapping.values()
+        for device_id, device in self._target.device_mapping.items():
+            device_mountpoint = self._source.remote_host.system_info['block_devices'][device_id]['mountpoint']
 
-            for partition in device['children'].values():
-                if partition['mountpoint'] and partition['mountpoint'] != '/':
-                    self._mount_source_mountpoint(remote_executor, root_source_mountpoint, partition['mountpoint'])
+            if device_mountpoint and device_mountpoint != '/':
+                self._mount_source_mountpoint(remote_executor, root_source_mountpoint, device_mountpoint)
+
+            for partition_id in device['children'].keys():
+                partition_mountpoint = self\
+                    ._source\
+                    .remote_host\
+                    .system_info['block_devices'][device_id]['children'][partition_id]['mountpoint']
+
+                if partition_mountpoint and partition_mountpoint != '/':
+                    self._mount_source_mountpoint(remote_executor, root_source_mountpoint, partition_mountpoint)
 
     def _mount_source_mountpoint(self, remote_executor, root_source_mountpoint, mountpoint):
         chrooted_env_location = root_source_mountpoint + mountpoint
