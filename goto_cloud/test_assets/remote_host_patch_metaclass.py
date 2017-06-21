@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 
-def mocked_execute(remote_executor, command):
+def mocked_execute(remote_executor, command, *args, **kwargs):
     from .test_assets import TestAsset
     return TestAsset.REMOTE_HOST_MOCKS[remote_executor.hostname].execute(
         command
@@ -28,7 +28,7 @@ class PatchTrackedRemoteExecutionMeta(PatchRemoteHostMeta):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.executed_commands = set()
-        def tracked_mocked_execute(remote_host, command):
+        def tracked_mocked_execute(remote_host, command, *args, **kwargs):
             self.executed_commands.add(command)
             return PatchRemoteHostMeta.MOCKED_EXECUTE(remote_host, command)
 
