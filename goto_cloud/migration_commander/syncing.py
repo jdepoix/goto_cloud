@@ -18,7 +18,7 @@ class SyncCommand(DeviceModifyingCommand):
         """
         raised if an error occurs during the sync
         """
-        COMMAND_DOES = 'syncing'
+        COMMAND_DOES = 'do the sync'
 
     ERROR_REPORT_EXCEPTION_CLASS = SyncingException
 
