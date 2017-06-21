@@ -129,6 +129,9 @@ class TestSshRemoteExecutor(unittest.TestCase):
             'Command Error'
         )
 
+    def test_execute__don_t_block_for_response(self):
+        self.assertEqual(self.remote_executor.execute('successful_command', block_for_response=False), None)
+
 
 @patch('paramiko.SSHClient.connect', connect_mock)
 @patch('paramiko.SSHClient.connect', connect_mock)
