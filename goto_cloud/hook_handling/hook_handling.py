@@ -62,7 +62,8 @@ class HookEventHandler():
                 self._hooks[hook_name],
             ).execute(
                 self._hooks[hook_name]['execute'],
-                self._load_script_env()
+                self._load_script_env(),
+                **{'sudo': self._hooks[hook_name]['sudo']} if 'sudo' in self._hooks[hook_name] else {}
             )
 
     def _get_remote_script_executor(self, hook):
