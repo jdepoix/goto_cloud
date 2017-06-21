@@ -25,6 +25,12 @@ class ProfitbricksAdapter(CloudAdapter):
         """
         DONE = 'DONE'
 
+    class VmState(StringEnum):
+        """
+        represents the states a vm can have
+        """
+        SHUTOFF = 'SHUTOFF'
+
     def __init__(self, settings):
         super().__init__(settings)
         self._client = ProfitBricksService(
@@ -50,6 +56,24 @@ class ProfitbricksAdapter(CloudAdapter):
         return response
 
     def stop_target(self, server_id):
+        """
+        stops the target with the given id and waits for it to be stopped
+
+        WARNING: since stopping the server without it being shutdown, can lead to file corruption when using
+        Profitbricks, this method will block, until the server is shutdown
+
+        :param server_id: the cloud id of the target machine
+        :type server_id: str
+        """
+        self._wait_for(
+            lambda server_id: self._client.get_server(
+                datacenter_id=self._datacenter,
+                server_id=server_id
+            ).get('properties', {}).get('vmState', ''),
+            {'server_id': server_id},
+            ProfitbricksAdapter.VmState.SHUTOFF,
+        )
+
         response = self._client.stop_server(datacenter_id=self._datacenter, server_id=server_id)
         self._wait_for_entity_state(
             self._client.get_server, {'server_id': server_id}, ProfitbricksAdapter.EntityState.INACTIVE

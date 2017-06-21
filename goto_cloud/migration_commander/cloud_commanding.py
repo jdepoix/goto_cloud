@@ -2,6 +2,8 @@ from cloud_management.public import CloudManager
 
 from command.public import SourceCommand
 
+from remote_execution.public import RemoteHostExecutor
+
 from remote_host.public import RemoteHost
 
 from .source_file_location_resolving import SourceFileLocationResolver
@@ -64,6 +66,7 @@ class CreateTargetCommand(CloudCommand):
 
 class StopTargetCommand(CloudCommand):
     def _execute(self):
+        RemoteHostExecutor(self._target.remote_host).execute('sudo shutdown -P now &', block_for_response=False)
         self._cloud_manager.stop_target(self._target.remote_host.cloud_metadata['id'])
 
 

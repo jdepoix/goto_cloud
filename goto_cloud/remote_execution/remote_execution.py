@@ -122,7 +122,7 @@ class RemoteExecutor(metaclass=ABCMeta):
         pass
 
     @catch_and_retry_for(ConnectionException)
-    def execute(self, command, raise_exception_on_failure=True):
+    def execute(self, command, raise_exception_on_failure=True, block_for_response=True):
         """
         executes the given command on the remote host and parses the returned output
         
@@ -131,6 +131,9 @@ class RemoteExecutor(metaclass=ABCMeta):
         :param raise_exception_on_failure: if this is true and the command will return an exit code different than 0,
         an exception will be thrown, if false execution won't be interrupted and stderr is returned
         :type raise_exception_on_failure: bool
+        :param block_for_response: if this is true, the method will block until execution is done and return the
+        response streams
+        :type block_for_response: bool
         :return: the output the command produced
         :rtype: str
         :raises RemoteExecutor.ExecutionException: in case something goes wrong during execution 
@@ -138,38 +141,43 @@ class RemoteExecutor(metaclass=ABCMeta):
         if not self.is_connected():
             self.connect()
 
-        execution_result = self._execute(command)
+        execution_result = self._execute(command, block_for_response)
 
-        if execution_result['exit_code'] != 0:
-            error_message = 'While executing:\n{command}\n\nThe following Error occurred:\n{error}'.format(
+        if block_for_response:
+            if execution_result['exit_code'] != 0:
+                error_message = 'While executing:\n{command}\n\nThe following Error occurred:\n{error}'.format(
+                    command=command,
+                    error=execution_result['stderr'],
+                )
+                if raise_exception_on_failure:
+                    self._logger.critical(error_message)
+                    raise RemoteExecutor.ExecutionException(error_message)
+                else:
+                    self._logger.debug(error_message)
+                    return execution_result['stderr']
+
+            self._logger.debug('executed the following command:\n{command}{stdout}{stderr}'.format(
                 command=command,
-                error=execution_result['stderr'],
-            )
-            if raise_exception_on_failure:
-                self._logger.critical(error_message)
-                raise RemoteExecutor.ExecutionException(error_message)
-            else:
-                self._logger.debug(error_message)
-                return execution_result['stderr']
-
-        self._logger.debug('executed the following command:\n{command}{stdout}{stderr}'.format(
-            command=command,
-            stdout='\n\nSTDOUT:\n{stdout}'.format(
-                stdout=execution_result['stdout']
-            ) if execution_result['stdout'].split() else '',
-            stderr='\n\nSTDERR:\n{stderr}'.format(
-                stderr=execution_result['stderr']
-            ) if execution_result['stderr'].split() else '',
-        ))
-        return execution_result['stdout']
+                stdout='\n\nSTDOUT:\n{stdout}'.format(
+                    stdout=execution_result['stdout']
+                ) if execution_result['stdout'].split() else '',
+                stderr='\n\nSTDERR:\n{stderr}'.format(
+                    stderr=execution_result['stderr']
+                ) if execution_result['stderr'].split() else '',
+            ))
+            return execution_result['stdout']
+        return None
 
     @abstractmethod
-    def _execute(self, command):
+    def _execute(self, command, block_for_response=True):
         """
         does the execution and returns the raw output
         
         :param command: the command to execute
         :type command: str
+        :param block_for_response: if this is true, the method will block until execution is done and return the
+        response streams
+        :type block_for_response: bool
         :return: the return value of the execution
         :rtype: Any
         """
@@ -183,17 +191,19 @@ class SshRemoteExecutor(RemoteExecutor):
     """
     implements RemoteExecutor using SSH as the remote execution client
     """
-    def _execute(self, command):
+    def _execute(self, command, block_for_response=True):
         _, stdout, stderr = self.remote_client.exec_command(command)
 
-        stdout_output = stdout.read().decode().strip()
-        stderr_output = stderr.read().decode().strip()
+        if block_for_response:
+            stdout_output = stdout.read().decode().strip()
+            stderr_output = stderr.read().decode().strip()
 
-        return {
-            'exit_code': stdout.channel.recv_exit_status(),
-            'stdout': stdout_output,
-            'stderr': stderr_output,
-        }
+            return {
+                'exit_code': stdout.channel.recv_exit_status(),
+                'stdout': stdout_output,
+                'stderr': stderr_output,
+            }
+        return None
 
     def connect(self):
         try:
@@ -236,7 +246,7 @@ class RemoteHostExecutor(AbstractedRemoteHostOperator, RemoteExecutor):
             port=self.remote_host.port if self.remote_host.port else None,
         )
 
-    def _execute(self, command): # pragma: no cover
+    def _execute(self, command, block_for_response=True): # pragma: no cover
         # At runtime the method of the chosen operator is used. This stub is only to implement the abstract method.
         pass
 

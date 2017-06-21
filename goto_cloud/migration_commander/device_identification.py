@@ -14,7 +14,7 @@ class DeviceIdentificationCommand(SourceCommand):
         COMMAND_DOES = 'match the target and source devices'
 
     ERROR_REPORT_EXCEPTION_CLASS = NoMatchingDevicesException
-    DEVICE_TYPES_TO_IDENTIFY = ['disk', 'part']
+    DEVICE_TYPES_TO_IDENTIFY = ('disk', 'part',)
 
     def _execute(self):
         self._target.device_mapping = self._map_unallocated_devices_onto_source_devices(

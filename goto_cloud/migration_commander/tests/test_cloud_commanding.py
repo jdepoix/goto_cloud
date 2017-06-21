@@ -71,6 +71,8 @@ class CloudCommandTestCase(TestCase, metaclass=TestAsset.PatchTrackedRemoteExecu
     }
 
     def _init_test_data(self):
+        self.executed_commands = set()
+
         # MOCKCEPTION!!!
         with patch.dict(TestAsset.MIGRATION_PLAN_MOCK, {'sources': [{'address': 'ubuntu16', 'blueprint': 'default'}]}):
             self.source = MigrationPlanParser().parse(TestAsset.MIGRATION_PLAN_MOCK).sources.first()
@@ -99,7 +101,7 @@ class TestCreateTarget(CloudCommandTestCase):
                     'source_interface': 'eth0',
                 },
             ],
-            [10, 10, 10, ],
+            [10, 10, 10,],
             1024,
             1,
         )
@@ -180,8 +182,12 @@ class AfterCreationCoudCommandTestCase(CloudCommandTestCase):
 
 class TestStopTargetCommand(AfterCreationCoudCommandTestCase):
     @patch('cloud_management.public.CloudManager.stop_target')
-    def test_execute(self, mocked_stop_target):
+    def test_execute__stop_server_called(self, mocked_stop_target):
         self._init_test_data()
+
+        self.source.target.remote_host.address = 'ubuntu16'
+        self.source.target.remote_host.save()
+
         StopTargetCommand(self.source).execute()
 
         mocked_stop_target.assert_called_with(self.CLOUD_DATA['id'])
