@@ -368,7 +368,10 @@ class TestProfitbricksAdapter(TestCase):
         return_value={
             'metadata': {
                 'state': ProfitbricksAdapter.EntityState.INACTIVE
-            }
+            },
+            'properties': {
+                'vmState': ProfitbricksAdapter.VmState.SHUTOFF
+            },
         }
     )
     @patch('profitbricks.client.ProfitBricksService.stop_server')
