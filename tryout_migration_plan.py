@@ -96,6 +96,9 @@ MIGRATION_PLAN = {
                     "script": "example.py",
                     # This is the location the hook is executed in. This can either be TARGET or SOURCE.
                     "location": "TARGET"
+                    # By default the hooks are not executed as sudo. You can execute a script as sudo, by adding this
+                    # option:
+                    # "sudo": True
                 }
             },
             # These are commands which are executed during the migration process. You most likely won't have to change
