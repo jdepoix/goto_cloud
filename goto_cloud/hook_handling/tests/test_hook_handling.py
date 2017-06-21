@@ -21,7 +21,17 @@ class TestHookHandling(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
         'GET_TARGET_SYSTEM_INFORMATION_BEFORE': {
             'location': 'SOURCE',
             'execute': 'GET_TARGET_SYSTEM_INFORMATION_BEFORE',
-        }
+        },
+        'SYNC_BEFORE': {
+            'location': 'SOURCE',
+            'execute': 'SYNC_BEFORE',
+            'sudo': True,
+        },
+        'SYNC_AFTER': {
+            'location': 'SOURCE',
+            'execute': 'SYNC_AFTER',
+            'sudo': False,
+        },
     }
 
     def setUp(self):
@@ -38,14 +48,16 @@ class TestHookHandling(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
         self.triggered_script = None
         self.execution_location = None
         self.execution_env = None
+        self.executed_as_sudo = None
 
         self.hook_event_handler = HookEventHandler(self.source)
 
     def get_mocked_script_execution_decorator(self):
-        def mocked_script_execution(remote_script_executor, script, env=None):
+        def mocked_script_execution(remote_script_executor, script, env=None, sudo=False):
             self.triggered_script = script
             self.execution_location = remote_script_executor.remote_executor.remote_host.address
             self.execution_env = env
+            self.executed_as_sudo = sudo
         return mocked_script_execution
 
     def test_emit__no_hook_triggered(self):
@@ -67,10 +79,12 @@ class TestHookHandling(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
             self.hook_event_handler.emit(HookEventHandler.EventType.BEFORE)
 
             self.assertEqual(self.triggered_script, 'GET_TARGET_SYSTEM_INFORMATION_BEFORE')
+            self.assertEqual(self.executed_as_sudo, False)
 
             self.hook_event_handler.emit(HookEventHandler.EventType.AFTER)
 
             self.assertEqual(self.triggered_script, 'GET_TARGET_SYSTEM_INFORMATION_AFTER')
+            self.assertEqual(self.executed_as_sudo, False)
 
     def test_emit__executed_in_correct_location(self):
         with patch(
@@ -122,3 +136,17 @@ class TestHookHandling(TestCase, metaclass=TestAsset.PatchRemoteHostMeta):
                 'target_system_info': {},
                 'cloud_metadata': {},
             })
+
+    def test_emit__execute_as_sudo(self):
+        with patch(
+            'remote_script_execution.remote_script_execution.RemoteScriptExecutor.execute',
+            self.get_mocked_script_execution_decorator()
+        ):
+            self.source.status = Source.Status.SYNC
+            self.source.save()
+
+            self.hook_event_handler.emit(HookEventHandler.EventType.BEFORE)
+            self.assertEqual(self.executed_as_sudo, True)
+            
+            self.hook_event_handler.emit(HookEventHandler.EventType.AFTER)
+            self.assertEqual(self.executed_as_sudo, False)
