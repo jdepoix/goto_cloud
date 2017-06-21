@@ -13,7 +13,7 @@ class RemoteScriptExecutor():
         'CONTEXT = {env_string}\n{script_string}'
     )
     PYTHON_SCRIPT_EXECUTION_COMMAND = RemoteHostCommand(
-        'python -c "import base64;exec(base64.b64decode({ENCODED_SCRIPT}))"'
+        '{SUDO_PREFIX}python -c "import base64;exec(base64.b64decode({ENCODED_SCRIPT}))"'
     )
 
     def __init__(self, remote_host):
@@ -24,7 +24,7 @@ class RemoteScriptExecutor():
         """
         self.remote_executor = RemoteHostExecutor(remote_host)
 
-    def execute(self, script, env=None):
+    def execute(self, script, env=None, sudo=False):
         """
         executes the given script on the remote host and injects the env dict as a CONTEXT dict into the script
         
@@ -32,19 +32,22 @@ class RemoteScriptExecutor():
         :type script: str
         :param env: the env to inject into the script
         :type env: dict
+        :param sudo: whether the script should be executed as sudo or not
+        :type sudo: bool
         :return: the stdout of the script execution
         :rtype: str
         """
-        return self.remote_executor.execute(self._render_script_execution_command(script, env))
+        return self.remote_executor.execute(self._render_script_execution_command(script, env, sudo))
 
-    def _render_script_execution_command(self, script, env):
+    def _render_script_execution_command(self, script, env, sudo):
         return self.PYTHON_SCRIPT_EXECUTION_COMMAND.render(
+            sudo_prefix='sudo ' if sudo else '',
             encoded_script=self._encode_script(
                 self.REMOTE_SCRIPT_BASE_TEMPLATE.format(
                     env_string=self._render_env(env),
                     script_string=script,
                 )
-            )
+            ),
         )
 
     def _render_env(self, env):

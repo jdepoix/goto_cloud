@@ -47,3 +47,27 @@ class TestRemoteScriptExecutor(TestCase, metaclass=TestAsset.PatchTrackedRemoteE
                 ).encode()
             )
         ),
+
+    def test_execute__sudo(self):
+        remote_script_executor = RemoteScriptExecutor(RemoteHost.objects.create(address='ubuntu16'))
+
+        env = {
+            '1': 1,
+            '2': 2,
+            '3': 3,
+            '4': '{"test_\'new\'_line": "\n"}'
+        }
+
+        remote_script_executor.execute('script', env=env, sudo=True)
+
+        self.assertIn(
+            'sudo python -c "import base64;exec(base64.b64decode({encoded_script}))"'.format(
+                encoded_script=base64.b64encode(
+                    RemoteScriptExecutor.REMOTE_SCRIPT_BASE_TEMPLATE.format(
+                        env_string=str(env),
+                        script_string='script'
+                    ).encode()
+                )
+            ),
+            self.executed_commands
+        )
