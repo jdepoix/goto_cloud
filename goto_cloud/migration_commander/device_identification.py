@@ -55,8 +55,8 @@ class DeviceIdentificationCommand(SourceCommand):
                 matching_device_id = next(
                     (
                         target_device_id
-                        for target_device_id, target_device
-                        in unallocated_devices.items() if target_device['size'] == source_device['size']
+                        for target_device_id, target_device in unallocated_devices.items()
+                        if round(target_device['size'] / 1024 ** 3) == round(source_device['size'] / 1024 ** 3)
                     ),
                     None
                 )
