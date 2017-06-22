@@ -114,8 +114,27 @@ class DeleteBootstrapNetworkInterfaceCommand(CloudCommand):
         )
         if bootstrap_interface:
             self._cloud_manager.delete_nic(self._target.remote_host.cloud_metadata['id'], bootstrap_interface['id'])
+            self._update_remote_host()
         else:
             self._add_error('bootstrapping network interface could not be found')
+
+    def _update_remote_host(self):
+        source_remote_host = self._source.remote_host
+        old_remote_host = self._target.remote_host
+
+        self._target.remote_host = RemoteHost.objects.create(
+            address=self._target.blueprint['network_interfaces'][0]['ip'],
+            cloud_metadata=old_remote_host.cloud_metadata,
+            username=source_remote_host.username,
+            os=source_remote_host.os,
+            version=source_remote_host.version,
+            port=source_remote_host.port,
+            password=source_remote_host.password,
+            private_key=source_remote_host.private_key,
+        )
+
+        self._target.save()
+        old_remote_host.delete()
 
 
 class ConfigureBootDeviceCommand(CloudCommand):
