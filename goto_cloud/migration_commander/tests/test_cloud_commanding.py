@@ -219,6 +219,51 @@ class TestDeleteBootstrapNetworkInterfaceCommand(AfterCreationCoudCommandTestCas
 
         mocked_delete_nic.assert_called_with(self.CLOUD_DATA['id'], self.BOOTSTRAP_INTERFACE_ID)
 
+    @patch('cloud_management.public.CloudManager.delete_nic', lambda *args, **kwargs: None)
+    def test_execute__remote_host_updated(self):
+        self._init_test_data()
+        cloud_metadata = self.source.target.remote_host.cloud_metadata
+        old_remote_host_id = self.source.target.remote_host.id
+
+        DeleteBootstrapNetworkInterfaceCommand(self.source).execute()
+
+        self.source.refresh_from_db()
+
+        self.assertEqual(
+            self.source.target.remote_host.address,
+            self.source.target.blueprint['network_interfaces'][0]['ip']
+        )
+        self.assertEqual(
+            self.source.target.remote_host.cloud_metadata,
+            cloud_metadata
+        )
+        self.assertEqual(
+            self.source.target.remote_host.username,
+            self.source.remote_host.username
+        )
+        self.assertEqual(
+            self.source.target.remote_host.os,
+            self.source.remote_host.os
+        )
+        self.assertEqual(
+            self.source.target.remote_host.version,
+            self.source.remote_host.version
+        )
+        self.assertEqual(
+            self.source.target.remote_host.port,
+            self.source.remote_host.port
+        )
+        self.assertEqual(
+            self.source.target.remote_host.password,
+            self.source.remote_host.password
+        )
+        self.assertEqual(
+            self.source.target.remote_host.private_key,
+            self.source.remote_host.private_key
+        )
+        self.assertFalse(RemoteHost.objects.filter(id=old_remote_host_id).exists())
+
+
     def test_execute__no_bootstrapping_interface_found(self):
         self._init_test_data()
         self.source.target.remote_host.refresh_from_db()
