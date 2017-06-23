@@ -14,7 +14,7 @@ from migration_scheduling.public import MigrationScheduler
 
 if len(sys.argv) < 2:
     print('no migration run id was provided')
-    exit(0)
+    exit(1)
 
 migration_run = MigrationRun.objects.get(id=sys.argv[1])
 
