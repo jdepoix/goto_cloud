@@ -10,7 +10,7 @@ import django
 django.setup()
 
 from migration_plan_parsing.public import MigrationPlanParser
-from migration_commander.migration_commander import MigrationCommander
+from migration_scheduling.public import MigrationScheduler
 from tryout_migration_plan import MIGRATION_PLAN
 
 
@@ -32,8 +32,7 @@ def load_migration_plan_with_parsed_scripts():
 print('start parsing migration plan...')
 migration_run = MigrationPlanParser().parse(load_migration_plan_with_parsed_scripts())
 print('migration plan successfully parsed')
-print('starting migration...')
-source = migration_run.sources.first()
-MigrationCommander(source).execute()
-MigrationCommander(source).increment_status_and_execute()
+print('starting migration with id: {migration_run_id}'.format(migration_run_id=migration_run.id))
+MigrationScheduler(migration_run).execute_migration()
 print('finished migration!')
+print('run "./tryout_go_live {migration_run_id}" to go live!'.format(migration_run_id=migration_run.id))

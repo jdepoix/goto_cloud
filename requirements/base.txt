@@ -12,3 +12,6 @@ profitbricks==3.1.2
 
 # celery
 celery==4.0.2
+
+# django-celery-results
+django-celery-results==1.0.1

@@ -39,7 +39,9 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
 ]
 
-EXTERNAL_APPS = []
+EXTERNAL_APPS = [
+    'django_celery_results'
+]
 
 INTERNAL_APPS = [
     'remote_host',
@@ -48,6 +50,7 @@ INTERNAL_APPS = [
     'target',
     'source',
     'status_model',
+    'migration_scheduling',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + INTERNAL_APPS
@@ -138,3 +141,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# Celery
+CELERY_RESULT_BACKEND = 'django-db'

@@ -30,9 +30,6 @@ the migration. It contains comments which should make clear how set things up. I
 configure it, feel free to ask me. But you probably need to be at least somewhat familiar, with how the migration 
 process works. It will be better documented in future releases for sure.
 
-Only add one source as of now, since scheduling is not implemented yet. If you add multiple sources, just the first one 
-will be migrated! You have been informed.
-
 ### Create your hook scripts
 In case you want to use hooks in your migration plan, put them in the folder `test_scripts` and use the file name in the
 migration plan. Hook script file names in the migration plan are always interpreted relative to the `test_scripts` 
@@ -49,5 +46,14 @@ machine, you take the snapshot of, which will be used as the bootstrapping templ
 ### Start the migration
 After everything is setup, you can start the migration. Just run `./tryout_migrate.py`, go get a coffee and see what 
 happened, when you come back.
+
+You can tail the file `migration.log`, to see what's going on, during the migration.
+
+### Go live
+After the migration has finished, you can trigger the go live. This will remove the bootstrapping volume and network 
+interface and boot into the actual system. The go live script is started, with an ID, referencing the migration. The ID 
+of the migration, was printed out during the migration. Then run:
+
+`./tryout_go_live.py <ID>`
 
 Have fun and let me know what you think of it!

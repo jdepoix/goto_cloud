@@ -132,8 +132,7 @@ MIGRATION_PLAN = {
             }
         }
     },
-    # This is the list of sources which will be migrated. Please keep in mind, that scheduling is not implemented yet
-    # and therefore only the first source will be migrated, when the migration script is started.
+    # This is the list of sources which will be migrated.
     "sources": [
         {
             # The address of the source system
