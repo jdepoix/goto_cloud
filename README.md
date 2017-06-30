@@ -4,6 +4,10 @@
 ## Early Access
 To try this out, follow these steps.
 
+### Current Limitations
+Currently the only supported cloud provider is Profitbricks. Also only migrating systems running Ubuntu 12.04-16.04 is
+supported. It could still work on other Linux distros, but it's only been tested against them.
+
 ### Requirements
 You need to have postgres >= 9.4 and rabbitmq running.
 
