@@ -4,6 +4,9 @@
 ## Early Access
 To try this out, follow these steps.
 
+### Requirements
+You need to have postgres >= 9.4 and rabbitmq running.
+
 ### Install dependencies
 First create a new python3 virtualenv and install the dependencies, in the root directory of this project:
 
@@ -22,6 +25,12 @@ vim secrets.json
 and now run the migrations: 
 ```
 ./manage.py migrate
+```
+
+### Start Celery
+Start celery by running:
+```
+virtualenv/bin/celery -A goto_cloud.settings.celery worker --loglevel=info --logfile=migration.log
 ```
 
 ### Configure your migration plan
