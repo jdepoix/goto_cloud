@@ -14,7 +14,7 @@ class TestSourceEventLogging(TestCase):
             RemoteHost.objects.create(address='test.com')
         )
         self.expected_message = (
-            '+------------- [2000-01-01 12:00:00] <test.com> -------------\n'
+            '\n+------------- [2000-01-01 12:00:00] <test.com> -------------\n'
             '| test message\n'
             '+------------------------------------------------------------\n'
         )

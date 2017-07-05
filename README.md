@@ -62,11 +62,20 @@ happened, when you come back.
 
 You can tail the file `migration.log`, to see what's going on, during the migration.
 
+### Retrying migration for individual sources
+If the migration on a given source fails, you can restart the migration for just this source, by running the following 
+command:
+
+`./tryout_retry_source_migration.py <SOURCE_ID>`
+
+If you don't know the ID of the source you want to restart, then just run the command without a parameter. When doing so
+a list of all sources, which are not live yet and the state they currently reside in, are printed.
+
 ### Go live
 After the migration has finished, you can trigger the go live. This will remove the bootstrapping volume and network 
 interface and boot into the actual system. The go live script is started, with an ID, referencing the migration. The ID 
 of the migration, was printed out during the migration. Then run:
 
-`./tryout_go_live.py <ID>`
+`./tryout_go_live.py <MIGRATION_ID>`
 
 Have fun and let me know what you think of it!

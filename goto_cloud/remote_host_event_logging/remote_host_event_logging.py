@@ -28,23 +28,18 @@ class RemoteHostEventLogger():
 
     def debug(self, msg, *args, **kwargs):
         self.logger.debug(self._format_message(msg), *args, **kwargs)
-        print(msg)
 
     def info(self, msg, *args, **kwargs):
         self.logger.info(self._format_message(msg), *args, **kwargs)
-        print(msg)
 
     def warning(self, msg, *args, **kwargs):
         self.logger.warning(self._format_message(msg), *args, **kwargs)
-        print(msg)
 
     def error(self, msg, *args, **kwargs):
         self.logger.error(self._format_message(msg), *args, **kwargs)
-        print(msg)
 
     def critical(self, msg, *args, **kwargs):
         self.logger.critical(self._format_message(msg), *args, **kwargs)
-        print(msg)
 
     @property
     def _logging_message_prefix(self):
@@ -54,7 +49,7 @@ class RemoteHostEventLogger():
         )
 
     def _format_message(self, message):
-        formatted_message = '+------------- {message_prefix} -------------'.format(
+        formatted_message = '\n+------------- {message_prefix} -------------'.format(
             message_prefix=self._logging_message_prefix
         )
         if message:
