@@ -72,10 +72,10 @@ class RemoteExecutor(metaclass=ABCMeta):
         :type password: str
         :param port: the port, the remote client should use
         :type port: int
-        :private_key: the private ssh key
-        :type: private_key: str
-        :private_key_file_path: the private ssh key file path
-        :type: private_key_file_path: str
+        :param private_key: the private ssh key
+        :type private_key: str
+        :param private_key_file_path: the private ssh key file path
+        :type private_key_file_path: str
         """
         self.remote_client = None
         self.hostname = hostname
