@@ -104,7 +104,6 @@ class AbstractedRemoteHostOperator(metaclass=ABCMeta):
 
         raise OperatingSystem.NotSupportedException()
 
-
     def _get_directly_supported_operator(self):
         for operating_systems, operator_class in self._get_operating_systems_to_supported_operation_mapping().items():
             if self.remote_host.os in operating_systems:
