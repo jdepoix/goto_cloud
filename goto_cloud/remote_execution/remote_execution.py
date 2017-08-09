@@ -5,6 +5,7 @@ import logging
 from abc import ABCMeta, abstractmethod
 
 from paramiko import SSHClient, AutoAddPolicy
+from paramiko.pkey import PKey
 from paramiko.ssh_exception import NoValidConnectionsError, AuthenticationException
 
 from operating_system.public import OperatingSystem
@@ -59,7 +60,7 @@ class RemoteExecutor(metaclass=ABCMeta):
         """
         pass
 
-    def __init__(self, hostname, username=None, password=None, port=22):
+    def __init__(self, hostname, username=None, password=None, port=22, private_key=None, private_key_file_path=None):
         """
         initializes the RemoteExecutor using the implemented remote client
         
@@ -71,11 +72,17 @@ class RemoteExecutor(metaclass=ABCMeta):
         :type password: str
         :param port: the port, the remote client should use
         :type port: int
+        :private_key: the private ssh key
+        :type: private_key: str
+        :private_key_file_path: the private ssh key file path
+        :type: private_key_file_path: str
         """
         self.remote_client = None
         self.hostname = hostname
         self.username = username
         self.password = password
+        self.private_key = private_key
+        self.private_key_file_path = private_key_file_path
         self.port = port
         self._logger = logging.getLogger(__name__)
 
@@ -209,7 +216,14 @@ class SshRemoteExecutor(RemoteExecutor):
         try:
             self.remote_client = SSHClient()
             self.remote_client.set_missing_host_key_policy(AutoAddPolicy())
-            self.remote_client.connect(self.hostname, username=self.username, password=self.password, port=self.port)
+            self.remote_client.connect(
+                self.hostname,
+                username=self.username,
+                password=self.password,
+                port=self.port,
+                pkey=PKey(self.private_key) if self.private_key else None,
+                key_filename=self.private_key_file_path,
+            )
         except AuthenticationException as e:
             raise RemoteExecutor.AuthenticationException(str(e))
         except NoValidConnectionsError as e:
@@ -244,6 +258,9 @@ class RemoteHostExecutor(AbstractedRemoteHostOperator, RemoteExecutor):
             username=self.remote_host.username if self.remote_host.username else None,
             password=self.remote_host.password if self.remote_host.password else None,
             port=self.remote_host.port if self.remote_host.port else None,
+            private_key=self.remote_host.private_key if self.remote_host.private_key else None,
+            private_key_file_path=self.remote_host.private_key_file_path
+                if self.remote_host.private_key_file_path else None,
         )
 
     def _execute(self, command, block_for_response=True): # pragma: no cover
