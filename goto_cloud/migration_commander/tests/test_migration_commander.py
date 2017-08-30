@@ -32,8 +32,16 @@ class TestMigrationCommander(MigrationCommanderTestCase):
 
         self.source = Source.objects.get(remote_host__address=source_host)
 
-        TestAsset.REMOTE_HOST_MOCKS[source_host].add_command(
-            'sudo sfdisk -d',
+        TestAsset.REMOTE_HOST_MOCKS['ubuntu16'].add_command(
+            'sudo sfdisk -d /dev/vda',
+            'PART "doesn\'t contain a valid partition table"'
+        )
+        TestAsset.REMOTE_HOST_MOCKS['ubuntu16'].add_command(
+            'sudo sfdisk -d /dev/vdb',
+            'PART "TABLE"'
+        )
+        TestAsset.REMOTE_HOST_MOCKS['ubuntu16'].add_command(
+            'sudo sfdisk -d /dev/vdc',
             'PART "TABLE"'
         )
         TestAsset.REMOTE_HOST_MOCKS[target_host].add_command(

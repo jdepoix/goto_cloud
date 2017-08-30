@@ -20,6 +20,8 @@ class CreatePartitionsCommand(DeviceModifyingCommand):
     READ_PARTITION_TABLE_COMMAND = RemoteHostCommand('sudo sfdisk -d {DEVICE}')
     WRITE_PARTITION_TABLE_COMMAND = RemoteHostCommand('echo "{PARTITION_TABLE}" | sudo sfdisk {DEVICE}')
 
+    NO_VALID_PARTITION_TABLE_KEYWORDS = ('doesn\'t contain a valid partition table',)
+
     def _execute(self):
         self.source_remote_executor = RemoteHostExecutor(self._source.remote_host)
         self._execute_on_every_device(self._replicate_partition_table, None, include_swap=True)
@@ -38,14 +40,14 @@ class CreatePartitionsCommand(DeviceModifyingCommand):
         :param target_device: the target device
         :type target_device: (str, dict)
         """
-        self._write_partition_table(
-            remote_executor,
-            target_device[0],
-            self._read_partition_table(
-                self.source_remote_executor,
-                source_device[0],
+        partition_table = self._read_partition_table(self.source_remote_executor, source_device[0])
+
+        if not any(keyword in partition_table for keyword in self.NO_VALID_PARTITION_TABLE_KEYWORDS):
+            self._write_partition_table(
+                remote_executor,
+                target_device[0],
+                partition_table
             )
-        )
 
     def _write_partition_table(self, remote_executor, target_device_id, partition_table):
         remote_executor.execute(
