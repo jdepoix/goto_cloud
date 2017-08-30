@@ -20,8 +20,6 @@ class CreatePartitionsCommand(DeviceModifyingCommand):
     READ_PARTITION_TABLE_COMMAND = RemoteHostCommand('sudo sfdisk -d {DEVICE}')
     WRITE_PARTITION_TABLE_COMMAND = RemoteHostCommand('echo "{PARTITION_TABLE}" | sudo sfdisk {DEVICE}')
 
-    NO_VALID_PARTITION_TABLE_KEYWORDS = ('doesn\'t contain a valid partition table',)
-
     def _execute(self):
         self.source_remote_executor = RemoteHostExecutor(self._source.remote_host)
         self._execute_on_every_device(self._replicate_partition_table, None, include_swap=True)
@@ -42,12 +40,14 @@ class CreatePartitionsCommand(DeviceModifyingCommand):
         """
         partition_table = self._read_partition_table(self.source_remote_executor, source_device[0])
 
-        if not any(keyword in partition_table for keyword in self.NO_VALID_PARTITION_TABLE_KEYWORDS):
+        if partition_table:
             self._write_partition_table(
                 remote_executor,
                 target_device[0],
                 partition_table
             )
+        else:
+            self.logger.debug('no valid partition table found for {source_device}'.format(source_device=source_device))
 
     def _write_partition_table(self, remote_executor, target_device_id, partition_table):
         remote_executor.execute(
@@ -58,11 +58,14 @@ class CreatePartitionsCommand(DeviceModifyingCommand):
         )
 
     def _read_partition_table(self, source_remote_executor, source_device_id):
-        return source_remote_executor.execute(
-            self.READ_PARTITION_TABLE_COMMAND.render(
-                device='/dev/{device_id}'.format(device_id=source_device_id)
+        try:
+            return source_remote_executor.execute(
+                self.READ_PARTITION_TABLE_COMMAND.render(
+                    device='/dev/{device_id}'.format(device_id=source_device_id)
+                )
             )
-        )
+        except RemoteHostExecutor.ExecutionException:
+            return ''
 
     def _make_string_echo_safe(self, string):
         return string.replace('"', '\\"')

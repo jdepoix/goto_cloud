@@ -156,11 +156,10 @@ class RemoteExecutor(metaclass=ABCMeta):
                     command=command,
                     error=execution_result['stderr'],
                 )
+                self._logger.debug(error_message)
                 if raise_exception_on_failure:
-                    self._logger.critical(error_message)
                     raise RemoteExecutor.ExecutionException(error_message)
                 else:
-                    self._logger.debug(error_message)
                     return execution_result['stderr']
 
             self._logger.debug('executed the following command:\n{command}{stdout}{stderr}'.format(

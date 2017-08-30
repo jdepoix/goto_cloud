@@ -10,7 +10,7 @@ class TestCreatePartitionsCommand(MigrationCommanderTestCase):
         super()._init_test_data(source_host, target_host)
         TestAsset.REMOTE_HOST_MOCKS['ubuntu16'].add_command(
             'sudo sfdisk -d /dev/vda',
-            'PART "doesn\'t contain a valid partition table"'
+            ''
         )
         TestAsset.REMOTE_HOST_MOCKS['ubuntu16'].add_command(
             'sudo sfdisk -d /dev/vdb',
@@ -48,6 +48,6 @@ class TestCreatePartitionsCommand(MigrationCommanderTestCase):
         CreatePartitionsCommand(self.source).execute()
 
         self.assertNotIn(
-            'echo "PART \\"doesn\'t contain a valid partition table\\"" | sudo sfdisk /dev/vdb',
+            'echo "" | sudo sfdisk /dev/vdb',
             self.executed_commands
         )
