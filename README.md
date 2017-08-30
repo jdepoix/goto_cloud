@@ -57,25 +57,36 @@ machine, you take the snapshot of, which will be used as the bootstrapping templ
 - The source needs to have ssh access to the target machine
 
 ### Start the migration
-After everything is setup, you can start the migration. Just run `./tryout_migrate.py`, go get a coffee and see what 
-happened, when you come back.
+After everything is setup, you can start the migration. Just run `./goto_cloud_cli.py migrate`, go get a coffee and see 
+what happened, when you come back.
 
 You can tail the file `migration.log`, to see what's going on, during the migration.
 
-### Retrying migration for individual sources
-If the migration on a given source fails, you can restart the migration for just this source, by running the following 
-command:
+### Retrying migration step for individual sources
+If the migration on a given source fails, you can retry the step of migration it failed on, for just this source, by 
+running the following command:
 
-`./tryout_retry_source_migration.py <SOURCE_ID>`
+`./goto_cloud_cli.py restart_source_migration_step <SOURCE_ID>`
 
 If you don't know the ID of the source you want to restart, then just run the command without a parameter. When doing so
 a list of all sources, which are not live yet and the state they currently reside in, are printed.
+
+### Reset migration
+You can also completely reset and restart a migration for a given source, by running:
+
+`./goto_cloud_cli.py restart_source_migration <SOURCE_ID>`
+
+### Skip migration step
+If you come across a step in the migration process, which can only be fixed manually, you can do so and then skip this
+step in the migration process. This way you can carry on with the migration process. Do so by running:
+
+`./goto_cloud_cli.py skip_source_migration_step <SOURCE_ID>`
 
 ### Go live
 After the migration has finished, you can trigger the go live. This will remove the bootstrapping volume and network 
 interface and boot into the actual system. The go live script is started, with an ID, referencing the migration. The ID 
 of the migration, was printed out during the migration. Then run:
 
-`./tryout_go_live.py <MIGRATION_ID>`
+`./goto_cloud_cli.py go_live <MIGRATION_ID>`
 
 Have fun and let me know what you think of it!
