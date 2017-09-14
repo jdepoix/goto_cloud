@@ -9,10 +9,6 @@ class TestCreatePartitionsCommand(MigrationCommanderTestCase):
     def _init_test_data(self, source_host, target_host):
         super()._init_test_data(source_host, target_host)
         TestAsset.REMOTE_HOST_MOCKS['ubuntu16'].add_command(
-            'sudo sfdisk -d /dev/vda',
-            ''
-        )
-        TestAsset.REMOTE_HOST_MOCKS['ubuntu16'].add_command(
             'sudo sfdisk -d /dev/vdb',
             'PART "TABLE"'
         )
