@@ -102,6 +102,9 @@ class TestSshRemoteExecutor(unittest.TestCase):
 
         self.assertIn('Command Error', str(context_manager.exception))
 
+    def test_execute__with_other_accepted_exit_code(self):
+        self.assertEqual(self.remote_executor.execute('error_command', accepted_exit_codes=(1,)), '')
+
     @patch('time.sleep', lambda *args, **kwargs: None)
     def test_connect__connection_exception(self):
         SSHClient.connect = raise_exception_mock(SSHException())

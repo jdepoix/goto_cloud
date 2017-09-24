@@ -129,7 +129,7 @@ class RemoteExecutor(metaclass=ABCMeta):
         pass
 
     @catch_and_retry_for(ConnectionException)
-    def execute(self, command, raise_exception_on_failure=True, block_for_response=True):
+    def execute(self, command, raise_exception_on_failure=True, block_for_response=True, accepted_exit_codes=None):
         """
         executes the given command on the remote host and parses the returned output
         
@@ -141,6 +141,8 @@ class RemoteExecutor(metaclass=ABCMeta):
         :param block_for_response: if this is true, the method will block until execution is done and return the
         response streams
         :type block_for_response: bool
+        :param accepted_exit_codes: a tuple of exit codes which are accepted besides 0
+        :type accepted_exit_codes: tuple
         :return: the output the command produced
         :rtype: str
         :raises RemoteExecutor.ExecutionException: in case something goes wrong during execution 
@@ -151,7 +153,10 @@ class RemoteExecutor(metaclass=ABCMeta):
         execution_result = self._execute(command, block_for_response)
 
         if block_for_response:
-            if execution_result['exit_code'] != 0:
+            if (
+                accepted_exit_codes and execution_result['exit_code'] not in accepted_exit_codes + (0,)
+                or not accepted_exit_codes and execution_result['exit_code'] != 0
+            ):
                 error_message = 'While executing:\n{command}\n\nThe following Error occurred:\n{error}'.format(
                     command=command,
                     error=execution_result['stderr'],

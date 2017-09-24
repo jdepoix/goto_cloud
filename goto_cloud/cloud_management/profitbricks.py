@@ -267,9 +267,9 @@ class ProfitbricksAdapter(CloudAdapter):
         current_state = retrieve_function(**retrieve_function_kwargs)
 
         while (
-                not expected_state(current_state)
-                if callable(expected_state)
-                else current_state != expected_state
+            not expected_state(current_state)
+            if callable(expected_state)
+            else current_state != expected_state
         ):
             if float(tries) >= try_for_mins / timeout * 60:
                 raise self.CloudConnectionException(
