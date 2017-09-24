@@ -21,6 +21,7 @@ class SyncCommand(DeviceModifyingCommand):
         COMMAND_DOES = 'do the sync'
 
     ERROR_REPORT_EXCEPTION_CLASS = SyncingException
+    ACCEPTED_EXIT_CODES = (24,)
 
     def _execute(self):
         self.source_remote_executor = RemoteHostExecutor(self._source.remote_host)
@@ -45,15 +46,18 @@ class SyncCommand(DeviceModifyingCommand):
     @DeviceModifyingCommand._collect_errors
     def _sync_device(self, remote_executor, source_directory, target_directory):
         if source_directory:
-            remote_executor.execute(RemoteHostCommand(self._target.blueprint['commands']['sync']).render(
-                source_dir=self._create_temp_bind_mount(remote_executor, source_directory),
-                target_dir='{user}{remote_host_address}:{target_directory}'.format(
-                    user=('{username}@'.format(username=self._target.remote_host.username))
-                            if self._target.remote_host.username else '',
-                    remote_host_address=self._target.remote_host.address,
-                    target_directory=target_directory,
-                )
-            ))
+            remote_executor.execute(
+                RemoteHostCommand(self._target.blueprint['commands']['sync']).render(
+                    source_dir=self._create_temp_bind_mount(remote_executor, source_directory),
+                    target_dir='{user}{remote_host_address}:{target_directory}'.format(
+                        user=('{username}@'.format(username=self._target.remote_host.username))
+                                if self._target.remote_host.username else '',
+                        remote_host_address=self._target.remote_host.address,
+                        target_directory=target_directory,
+                    )
+                ),
+                accepted_exit_codes=self.ACCEPTED_EXIT_CODES
+            )
 
     def _create_temp_bind_mount(self, remote_executor, source_directory):
         temp_mountpoint = MountpointMapper.map_mountpoint('/tmp', source_directory)
